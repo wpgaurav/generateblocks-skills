@@ -220,6 +220,33 @@ npm run wp-env:start   # Local WordPress
 
 ---
 
+## Push generated blocks into a live WordPress install
+
+The skills generate block markup as a string. If you want your AI
+assistant to also push that markup into a real WordPress site (read
+the current page, find a container by id or text, swap children, write
+back), pair this repo with an MCP server that exposes a write surface
+for WordPress.
+
+[Respira for WordPress](https://github.com/respira-press/respira-wordpress)
+is one such MCP server. Its native Gutenberg adapter round-trips
+`generateblocks/element`, `generateblocks/text`, `generateblocks/media`,
+and `generateblocks/shape` byte-faithfully, and supports
+snapshot-before-write with one-click rollback for safe iteration.
+
+Typical pairing:
+
+```
+Read skills/generateblocks-layouts/SKILL.md, then generate a
+testimonial grid with 3 cards and use the Respira MCP to insert
+it as a new section at the top of /about on my staging site.
+```
+
+Any Gutenberg-aware MCP server works the same way. The skills here
+are server-agnostic.
+
+---
+
 ## Other LLMs
 
 For non-Claude assistants (GPT, Gemini, etc.), see **`AGENTS.md`** for universal instructions — or just run `./install.sh` to set up your tool automatically.
