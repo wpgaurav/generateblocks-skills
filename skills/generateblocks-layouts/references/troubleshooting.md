@@ -20,10 +20,11 @@ recipes you reach for after a failure.
    the post. The mismatch is your bug.
 4. **Check the JSON `--` escapes first.** This is the most common silent
    failure.
-5. **Check for `transition:` or `:hover` rules in any `css` string.** Strip
-   them and retry — the plugin should generate those from `styles`.
-6. **Check for descendant selectors in `css` strings.** Strip them and put
-   the styles inline on the rendered HTML element.
+5. **Check `styles`/`css` parity.** A transition, selector, or at-rule in the
+   CSS cache needs an equivalent structured styles branch. Repair the pair;
+   do not blindly strip valid CSS Mode selectors.
+6. **Check selector/at-rule depth.** CSS Mode supports one selector level plus
+   one `@media`, `@supports`, or `@container` level. Flatten deeper selectors.
 
 ### Solutions
 
@@ -93,7 +94,7 @@ Section: Services
 **Chunk 1: Trust Block**
 ```html
 <!-- CHUNK 1: Trust Block -->
-<!-- wp:generateblocks/element {"uniqueId":"trust001"...} -->
+<!-- wp:generateblocks/element {"uniqueId":"trust1"...} -->
 ...
 <!-- /wp:generateblocks/element -->
 <!-- END CHUNK 1 -->
@@ -102,7 +103,7 @@ Section: Services
 **Chunk 2: Header**
 ```html
 <!-- CHUNK 2: Header -->
-<!-- wp:generateblocks/element {"uniqueId":"head001"...} -->
+<!-- wp:generateblocks/element {"uniqueId":"head1"...} -->
 ...
 <!-- /wp:generateblocks/element -->
 <!-- END CHUNK 2 -->
@@ -120,12 +121,12 @@ After generating all chunks, combine in order with proper nesting.
 
 ```html
 <!-- WRONG -->
-<!-- wp:generateblocks/text {"uniqueId":"txt001"} -->
+<!-- wp:generateblocks/text {"uniqueId":"txt1"} -->
 <p class="gb-text">Text</p>
 <!-- Missing closing comment -->
 
 <!-- CORRECT -->
-<!-- wp:generateblocks/text {"uniqueId":"txt001"} -->
+<!-- wp:generateblocks/text {"uniqueId":"txt1"} -->
 <p class="gb-text">Text</p>
 <!-- /wp:generateblocks/text -->
 ```
@@ -134,12 +135,12 @@ After generating all chunks, combine in order with proper nesting.
 
 ```html
 <!-- WRONG -->
-<!-- wp:generateblocks/element {"uniqueId":"elem001"} -->
+<!-- wp:generateblocks/element {"uniqueId":"elem1"} -->
 <div>Content</div>
 <!-- /wp:generateblocks/text -->  <!-- Wrong type -->
 
 <!-- CORRECT -->
-<!-- wp:generateblocks/element {"uniqueId":"elem001"} -->
+<!-- wp:generateblocks/element {"uniqueId":"elem1"} -->
 <div>Content</div>
 <!-- /wp:generateblocks/element -->
 ```
@@ -148,10 +149,10 @@ After generating all chunks, combine in order with proper nesting.
 
 ```json
 // WRONG - trailing comma
-{"uniqueId":"id001","styles":{"padding":"1rem",}}
+{"uniqueId":"id1","styles":{"padding":"1rem",}}
 
 // CORRECT
-{"uniqueId":"id001","styles":{"padding":"1rem"}}
+{"uniqueId":"id1","styles":{"padding":"1rem"}}
 ```
 
 ```json
@@ -174,29 +175,33 @@ After generating all chunks, combine in order with proper nesting.
 
 ```css
 /* Element block: */
-.gb-element-elem001{...}
+.gb-element-elem1{...}
 
 /* Text block: */
-.gb-text-text001{...}
+.gb-text-text1{...}
 
 /* Media block: */
-.gb-media-img001{...}
+.gb-media-img1{...}
 
 /* Shape block: */
-.gb-shape-icon001{...}
+.gb-shape-icon1{...}
 ```
 
 ### Hover Not Working
 
-1. **Don't add hover/transitions to `css`** - The plugin generates hover CSS from the `styles` object. If you write hover rules in `css`, they may conflict or cause recovery errors
-2. **Parent hover targeting children** - This is the exception. Write in the child's `css`: `.gb-element-card001:hover .gb-text-title001{color:#c0392b}`
-3. **Pseudo-element hover** - Another exception. Write in `css`: `.gb-element-card001::after{...}.gb-element-card001:hover::after{transform:scaleX(1)}`
+1. Put the transition in base `styles` and the state under `&:hover` or
+   `&:focus-visible`.
+2. Compile those same branches into `css`; a CSS-only hover is not durable.
+3. Parent-hover, child, and pseudo-element behavior is valid when represented
+   as one structured selector such as `&:hover > .child` or `&::after`.
+4. Do not depend on hover for access to mobile content.
 
 ### Responsive Not Working
 
 1. **Check breakpoint order** - Desktop first, then tablet, then mobile
-2. **Use !important if needed** - For overriding specificity
-3. **Verify media query syntax** - `@media(max-width:768px)`
+2. **Verify the installed query** - native Mobile is `@media (max-width:767px)`
+3. **Check both `styles` and `css`** - the at-rule belongs in both layers
+4. **Inspect specificity before `!important`** - fix ownership/order first
 
 ---
 
@@ -314,8 +319,8 @@ Before finalizing complex layouts:
 
 ```html
 <!-- Check: Is content between comments? -->
-<!-- wp:generateblocks/text {"uniqueId":"txt001"} -->
-<p class="gb-text gb-text-txt001">Content HERE</p>
+<!-- wp:generateblocks/text {"uniqueId":"txt1"} -->
+<p class="gb-text gb-text-txt1">Content HERE</p>
 <!-- /wp:generateblocks/text -->
 ```
 
@@ -323,18 +328,17 @@ Before finalizing complex layouts:
 
 ```html
 <!-- Check: Does class match uniqueId? -->
-<!-- wp:generateblocks/element {"uniqueId":"box001","css":".gb-element-box001{...}"} -->
-<div class="gb-element-box001 gb-element">...</div>  <!-- box001 matches -->
+<!-- wp:generateblocks/element {"uniqueId":"box1","css":".gb-element-box1{...}"} -->
+<div class="gb-element-box1 gb-element">...</div>  <!-- box001 matches -->
 <!-- /wp:generateblocks/element -->
 ```
 
 ### Hover Breaking Layout
 
-Hover states and transitions are managed by the `styles` object - the plugin generates the CSS. Do NOT write hover/transition rules in the `css` attribute for individual block states.
-
-The exceptions that go in `css`:
-- Pseudo-element hover: `.gb-element-card001:hover::after{transform:scaleX(1)}`
-- Parent hover targeting children: `.gb-element-card001:hover .gb-shape-icon001{color:white}`
+Hover states and transitions belong in the `styles` object and the compiled
+`css` cache. CSS Mode supports pseudo-elements and parent/child selectors as
+one-level structured branches. If the cache contains a state that `styles`
+does not, the next editor save can remove it.
 
 ---
 

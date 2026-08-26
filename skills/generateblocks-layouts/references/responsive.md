@@ -1,264 +1,346 @@
 ---
-title: Responsive Design Reference
-description: Media queries and breakpoint patterns for GenerateBlocks layouts
+title: Responsive Styles and At-Rules
+description: Source-verified GenerateBlocks 2.4 responsive queries, Pro custom at-rules, structured styles data, composition patterns, and verification.
 ---
 
-# Responsive Design Reference
+# Responsive Styles and At-Rules
 
-GenerateBlocks uses desktop-first responsive design with CSS media queries.
+GenerateBlocks V2 stores responsive declarations as at-rule branches inside
+the block or Global Style `styles` object. The `css` attribute mirrors the
+compiled result for local blocks.
 
-## Standard Breakpoints
+Read `css-mode.md` with this file when editing CSS directly.
 
-| Device | Media Query | Width |
-|--------|-------------|-------|
-| Desktop | Default (no query) | 1025px+ |
-| Tablet | `@media(max-width:1024px)` | 768-1024px |
-| Mobile | `@media(max-width:768px)` | <768px |
+## Installed Query Contract
 
-## CSS Format
+GenerateBlocks 2.4.1 registers 5 native media queries through
+`generateblocks_get_media_queries()`:
 
-Media queries go in the `css` attribute after base styles:
+| Editor label | Styles key | Intended range |
+|---|---|---|
+| Desktop | `@media (min-width:1025px)` | 1025px and wider |
+| Desktop & Tablet | `@media (min-width:768px)` | 768px and wider |
+| Tablet | `@media (max-width:1024px) and (min-width:768px)` | 768px through 1024px |
+| Tablet & Mobile | `@media (max-width:1024px)` | 1024px and narrower |
+| Mobile | `@media (max-width:767px)` | 767px and narrower |
 
-```css
-.gb-element-id{base styles}@media(max-width:1024px){.gb-element-id{tablet styles}}@media(max-width:768px){.gb-element-id{mobile styles}}
-```
+The default Mobile query is `767px`, not `768px`.
 
-**Important:** Keep CSS minified (no line breaks).
+GenerateBlocks Pro can register custom `@media` and `@container` queries. A
+site can therefore have a valid custom `@media (max-width:768px)` rule alongside
+the native queries. Before editing an existing page:
 
----
+1. inspect the installed versions;
+2. read `generateblocks_get_media_queries()` or the localized editor settings;
+3. inventory the at-rule keys already stored on the target;
+4. preserve existing custom boundaries unless the user approved a migration.
 
-## Grid Patterns
+## Styles First, CSS Mirrored
 
-### 4 → 2 → 1 Column Grid
+Use this shape for new local block output:
 
 ```json
 {
   "styles": {
     "display": "grid",
-    "gridTemplateColumns": "repeat(4, minmax(0, 1fr))",
-    "gap": "1rem"
+    "gap": "2rem",
+    "gridTemplateColumns": "repeat(3,minmax(0,1fr))",
+    "@media (max-width:1024px)": {
+      "gap": "1.5rem",
+      "gridTemplateColumns": "repeat(2,minmax(0,1fr))"
+    },
+    "@media (max-width:767px)": {
+      "gap": "1rem",
+      "gridTemplateColumns": "1fr"
+    }
   },
-  "css": ".gb-element-grid001{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:1rem}@media(max-width:1024px){.gb-element-grid001{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media(max-width:768px){.gb-element-grid001{grid-template-columns:1fr}}"
+  "css": ".gb-element-grid{display:grid;gap:2rem;grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:1024px){.gb-element-grid{gap:1.5rem;grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:767px){.gb-element-grid{gap:1rem;grid-template-columns:1fr}}"
 }
 ```
 
-### 3 → 2 → 1 Column Grid
+The JSON shown above is conceptual. In Gutenberg block comments, run it
+through `serialize_attrs()` so `--`, `<`, `>`, `&`, and embedded quotes use
+WordPress's canonical substitutions.
 
-```css
-.gb-element-grid002{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:2rem}@media(max-width:1024px){.gb-element-grid002{grid-template-columns:repeat(2, minmax(0, 1fr));gap:1.5rem}}@media(max-width:768px){.gb-element-grid002{grid-template-columns:1fr;gap:1rem}}
+Do not put a responsive rule only in `css`. It can render immediately, but a
+later Styles-panel or CSS Mode edit can recompile the block from `styles` and
+remove the orphan rule.
+
+## Cascade Order
+
+At-rule order is part of the design.
+
+Desktop-first order:
+
+1. base declarations;
+2. `max-width:1024px`;
+3. `max-width:767px`.
+
+Mobile-first order:
+
+1. mobile base declarations;
+2. `min-width:768px`;
+3. `min-width:1025px`.
+
+Both approaches work. Do not mix directions casually. Overlapping min/max
+queries are safe only when you can explain which rule should win at every
+boundary.
+
+## Design the Composition, Not Device Labels
+
+Use a breakpoint when the composition needs to change:
+
+- columns no longer have useful minimum widths;
+- navigation needs a different control;
+- a sticky panel should return to normal flow;
+- actions need to regroup or reorder;
+- a comparison needs a different representation;
+- artwork starts obscuring content;
+- tap targets become crowded.
+
+Do not add a media query only because a value looks familiar. Prefer intrinsic
+CSS when it preserves intent:
+
+```json
+{
+  "display":"grid",
+  "gap":"clamp(1rem,2vw,2rem)",
+  "gridTemplateColumns":"repeat(auto-fit,minmax(min(100%,18rem),1fr))"
+}
 ```
 
-### 2 → 1 Column Grid
+This can remove an unnecessary grid breakpoint while still allowing a later
+query for a genuine layout change.
 
-```css
-.gb-element-grid003{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:2rem}@media(max-width:768px){.gb-element-grid003{grid-template-columns:1fr}}
+## Common Patterns
+
+### 4 to 2 to 1 grid
+
+```json
+{
+  "display":"grid",
+  "gap":"1.5rem",
+  "gridTemplateColumns":"repeat(4,minmax(0,1fr))",
+  "@media (max-width:1024px)":{
+    "gridTemplateColumns":"repeat(2,minmax(0,1fr))"
+  },
+  "@media (max-width:767px)":{
+    "gridTemplateColumns":"1fr"
+  }
+}
 ```
 
-### Complex Grid Areas
+### Split layout to one column
 
-```css
-.gb-element-grid004{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:1rem;grid-template-areas:'primary primary profile' 'newsletter services profile'}@media(max-width:1024px){.gb-element-grid004{grid-template-columns:1fr;grid-template-areas:'primary' 'profile' 'newsletter' 'services'}}
+```json
+{
+  "display":"grid",
+  "gap":"clamp(2rem,5vw,4rem)",
+  "gridTemplateColumns":"minmax(0,5fr) minmax(0,7fr)",
+  "@media (max-width:1024px)":{
+    "gridTemplateColumns":"1fr"
+  }
+}
 ```
 
----
+Each column needs its own wrapper element. Otherwise every heading, paragraph,
+button, and image becomes an independent grid item.
 
-## Flexbox Patterns
+### Row to column
 
-### Row → Column
-
-```css
-.gb-element-flex001{display:flex;flex-direction:row;gap:2rem;align-items:center}@media(max-width:768px){.gb-element-flex001{flex-direction:column;gap:1rem}}
+```json
+{
+  "alignItems":"center",
+  "display":"flex",
+  "gap":"2rem",
+  "@media (max-width:767px)":{
+    "alignItems":"stretch",
+    "flexDirection":"column",
+    "gap":"1rem"
+  }
+}
 ```
 
-### Flex Wrap
+### Sticky to normal flow
 
-```css
-.gb-element-flex002{display:flex;flex-wrap:wrap;gap:1rem}@media(max-width:768px){.gb-element-flex002{gap:0.5rem}}
+```json
+{
+  "position":"sticky",
+  "top":"calc(var(--site-header-height,0px) + 1rem)",
+  "@media (max-width:1024px)":{
+    "position":"static",
+    "top":"auto"
+  }
+}
 ```
 
-### Justify Content Changes
+Remember that the custom property's `--` must be escaped in block-comment
+JSON, not in the rendered HTML body.
 
-```css
-.gb-element-flex003{display:flex;justify-content:space-between;align-items:center}@media(max-width:768px){.gb-element-flex003{justify-content:center;flex-direction:column;gap:1rem}}
+### Deliberate source order
+
+Prefer DOM order that works for reading and keyboard navigation. Use visual
+`order` only when focus order remains understandable:
+
+```json
+{
+  "order":"2",
+  "@media (max-width:767px)":{"order":"1"}
+}
 ```
 
----
+Do not use CSS order to conceal a structurally wrong document.
 
-## Typography Patterns
+### Responsive type
 
-### Heading Sizes
+Start with the project's type scale. Use `clamp()` when the role genuinely
+scales:
 
-```css
-.gb-text-head001{font-size:clamp(2rem, 5vw, 3.5rem);font-weight:900;line-height:1.1}
+```json
+{
+  "fontSize":"clamp(2rem,1.45rem + 2.2vw,3.25rem)",
+  "lineHeight":"1.08"
+}
 ```
 
-Using `clamp()` handles most responsive typography automatically.
+Whitespace around `+` is required inside CSS math expressions. Commas can be
+minified; the addition operator cannot.
 
-### Explicit Breakpoints
+### Device visibility
 
-```css
-.gb-text-head002{font-size:3rem;line-height:1.2}@media(max-width:1024px){.gb-text-head002{font-size:2.5rem}}@media(max-width:768px){.gb-text-head002{font-size:2rem}}
+Visibility is usually a last resort. Duplicating meaningful content for
+desktop and mobile creates accessibility and maintenance problems.
+
+When a truly device-specific control is required:
+
+```json
+{
+  "display":"none",
+  "@media (max-width:767px)":{"display":"block"}
+}
 ```
 
-### Text Alignment
+Confirm that an equivalent route remains available on every viewport and that
+duplicate IDs or announcements are not introduced.
 
-```css
-.gb-text-head003{text-align:left}@media(max-width:768px){.gb-text-head003{text-align:center}}
+## Container Queries
+
+Use a container query when a component's available width matters more than the
+viewport.
+
+Parent:
+
+```json
+{
+  "containerName":"cards",
+  "containerType":"inline-size"
+}
 ```
 
----
+Child layout:
 
-## Spacing Patterns
-
-### Padding Changes
-
-```css
-.gb-element-sect001{padding:4rem 2rem}@media(max-width:1024px){.gb-element-sect001{padding:3rem 1.5rem}}@media(max-width:768px){.gb-element-sect001{padding:2rem 1rem}}
+```json
+{
+  "display":"grid",
+  "gridTemplateColumns":"repeat(2,minmax(0,1fr))",
+  "@container cards (max-width:40rem)":{
+    "gridTemplateColumns":"1fr"
+  }
+}
 ```
 
-### Gap Changes
+CSS Mode supports `@container`; Pro can register reusable container queries.
+Keep the component usable without relying on a site-specific container name
+that may not exist at its destination.
 
-```css
-.gb-element-grid005{gap:2rem}@media(max-width:768px){.gb-element-grid005{gap:1rem}}
+## Other Responsive At-Rules
+
+Motion preference:
+
+```json
+{
+  "transition":"transform .22s ease,opacity .22s ease",
+  "@media (prefers-reduced-motion:reduce)":{
+    "transition":"none"
+  }
+}
 ```
 
-### Margin Changes
+Forced colors:
 
-```css
-.gb-element-card001{margin-bottom:2rem}@media(max-width:768px){.gb-element-card001{margin-bottom:1rem}}
+```json
+{
+  "@media (forced-colors:active)":{
+    "borderColor":"CanvasText"
+  }
+}
 ```
 
----
+Feature support:
 
-## Show/Hide Patterns
-
-### Desktop Only
-
-```css
-.gb-element-desk001{display:block}@media(max-width:768px){.gb-element-desk001{display:none}}
+```json
+{
+  "@supports (text-wrap:balance)":{
+    "textWrap":"balance"
+  }
+}
 ```
 
-### Mobile Only
+Do not add support queries as decoration. Use them only when the fallback is
+complete and the enhancement changes the result.
 
-```css
-.gb-element-mob001{display:none}@media(max-width:768px){.gb-element-mob001{display:block}}
-```
+## Responsive Anti-Slop Gate
 
-### Tablet Only
+- Mobile is deliberately composed, not a tall stack of desktop cards.
+- The primary action stays near the relevant decision.
+- Long titles, untranslated strings, empty fields, and missing media do not
+  break the layout.
+- No horizontal overflow at 200% zoom.
+- Fixed and sticky elements do not cover content or the on-screen keyboard.
+- Tap targets remain large and separated.
+- Images keep their subject and intrinsic dimensions.
+- Tables and comparisons adapt without clipping essential information.
+- Decorative effects do not overlap text.
+- Tablet widths do not expose an accidental empty column.
 
-```css
-.gb-element-tab001{display:none}@media(min-width:769px) and (max-width:1024px){.gb-element-tab001{display:block}}
-```
+## Verification Matrix
 
----
+At minimum, check:
 
-## Sizing Patterns
+| Viewport/state | What to verify |
+|---|---|
+| 1280px or wider | rail width, full composition, no stretched measures |
+| 1025px | desktop side of native tablet boundary |
+| 1024px | tablet side, grid and sticky changes |
+| 768px | tablet-only lower edge |
+| 767px | mobile query is active |
+| 375px | content order, tap targets, overflow, long labels |
+| 200% zoom | no clipping or lost controls |
+| reduced motion | content stays visible and usable |
+| forced colors | focus and boundaries remain perceivable |
 
-### Width Changes
+Also test an awkward in-between width such as 820px. Breakpoint edges can pass
+while the space between them still looks broken.
 
-```css
-.gb-element-box001{width:50%}@media(max-width:768px){.gb-element-box001{width:100%}}
-```
+## Common Failures
 
-### Max-Width Changes
+### `768px` used as native Mobile
 
-```css
-.gb-element-cont001{max-width:var(--gb-container-width)}@media(max-width:1024px){.gb-element-cont001{max-width:100%}}
-```
+The installed default is `max-width:767px`. Use `768px` only when the project
+registered or deliberately chose it as a custom query.
 
-### Min-Height Changes
+### Media query only in `css`
 
-```css
-.gb-element-hero001{min-height:600px}@media(max-width:768px){.gb-element-hero001{min-height:400px}}
-```
+Move it into `styles`, recompile `css`, and verify through CSS Mode.
 
----
+### Descendant rule rejected by old tooling
 
-## Grid Span Changes
+GenerateBlocks 2.4/Pro 2.7 supports one selector level in structured styles.
+Represent the selector as an `&`-relative branch and regenerate the compiled
+CSS. Do not keep a valid CSS Mode selector only in the cache string.
 
-### Featured Card Span
+### `!important` everywhere
 
-```css
-.gb-element-feat001{grid-column:span 2;grid-row:span 2}@media(max-width:1024px){.gb-element-feat001{grid-column:span 2;grid-row:span 1}}@media(max-width:768px){.gb-element-feat001{grid-column:span 1}}
-```
-
-### Profile Card Span
-
-```css
-.gb-element-profile001{grid-area:profile;grid-row:span 4}@media(max-width:1024px){.gb-element-profile001{grid-row:span 1}}
-```
-
----
-
-## Position Changes
-
-### Sticky → Static
-
-```css
-.gb-element-sidebar001{position:sticky;top:calc(var(--header-height, 80px) + 1rem)}@media(max-width:1024px){.gb-element-sidebar001{position:static}}
-```
-
-### Absolute Position Adjustments
-
-```css
-.gb-text-badge001{position:absolute;top:1rem;right:1rem}@media(max-width:768px){.gb-text-badge001{top:0.5rem;right:0.5rem}}
-```
-
----
-
-## Order Changes
-
-### Reorder Columns
-
-```css
-.gb-element-img001{order:1}@media(max-width:768px){.gb-element-img001{order:2}}
-.gb-element-text001{order:2}@media(max-width:768px){.gb-element-text001{order:1}}
-```
-
----
-
-## Complete Section Example
-
-```html
-<!-- wp:generateblocks/element {"uniqueId":"sect001","tagName":"section","styles":{"paddingTop":"4rem","paddingBottom":"4rem"},"css":".gb-element-sect001{padding-top:4rem;padding-bottom:4rem}@media(max-width:768px){.gb-element-sect001{padding-top:2rem;padding-bottom:2rem}}"} -->
-<section class="gb-element gb-element-sect001">
-
-    <!-- wp:generateblocks/element {"uniqueId":"inner001","tagName":"div","styles":{"maxWidth":"var(--gb-container-width)","marginLeft":"auto","marginRight":"auto","paddingLeft":"1rem","paddingRight":"1rem"},"css":".gb-element-inner001{max-width:var(--gb-container-width);margin-left:auto;margin-right:auto;padding-left:1rem;padding-right:1rem}"} -->
-    <div class="gb-element gb-element-inner001">
-
-        <!-- wp:generateblocks/element {"uniqueId":"grid001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(3, minmax(0, 1fr))","gap":"2rem"},"css":".gb-element-grid001{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:2rem}@media(max-width:1024px){.gb-element-grid001{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media(max-width:768px){.gb-element-grid001{grid-template-columns:1fr;gap:1rem}}"} -->
-        <div class="gb-element gb-element-grid001">
-            <!-- Grid items -->
-        </div>
-        <!-- /wp:generateblocks/element -->
-
-    </div>
-    <!-- /wp:generateblocks/element -->
-
-</section>
-<!-- /wp:generateblocks/element -->
-```
-
----
-
-## Using !important
-
-Use `!important` sparingly for media query overrides when needed:
-
-```css
-@media(max-width:768px){.gb-element-grid001{grid-template-columns:1fr!important}}
-```
-
-This ensures the responsive style takes precedence over any inline or conflicting styles.
-
----
-
-## Mobile-First Alternative
-
-While desktop-first is standard, mobile-first can be used:
-
-```css
-.gb-element-grid001{grid-template-columns:1fr}@media(min-width:768px){.gb-element-grid001{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media(min-width:1024px){.gb-element-grid001{grid-template-columns:repeat(4, minmax(0, 1fr))}}
-```
-
-Use whichever approach matches your design workflow.
+Inspect selector ownership, at-rule order, Global Style order, and theme
+specificity first. `!important` should describe a real constraint, not hide a
+cascade you did not understand.

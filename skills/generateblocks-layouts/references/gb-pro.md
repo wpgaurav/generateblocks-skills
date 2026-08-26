@@ -3,17 +3,16 @@ title: GenerateBlocks Pro overview (2.7)
 description: What Pro adds on top of free GenerateBlocks — block catalog, global classes, query extensions, conditions, forms, overlays — with pointers to the deep-dive references.
 ---
 
-# GenerateBlocks Pro (2.7)
+# GenerateBlocks Pro (2.7.1)
 
 Use Pro features only when the user has GB Pro installed. If unsure, default
 to free-plugin patterns and say in chat which parts would need Pro.
 
-Status note (July 2026): public stable is free 2.3.0 / Pro 2.6.1; free 2.4
-and Pro 2.7 (Editor Access) are in RC — this repo carries the RC source
-(free 2.4.0-rc.1 / Pro 2.7.0-rc.1). On a stable site, Editor Access isn't
-available yet, but Forms and CSS Mode (2.6) are. Note 2.3 also disabled the
-legacy "Additional CSS" block option by default in favor of CSS Mode; 2.4/2.7
-raise minimum WordPress to 6.7.
+Status note (August 2026): free 2.4.1 and Pro 2.7.1 are stable and active on
+gauravtiwari.org. Both require WordPress 6.7 or later; free requires PHP 7.2+
+and Pro requires PHP 7.4+. Recheck the target instead of assuming these
+versions. GenerateBlocks 2.3 disabled the legacy core Additional CSS field on
+GB blocks by default; Pro 2.6 added the structured CSS Editor/CSS Mode.
 
 ## What Pro adds — map
 
@@ -26,6 +25,7 @@ raise minimum WordPress to 6.7.
 | ACF / custom-field deep integration | `acf-and-custom-fields.md` |
 | Query extensions (`"current"` magic values, `stickyPosts`, `post_meta`/`option` loop types) | `query-block.md` §3, §6 |
 | Global classes & Styles dashboard | below |
+| CSS Properties and CSS Mode | `css-mode.md` |
 | Pattern library (local CPT + remote pro library) | below |
 | Editor Access & Control Sets (lock down editing per role) — **2.7** | below |
 
@@ -52,9 +52,9 @@ dashboard and referenced from blocks by ID or applied globally.
 
 ## Global classes
 
-- Created/managed in the **Styles dashboard** (GenerateBlocks → Styles);
-  stored server-side (option + `gblocks_styles` CPT — `gblocks_global_style`
-  is the deprecated V1 CPT), CSS compiled and enqueued site-wide.
+- Created/managed in the **Global Styles dashboard**; current styles are
+  `gblocks_styles` records (`gblocks_global_style` is the deprecated V1 CPT),
+  with compiled CSS stored in post meta and cached for frontend delivery.
 - A block opts in via its `globalClasses` array attribute; the class names
   are also written into the rendered HTML class list:
 
@@ -62,14 +62,16 @@ dashboard and referenced from blocks by ID or applied globally.
 "globalClasses":["button-primary"]
 ```
 ```html
-<a class="gb-element-cta001 gb-element button-primary" href="...">
+<a class="gb-element-cta1 gb-element button-primary" href="...">
 ```
 
 - Use global classes when the same component style repeats across the site
   (buttons, cards, badges). The per-block `styles`/`css` then carries only
   instance-specific overrides.
-- 2.6 adds **CSS Mode** (write raw CSS on blocks and global styles) and a CSS
-  Properties panel in the Styles builder.
+- 2.6 adds **CSS Mode** and a CSS Properties panel. CSS Mode parses supported
+  CSS into the normal `styles` object and has no `cssMode` markup attribute.
+  It supports one selector level and `@media`, `@supports`, and `@container`.
+  Read `css-mode.md` before hand-authoring nested selectors or at-rules.
 - Hand-authoring: reference existing global classes freely. Creating them
   programmatically goes through the Styles REST API — otherwise tell the user
   to create the class in the dashboard first.

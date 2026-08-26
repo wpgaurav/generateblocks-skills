@@ -71,6 +71,31 @@ markup in the rendered `<h1>` body** stays literal.
 
 After running, grep to prove it: `grep '^<!-- wp:' f.html | grep -o '{.*}' | grep -c -- '--'` must be `0`.
 
+**The trap is worse than it looks: it also strikes when you WRITE the tool.**
+Authoring a generator script through an editor/agent that processes escapes can
+silently strip the backslashes out of your source, turning
+`('--', '\\u002d\\u002d')` into `('--', '--')` — a table of four no-ops that
+looks correct on screen. This has shipped broken markup.
+
+Build the escape strings from `chr(92)` so no writer, linter, or heredoc can
+touch them:
+
+```python
+_BS = chr(92)
+_U  = lambda code: _BS + 'u' + code
+SUBS = [('--', _U('002d') + _U('002d')),
+        ('<',  _U('003c')),
+        ('>',  _U('003e')),
+        ('&',  _U('0026'))]
+QUOTE = _U('0022')          # for the fifth substitution
+```
+
+Then assert before you trust it:
+
+```python
+assert SUBS[0][1] != '--', 'escape table is a no-op'
+```
+
 ---
 
 ## 2. Documentation contradictions — which source wins
@@ -148,6 +173,62 @@ omits it and puts the SVG in the rendered `<span>` body, with sizing via
 `styles.svg`. Keep SVG attribute order per SKILL.md rule #23
 (`stroke-linejoin, stroke-linecap, stroke-width, stroke, fill, viewBox, height, width`).
 
+### 2.6 `text`: static editor output usually keeps text in the body
+
+`recovery-rules.md` §3.4 lists `content` 3rd in the text block's key order
+(correct per `block.json`). But the editor **does not serialize it** for
+ordinary static text — the string lives only in the rendered inner HTML.
+
+Measured on a production page in July 2026 (520-block `/services/`, GB free 2.4.0-rc.1 /
+Pro 2.7.0-rc.1): **0 of 199** text blocks carried `content`; **199 of 199**
+also omitted `className` and rendered base-class-first.
+
+```html
+<!-- RIGHT — matches the editor -->
+<!-- wp:generateblocks/text {"uniqueId":"item-1173976-23a","tagName":"h3","styles":{...},"css":"..."} -->
+<h3 class="gb-text gb-text-n23a">Blog Setup &amp; Monetization</h3>
+<!-- /wp:generateblocks/text -->
+
+<!-- Do not add source attributes merely to duplicate static body text -->
+<!-- wp:generateblocks/text {"uniqueId":"item-1173976-23a","tagName":"h3","content":"Blog Setup &amp; Monetization","styles":{...},"className":"gb-text"} -->
+```
+
+That measurement describes one editor-authored target, not every record on a
+mixed site. An August 2026 sample of the 100 most recently modified
+GenerateBlocks-bearing records on gauravtiwari.org contained 11,598 GB blocks
+and mixed `content`/`className` conventions, including generated/imported
+markup. Preserve the target's existing convention. For new static text, omit a
+duplicate `content` attribute; use it when a dynamic binding or the measured
+target requires it.
+
+Note the ampersand: `&` is `&amp;` in the rendered body, and would be
+`&amp;` in JSON — the entity is part of the string, then the `&` of the
+entity gets substituted. Three-layer escaping, same as §1.
+
+### 2.7 The `css` attribute is NOT re-derived during block validation
+
+This is the single most useful thing to know about `css`, and it resolves a lot
+of anxiety in this repo.
+
+`css` is the plugin's cached compile of `styles`. The editor's recovery check
+compares **serialized attributes**, and `css` is just another string attribute —
+it is not recomputed and diffed at load time. Evidence: the same production page
+carries hand-authored `css` strings that are internally inconsistent (some
+`clamp(2rem, 4vw, 3rem)` with spaces, some without; hand-written `:hover` and
+`transition:` inside `css`; non-alphabetical property order) and loads without a
+single recovery error.
+
+What this means in practice:
+
+- **Recovery is driven by:** JSON key order, the five escapes, `htmlAttributes`
+  shape, and the rendered class list. Get those right and blocks validate.
+- **`css` still has to be CORRECT**, because it is what actually renders until
+  someone re-saves the block from the editor.
+- **Transitions, states, selectors, and at-rules belong in `styles` and the
+  compiled `css`.** Pro CSS Mode supports one selector level plus `@media`,
+  `@supports`, and `@container`. If a human later changes the block's styles,
+  CSS present only in the cache can be silently lost. Read `css-mode.md`.
+
 ---
 
 ## 3. Robustness decisions when converting a real design
@@ -220,3 +301,117 @@ page and hand back the edit URL so the user can confirm it loads clean.
 - [ ] External images via `background-image`, not media block (§3)
 - [ ] Decorative grid/orb/SVG layers dropped or moved to global CSS (§3)
 - [ ] Ran the §4 validation script; reported the headless-verification limit
+
+---
+
+## 6. The `css` compiler — reproducing plugin output
+
+When you want `css` to match what the plugin would generate (not required for
+recovery, see §2.7, but it keeps the block clean through future edits), this is
+the algorithm. It was reverse-engineered and validated against **467 production
+blocks** that carry both `styles` and `css`, reproducing 89% byte-for-byte —
+every residual difference being a place where the *live* markup was
+hand-authored and internally inconsistent.
+
+1. camelCase property → kebab-case (`gridTemplateColumns` → `grid-template-columns`).
+2. If a complete longhand box set is present (`paddingTop/Right/Bottom/Left`),
+   collapse it to the shortest shorthand (`6rem 1.5rem`) and **remove the longhands**.
+3. Emit the remaining properties **alphabetically sorted**.
+4. Append the collapsed shorthands **after** the sorted longhands — this is why
+   real output reads `background-color;overflow;position;padding`, which looks
+   non-alphabetical but is deterministic.
+5. Strip whitespace **after commas** inside values (`clamp(2rem, 4vw, 3rem)` →
+   `clamp(2rem,4vw,3rem)`). Do **not** strip spaces around `+` — `1.9rem + 3.4vw`
+   is required for the calc expression to be valid.
+6. Compile one-level selector branches (`&:hover`, `&::before`, child and
+   sibling selectors) relative to the block selector.
+7. Compile `@media`, `@supports`, and `@container` branches, including one
+   selector level inside an at-rule or one at-rule level inside a selector.
+8. Reject unsupported structured at-rules instead of hiding them only in
+   `css`.
+
+`scripts/gb_serialize.py` implements this, plus `serialize_block_attributes()`
+and the canonical key order. Import it rather than re-deriving.
+
+### 6.1 clamp() and the `+` operator
+
+```css
+clamp(2.75rem,1.9rem+3.4vw,4.25rem)      /* INVALID — whole declaration dropped, silently */
+clamp(2.75rem,1.9rem + 3.4vw,4.25rem)    /* correct: no space after commas, spaces around + */
+```
+
+CSS requires whitespace around `+` inside `calc()`-style expressions. Combined
+with rule 5 this is the one place where "minify everything" is wrong. Symptom of
+getting it wrong: headings render at body size with **no console error**.
+
+---
+
+## 7. Verify against the TARGET SITE, not just the docs
+
+The single highest-value step before hand-authoring for an existing site: pull
+the page you're extending and measure its conventions. Plugin behaviour varies by
+version, and the live page is ground truth for the build actually installed.
+
+```python
+import re, json
+h = open('existing-page.html').read()
+blocks = re.findall(r'<!-- wp:(generateblocks/[a-z-]+) (\{.*?\}) /?-->', h)
+# key order actually used
+import collections
+print(collections.Counter(tuple(json.loads(r).keys()) for _, r in blocks).most_common())
+# does this build serialize text `content`?
+print(sum('"content"' in r for n, r in blocks if n.endswith('/text')))
+# rendered class order
+print(collections.Counter(c.split()[0] for c in re.findall(r'class="(gb-[^"]+)"', h)).most_common(4))
+```
+
+Check the installed versions too — authenticated plugin inventory or read-only
+WP-CLI returns exact versions, which decides whether Pro features are available.
+On 2026-08-26, gauravtiwari.org ran free 2.4.1 + Pro 2.7.1 on WordPress 7.1,
+with native Mobile at `max-width:767px`. Its recent content still contained many
+custom `max-width:768px` branches. Preserve those existing boundaries; use the
+native query for new work unless the project deliberately defines another one.
+
+A mixed result is normal and fine: a page can carry both legacy (no `className`,
+base-first) and Option A (with `className`, id-first) blocks. Pick the dominant
+convention **per block type** and stay internally consistent.
+
+---
+
+## 8. Layout gotchas that survive validation but break the page
+
+These pass every recovery check and still render wrong.
+
+### 8.1 Grid/flex columns need their own wrapper element
+
+Emitting a column's contents directly into a grid container makes **each child**
+a grid item. A two-column hero with 5 elements on the left becomes a 6-cell flow.
+
+```html
+<!-- WRONG: grid gets 6 items -->
+grid(cols=2) -> [h1, lede, buttons, meta, panel]
+
+<!-- RIGHT: grid gets 2 items -->
+grid(cols=2) -> [ div(h1,lede,buttons,meta), div(panel) ]
+```
+
+Catch it by measuring, not eyeballing: assert the vertical gaps between siblings
+are what the design specifies. Negative gaps mean elements are in different grid
+cells than you think.
+
+### 8.2 GB has no page-level stylesheet
+
+A design built on a scoped token layer (`.wrapper { --ink: … }`) does not survive
+conversion — every block owns isolated CSS. Either flatten tokens to literal
+values via a generator palette, or set custom properties on a section block's
+`styles` and let children inherit through the cascade. Decide deliberately; a
+half-flattened design is unmaintainable.
+
+If a design genuinely depends on one scoped stylesheet plus JS, a Marketers
+Delight **Page Block** (`/page-block`) is the better delivery vehicle than GB.
+
+### 8.3 Interactivity needs a `core/html` block
+
+GB has no JS field. Filters, tabs-by-script, and custom behaviour ship as one
+`core/html` block. GB Pro's interactive blocks (accordion, tabs, carousel) cover
+the common cases without script — prefer them when they fit.

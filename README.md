@@ -2,7 +2,7 @@
 
 LLM-optimized skill documentation and development resources for the [GenerateBlocks](https://generateblocks.com/) WordPress plugin.
 
-**Source-verified against GenerateBlocks free 2.4 and GB Pro 2.7** (July 2026). Every block schema, attribute order, and dynamic-tag in these skills was checked against the plugin source in this repo — not recalled from training data.
+**Source-verified against GenerateBlocks free 2.4.1 and GB Pro 2.7.1** (August 2026), including a read-only check of the same active versions on WordPress 7.1 at gauravtiwari.org. The styling guidance covers Pro CSS Mode, structured selectors, native/custom at-rules, CSS delivery, and a GenerateBlocks-specific anti-slop gate.
 
 ## What the skills can build
 
@@ -83,39 +83,25 @@ Direct links to skill files:
 
 ---
 
-## Copy-Paste Examples
+## Validated Examples
 
-Browse the [`examples/`](examples/) folder for **38 ready-to-use templates** across 14 section types:
+Use the compact examples inside
+[`skills/generateblocks-layouts/examples/`](skills/generateblocks-layouts/examples/).
+They cover buttons, containers, an interactive card, a restrained hero, a V2
+Query/Looper grid, and SVGs. Every file passes the bundled `preflight.py`.
 
-| Section | Description |
-|---------|-------------|
-| [Hero Section](examples/01-hero/) | Stats bar, dual CTAs (5 variations) |
-| [Pricing Table](examples/02-pricing/) | 3-tier with "Popular" badge |
-| [Card Grid](examples/03-card-grid/) | Blog posts, portfolio |
-| [Feature List](examples/04-feature-list/) | 6 features with icons |
-| [FAQ Section](examples/05-faq/) | Numbered Q&A, two columns |
-| [Testimonials](examples/06-testimonials/) | Quotes, avatars, stars |
-| [Sticky CTA](examples/07-sticky-cta/) | Dark banner, dual buttons |
-| [Post Grid](examples/08-post-grid/) | Featured + small posts |
-| [Stats Section](examples/09-stats/) | 4 metrics on dark bg |
-| [Services Grid](examples/10-services/) | Bento layout |
-| [Logo Carousel](examples/11-logo-carousel/) | Client/partner logos |
-| [Team Grid](examples/12-team-grid/) | Team member cards |
-| [Timeline](examples/13-timeline/) | Vertical timeline |
-| [Comparison Table](examples/14-comparison-table/) | Feature comparison |
+Before inserting one into WordPress:
 
-Each folder contains multiple variations plus the prompt that generated them. A fully dynamic query-loop blog grid lives at [`skills/generateblocks-layouts/examples/layouts/query-blog-grid.html`](skills/generateblocks-layouts/examples/layouts/query-blog-grid.html).
+1. create/resolve the destination record;
+2. regenerate every ID with the real numeric post ID;
+3. replace example URLs/content/media;
+4. inherit the destination's design system and registered at-rules;
+5. run `preflight.py <file> --post-id <ID>`.
 
-**Bonus:** Check out [`examples/from-gauravtiwari-org/`](examples/from-gauravtiwari-org/) for real-world sections exported from production sites.
-
-### Using Examples
-
-1. Open any [`examples/`](examples/) folder
-2. Copy any `output-*.html` file content
-3. In WordPress, open your page/post
-4. Switch to Code Editor (three dots menu > Code Editor)
-5. Paste the blocks
-6. Switch back to Visual Editor
+The root [`examples/`](examples/) gallery contains older exploration and
+production exports. Treat it as historical visual/structural reference, not as
+recovery-safe copy-paste markup. It predates the current CSS Mode parity,
+post-scoped ID, and anti-slop gates.
 
 ---
 
@@ -129,15 +115,15 @@ generateblocks-skills/
 ├── skills/                    # Skill source files
 │   ├── generateblocks-layouts/
 │   │   ├── SKILL.md           # Main entry point (slim — depth in references/)
-│   │   ├── references/        # 23 reference files (see map below)
+│   │   ├── references/        # Routed reference files (see map below)
 │   │   └── examples/          # Basic, compound, layout, SVG examples
 │   ├── html-to-generateblocks/
 │   ├── elementor-to-generateblocks/
 │   └── figma-to-generateblocks/
 ├── importable/                # .skill and .zip files for upload
-├── examples/                  # 38 golden examples across 14 sections
-├── generateblocks/            # Plugin source (2.4.0-rc) for reference
-└── generateblocks-pro/        # Pro plugin source (2.7.0-rc, git-ignored) for reference
+├── examples/                  # Historical exploration/exports; not current copy-paste fixtures
+├── generateblocks/            # Plugin source (2.4.1) for reference
+└── generateblocks-pro/        # Pro plugin source (2.7.1, git-ignored) for reference
 ```
 
 ### Skills
@@ -166,7 +152,9 @@ generateblocks-skills/
 | `gb-pro.md` | Pro feature map (27 blocks, global classes, Editor Access, version timeline) |
 | `pro-forms.md` | Pro Forms (2.6+): fields, validation, ESP integrations, Turnstile |
 | `pro-interactive.md` | Accordion, Tabs, Carousel, Navigation, Site Header, Overlays |
-| `css-patterns.md` · `svg-icons.md` · `responsive.md` | Styling patterns |
+| `css-mode.md` | CSS Mode, CSS Properties, selectors, supported at-rules, `styles`/`css` parity |
+| `design-quality.md` | GenerateBlocks-specific anti-slop and responsive implementation gate |
+| `css-patterns.md` · `svg-icons.md` · `responsive.md` | Durable styling patterns |
 | `global-styles.md` · `patterns.md` · `performance.md` · `migrations.md` · `troubleshooting.md` | Supporting guides |
 
 ### Importable Formats
@@ -197,13 +185,15 @@ generateblocks/query      → Dynamic lists (+ looper, loop-item, query-no-resul
 - `htmlAttributes` is a plain object (`{"href":"https://example.com/about/"}`) — never an array
 - **Links**: element `<a>` wrapping a text `span` child. Text `<a>` strips its href on save; element `<a>` with raw text triggers recovery
 - JSON attribute order follows each block's `block.json` declaration order, `className` last
-- The `css` string is single-line, minified, alphabetized — hover states live in the `styles` object
+- `styles` is the editable source; compile the same states/selectors/at-rules into local `css`
+- Native Mobile is `@media (max-width:767px)` in 2.4.1; preserve deliberate custom queries
+- Pro CSS Mode has no `cssMode` markup attribute
 
 Block format (Option A — the plugin auto-injects the id-class):
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"hero001","tagName":"section","styles":{...},"css":"...","className":"gb-element"} -->
-<section class="gb-element-hero001 gb-element">
+<!-- wp:generateblocks/element {"uniqueId":"hero-1173976-1","tagName":"section","styles":{...},"css":"...","className":"gb-element"} -->
+<section class="gb-element-hero-1173976-1 gb-element">
     <!-- content -->
 </section>
 <!-- /wp:generateblocks/element -->
@@ -254,9 +244,8 @@ Block format (Option A — the plugin auto-injects the id-class):
 - **UI-managed settings** — condition rules, form actions, overlay triggers,
   and display rules are configured in wp-admin, not in block markup; the
   skills list these as manual steps
-- **Pro 2.7 / free 2.4 features** (Editor Access, dynamic-data save gate) are
-  RC as of July 2026 — sites on stable releases (free 2.3.0 / Pro 2.6.1)
-  won't have them yet; Forms and CSS Mode are stable
+- **Version-dependent features** — always inspect the target. Editor Access
+  requires Pro 2.7+ with free 2.4+; CSS Mode and Forms require Pro 2.6+
 
 ---
 

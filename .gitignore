@@ -17,6 +17,8 @@ output/
 dist/
 build/
 *.log
+__pycache__/
+*.pyc
 
 # Plugin sources kept locally for reference, not versioned
 generateblocks-pro/

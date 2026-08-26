@@ -177,8 +177,8 @@ name, pipe-separated options, no quotes). The high-frequency loop patterns:
 `generateblocks/media` with a tag in `src` and `mediaId` omitted:
 
 ```html
-<!-- wp:generateblocks/media {"uniqueId":"grid004","tagName":"img","styles":{"width":"100%","aspectRatio":"16/9","objectFit":"cover"},"css":".gb-media-grid004{aspect-ratio:16/9;object-fit:cover;width:100%}","htmlAttributes":{"src":"{{featured_image size:large}}","alt":"{{featured_image key:alt}}","loading":"lazy"},"className":"gb-media"} -->
-<img class="gb-media-grid004 gb-media" src="{{featured_image size:large}}" alt="{{featured_image key:alt}}" loading="lazy"/>
+<!-- wp:generateblocks/media {"uniqueId":"grid4","tagName":"img","styles":{"width":"100%","aspectRatio":"16/9","objectFit":"cover"},"css":".gb-media-grid4{aspect-ratio:16/9;object-fit:cover;width:100%}","htmlAttributes":{"src":"{{featured_image size:large}}","alt":"{{featured_image key:alt}}","loading":"lazy"},"className":"gb-media"} -->
+<img class="gb-media-grid4 gb-media" src="{{featured_image size:large}}" alt="{{featured_image key:alt}}" loading="lazy"/>
 <!-- /wp:generateblocks/media -->
 ```
 
@@ -188,8 +188,8 @@ Either make the loop-item itself an `<a>` (`tagName:"a"` is in its enum), or
 use an inner element `<a>`:
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"grid005","tagName":"a","styles":{"display":"block"},"css":".gb-element-grid005{display:block}","htmlAttributes":{"href":"{{post_permalink}}","aria-label":"{{post_title}}"},"className":"gb-element"} -->
-<a class="gb-element-grid005 gb-element" href="{{post_permalink}}" aria-label="{{post_title}}">
+<!-- wp:generateblocks/element {"uniqueId":"grid5","tagName":"a","styles":{"display":"block"},"css":".gb-element-grid5{display:block}","htmlAttributes":{"href":"{{post_permalink}}","aria-label":"{{post_title}}"},"className":"gb-element"} -->
+<a class="gb-element-grid5 gb-element" href="{{post_permalink}}" aria-label="{{post_title}}">
     <!-- inner blocks -->
 </a>
 <!-- /wp:generateblocks/element -->

@@ -8,7 +8,8 @@ description: Tells Claude which reference file to open for which task. Always ch
 Read this file FIRST, then load only what the task needs. Loading the wrong
 file (or loading too much) wastes context — be precise.
 
-Verified against: GenerateBlocks free **2.4**, GB Pro **2.7**.
+Verified against: GenerateBlocks free **2.4.1**, GB Pro **2.7.1** on
+WordPress **7.1** (live + installed source, 2026-08-26).
 
 ## Before doing anything
 
@@ -29,10 +30,12 @@ around the internet (and in old markup) is wrong and silently fails.
 | If the user is asking for... | Read |
 |---|---|
 | A static section / hero / cards / grid (no dynamic data) | `block-types.md`, `css-patterns.md` |
-| Hover effects, transitions, gradients, pseudo-elements | `css-patterns.md` |
+| **CSS Mode, CSS Properties, raw CSS, nested selectors, `styles` vs `css`** | `css-mode.md` |
+| Hover, focus, transitions, pseudo-elements, child selectors | `css-mode.md`, `css-patterns.md` |
 | Entrance animations, scroll effects, micro-interactions, motion | `animations.md` |
 | SVG icons or decorative shapes | `svg-icons.md` |
 | Responsive layout / breakpoints | `responsive.md` |
+| Container queries, `@supports`, reduced motion, forced colors | `css-mode.md`, `responsive.md` |
 | **Blog grid, archive, related posts, any dynamic post list** | `query-block.md` + `dynamic-tags.md` |
 | Pagination on a query | `query-block.md` §1.5 |
 | Dynamic titles, dates, images, meta, author boxes | `dynamic-tags.md` |
@@ -45,6 +48,7 @@ around the internet (and in old markup) is wrong and silently fails.
 | Design tokens, theme.json bridge | `global-styles.md` |
 | Block patterns / pattern registration | `patterns.md` |
 | Performance / CSS delivery | `performance.md` |
+| Inventing or materially changing a visual design | `design-quality.md` (+ `/design-slop` when available) |
 | Migrating V1 blocks (`container`, `headline`, `grid`) | `migrations.md` |
 | Markup that's failing / debugging | `troubleshooting.md`, `recovery-rules.md` |
 | Hand-converting an existing design / bulk escaping / pre-delivery validation | `field-notes.md` |
@@ -60,6 +64,8 @@ references/
 ├── recovery-rules.md         ← MUST read every task. Recovery error catalog.
 ├── field-notes.md            ← Real-conversion lessons: escaping workflow, validation script
 ├── block-types.md            ← Element/Text/Media/Shape verified specs
+├── css-mode.md               ← Pro CSS Mode, supported selectors/at-rules, styles/css contract
+├── design-quality.md         ← GenerateBlocks-specific anti-slop implementation gate
 ├── dynamic-tags.md           ← Canonical tag catalog + syntax. Wins all conflicts.
 ├── query-block.md            ← Query/Looper/Loop-Item + Pro query extensions
 ├── acf-and-custom-fields.md  ← ACF patterns, repeater loops, options pages
@@ -69,9 +75,9 @@ references/
 ├── gb-pro.md                 ← Pro overview + feature map (2.7)
 ├── pro-forms.md              ← Forms system deep dive
 ├── pro-interactive.md        ← Accordion/Tabs/Carousel/Nav/Header/Overlays
-├── css-patterns.md           ← Hover, gradients, pseudo-elements, buttons, cards
+├── css-patterns.md           ← Durable states, surfaces, buttons, selectors
 ├── svg-icons.md              ← Shape block + inline SVG patterns
-├── responsive.md             ← Media queries, breakpoints (V2)
+├── responsive.md             ← Native/custom at-rules + responsive composition
 ├── global-styles.md          ← Design tokens, theme.json bridge
 ├── patterns.md               ← Block pattern registration
 ├── performance.md            ← CSS delivery optimization
@@ -88,13 +94,17 @@ references/
 1. **Output to a file**, never inline in chat. Filename: `{section}-section.html`
    or `{slug}.html`. Place in `output/` if working in this repo, otherwise
    wherever the user wants.
-2. **Run the pre-flight checklist** from `recovery-rules.md` §7 against your
-   output before saving. Every item.
-3. **Summarize in chat**: purpose, block count, anything that needs Pro,
+2. **Resolve the actual WordPress post ID before serialization.** A new record
+   must be created as a draft first. Generate new IDs as
+   `{section}-{post_id}-{sequence}` and never leave `{post_id}` literal.
+3. **Run the pre-flight checklist** from `recovery-rules.md` §7 against your
+   output before saving. Use `scripts/preflight.py <file> --post-id <ID>`.
+4. **Summarize in chat**: purpose, block count, anything that needs Pro,
    anything skipped due to a recovery rule.
-4. **Anti-slop gate**: if you invented any part of the design (no reference
-   provided), run the "Design quality — no slop" checklist in `SKILL.md`
-   before delivering — load the `/design-slop` skill when it's available.
+5. **Anti-slop gate**: if you invented or materially changed any part of the
+   design, run `design-quality.md` before delivering and load `/design-slop`
+   when it is available. The nearest project design system owns brand-specific
+   decisions.
 
 ---
 
@@ -122,6 +132,11 @@ references/
 - **CSS variable in JSON?** → escape it: `var(\u002d\u002dgb-foo)`.
 - **CSS variable in inline `style=""`?** → literal: `var(--gb-foo)`.
 - **Quote inside a JSON string value?** → `\u0022`, never `\"`.
+- **GenerateBlocks Mobile?** → `@media (max-width:767px)` in 2.4.1.
+- **Existing `max-width:768px` rule?** → preserve it as a custom boundary
+  unless a breakpoint migration was explicitly approved.
+- **CSS Mode?** → edit `styles`; compile the same structure into local `css`.
+  Never invent a `cssMode` attribute.
 
 Default minimum context for any task: `recovery-rules.md` + `block-types.md`
 + the task file. Add `dynamic-tags.md` whenever data is dynamic.

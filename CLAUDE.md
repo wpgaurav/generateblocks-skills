@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This repository contains GenerateBlocks WordPress plugin development and skills for creating/converting layouts.
 
 **Contents:**
-- `generateblocks/` - Free plugin source code (2.4.0-rc)
-- `generateblocks-pro/` - Pro plugin source code (2.7.0-rc — Editor Access, Forms, CSS Mode; git-ignored)
+- `generateblocks/` - Free plugin source code (2.4.1)
+- `generateblocks-pro/` - Pro plugin source code (2.7.1 — Editor Access, Forms, CSS Mode; git-ignored)
 - `skills/` - Claude Code skills for GenerateBlocks workflows
 - `examples/` - Golden example sections + production pages from gauravtiwari.org
 
@@ -135,11 +135,11 @@ npm run plugin-zip         # Create plugin zip
 **IMPORTANT V2 Naming:**
 - Use `generateblocks/element` (NOT `/container`)
 - Use `generateblocks/text` (NOT `/headline` or `/button`)
-- Rendered HTML classes MUST be: `gb-element-{uniqueId} gb-element` for element blocks
-- Rendered HTML classes MUST be: `gb-text-{uniqueId} gb-text` for text blocks
-- Rendered HTML classes MUST be: `gb-media-{uniqueId} gb-media` for media blocks
-- Rendered HTML classes MUST be: `gb-shape-{uniqueId} gb-shape` for shape blocks
-- In JSON, `className` holds only the base class (`"className":"gb-element"` — Option A, serialized last); the plugin auto-injects the id-class into the rendered class list
+- New element blocks prefer `gb-element-{uniqueId} gb-element` with
+  `"className":"gb-element"` (Option A, serialized last)
+- Text/media/shape commonly omit `className` and render base-first
+- Existing pages can mix conventions; measure and preserve the target per block
+  type instead of normalizing it
 
 ### Plugin Structure
 
@@ -188,8 +188,8 @@ npm run plugin-zip         # Create plugin zip
 **Attributes:**
 - `uniqueId` - Required for CSS targeting
 - `tagName` - HTML element type
-- `styles` - Object with basic CSS (padding, margin, colors, flex, grid)
-- `css` - Base styles (alphabetically sorted, minified). Exceptions: pseudo-elements, media queries, animations, parent hover targeting children. No hover states or transitions
+- `styles` - Editable structured CSS, including one-level selectors and supported at-rules
+- `css` - Compiled local frontend cache; keep it semantically aligned with `styles`
 - `globalClasses` - Array of global CSS classes
 - `htmlAttributes` - Plain object of HTML attrs: `{"href":"url","target":"_blank"}`. NOT array format
 - **Links**: element `<a>` wrapping a text `span` child. Text `<a>` strips its `href` on save; element `<a>` with raw text (no inner blocks) causes recovery. Inline links go inside a text block's rich-text content
@@ -197,18 +197,23 @@ npm run plugin-zip         # Create plugin zip
 
 ## CSS Approaches
 
-**1. PHP-Generated (Standard):** Styles stored as objects, PHP generates CSS at render time
+**Local V2 blocks:** `styles` is the editable structured source and `css` is
+the compiled frontend cache. Keep base declarations, transitions, one-level
+selectors, and `@media`/`@supports`/`@container` branches in `styles`, then
+compile the same structure into `css`.
 
-**2. Inline Styles (V2 with `styles` + `css`):** Self-contained styling in block attributes
+**Pro CSS Mode:** a code editor for the same `styles` data. It does not create
+a `cssMode` attribute. See `skills/generateblocks-layouts/references/css-mode.md`.
 
-Use `styles` for: layout, spacing, colors, typography, borders
-Use `css` for: base styles (minified, alphabetically sorted). Exceptions in css: pseudo-elements, media queries, animations, parent hover targeting children. **Never** hover states or transitions in css
+**Delivery:** GenerateBlocks collects saved block CSS and delivers it inline or
+through generated files according to site settings and runtime fallbacks.
 
 ## Unique ID Convention
 
-Format: `{section}{number}{letter}`
-- Section: 3-4 chars (hero, serv, tool, blog)
-- Number: 001-999
-- Letter: Optional for nested elements (a, b, c)
+Format: `{section}-{post_id}-{sequence}{letter}`
+- Section: short lowercase component name
+- Post ID: real numeric WordPress record ID
+- Sequence: starts at 1 and is never zero-padded
+- Letter: optional lowercase nesting suffix
 
-Examples: `hero001a`, `serv023`, `card014b`
+Examples: `hero-1173976-1a`, `service-15975-23`, `card-42869-14b`

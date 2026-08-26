@@ -42,18 +42,18 @@ field label or the `field_xxxxx` key.
 ### ACF image (return format: URL)
 
 ```html
-<!-- wp:generateblocks/media {"uniqueId":"prod002","tagName":"img","styles":{"width":"100%","borderRadius":"0.75rem"},"css":".gb-media-prod002{border-radius:0.75rem;width:100%}","htmlAttributes":{"src":"{{post_meta key:product_image}}","alt":"{{post_title}}"},"className":"gb-media"} -->
-<img class="gb-media-prod002 gb-media" src="{{post_meta key:product_image}}" alt="{{post_title}}"/>
+<!-- wp:generateblocks/media {"uniqueId":"prod2","tagName":"img","styles":{"width":"100%","borderRadius":"0.75rem"},"css":".gb-media-prod2{border-radius:0.75rem;width:100%}","htmlAttributes":{"src":"{{post_meta key:product_image}}","alt":"{{post_title}}"},"className":"gb-media"} -->
+<img class="gb-media-prod2 gb-media" src="{{post_meta key:product_image}}" alt="{{post_title}}"/>
 <!-- /wp:generateblocks/media -->
 ```
 
 ### ACF link field (return format: array) → CTA button
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"prod003","tagName":"a","styles":{"display":"inline-block","backgroundColor":"#c0392b","color":"#ffffff","padding":"0.75rem 1.5rem","borderRadius":"2rem"},"css":".gb-element-prod003{background-color:#c0392b;border-radius:2rem;color:#ffffff;display:inline-block;padding:0.75rem 1.5rem}","htmlAttributes":{"href":"{{post_meta key:cta_link.url}}"},"className":"gb-element"} -->
-<a class="gb-element-prod003 gb-element" href="{{post_meta key:cta_link.url}}">
-    <!-- wp:generateblocks/text {"uniqueId":"prod004","tagName":"span","content":"{{post_meta key:cta_link.title}}","styles":{},"css":"","className":"gb-text"} -->
-    <span class="gb-text-prod004 gb-text">{{post_meta key:cta_link.title}}</span>
+<!-- wp:generateblocks/element {"uniqueId":"prod3","tagName":"a","styles":{"display":"inline-block","backgroundColor":"#c0392b","color":"#ffffff","padding":"0.75rem 1.5rem","borderRadius":"0.375rem"},"css":".gb-element-prod3{background-color:#c0392b;border-radius:0.375rem;color:#ffffff;display:inline-block;padding:0.75rem 1.5rem}","htmlAttributes":{"href":"{{post_meta key:cta_link.url}}"},"className":"gb-element"} -->
+<a class="gb-element-prod3 gb-element" href="{{post_meta key:cta_link.url}}">
+    <!-- wp:generateblocks/text {"uniqueId":"prod4","tagName":"span","content":"{{post_meta key:cta_link.title}}","styles":{},"css":"","className":"gb-text"} -->
+    <span class="gb-text-prod4 gb-text">{{post_meta key:cta_link.title}}</span>
     <!-- /wp:generateblocks/text -->
 </a>
 <!-- /wp:generateblocks/element -->
@@ -72,7 +72,7 @@ Mix static text and tags freely inside one text block's content:
 Free: `:empty` on the block's own selector (allowed exception):
 
 ```json
-"css":".gb-text-prod005:empty{display:none}.gb-text-prod005{color:#5c5c5c}"
+"css":".gb-text-prod5:empty{display:none}.gb-text-prod5{color:#5c5c5c}"
 ```
 
 Pro: a Conditions post on Post Meta — see `conditions.md`.
@@ -101,17 +101,17 @@ The Query block's Pro `queryType:"post_meta"` loops any array meta — which is
 exactly what an ACF repeater is. Structure is the normal query family:
 
 ```html
-<!-- wp:generateblocks/query {"uniqueId":"team001","tagName":"section","styles":{"paddingTop":"4rem","paddingBottom":"4rem"},"css":".gb-query-team001{padding-bottom:4rem;padding-top:4rem}","queryType":"post_meta","paginationType":"standard","query":{"meta_key_id":"current","meta_key":"team_members","posts_per_page":-1},"className":"gb-query"} -->
-<section class="gb-query-team001 gb-query">
-    <!-- wp:generateblocks/looper {"uniqueId":"team002","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(3,minmax(0,1fr))","gap":"2rem","@media (max-width:768px)":{"gridTemplateColumns":"1fr"}},"css":".gb-looper-team002{display:grid;gap:2rem;grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:768px){.gb-looper-team002{grid-template-columns:1fr}}","className":"gb-looper"} -->
-    <div class="gb-looper-team002 gb-looper">
-        <!-- wp:generateblocks/loop-item {"uniqueId":"team003","tagName":"div","styles":{"backgroundColor":"#f5f5f3","borderRadius":"1rem","padding":"2rem"},"css":".gb-loop-item-team003{background-color:#f5f5f3;border-radius:1rem;padding:2rem}","className":"gb-loop-item"} -->
-        <div class="gb-loop-item-team003 gb-loop-item">
-            <!-- wp:generateblocks/text {"uniqueId":"team004","tagName":"h3","content":"{{loop_item key:name}}","styles":{"fontSize":"1.25rem"},"css":".gb-text-team004{font-size:1.25rem}","className":"gb-text"} -->
-            <h3 class="gb-text-team004 gb-text">{{loop_item key:name}}</h3>
+<!-- wp:generateblocks/query {"uniqueId":"team1","tagName":"section","styles":{"paddingTop":"4rem","paddingBottom":"4rem"},"css":".gb-query-team1{padding-bottom:4rem;padding-top:4rem}","queryType":"post_meta","paginationType":"standard","query":{"meta_key_id":"current","meta_key":"team_members","posts_per_page":-1},"className":"gb-query"} -->
+<section class="gb-query-team1 gb-query">
+    <!-- wp:generateblocks/looper {"uniqueId":"team2","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(3,minmax(0,1fr))","gap":"2rem","@media (max-width:767px)":{"gridTemplateColumns":"1fr"}},"css":".gb-looper-team2{display:grid;gap:2rem;grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:767px){.gb-looper-team2{grid-template-columns:1fr}}","className":"gb-looper"} -->
+    <div class="gb-looper-team2 gb-looper">
+        <!-- wp:generateblocks/loop-item {"uniqueId":"team3","tagName":"div","styles":{"backgroundColor":"#f5f5f3","borderRadius":"1rem","padding":"2rem"},"css":".gb-loop-item-team3{background-color:#f5f5f3;border-radius:1rem;padding:2rem}","className":"gb-loop-item"} -->
+        <div class="gb-loop-item-team3 gb-loop-item">
+            <!-- wp:generateblocks/text {"uniqueId":"team4","tagName":"h3","content":"{{loop_item key:name}}","styles":{"fontSize":"1.25rem"},"css":".gb-text-team4{font-size:1.25rem}","className":"gb-text"} -->
+            <h3 class="gb-text-team4 gb-text">{{loop_item key:name}}</h3>
             <!-- /wp:generateblocks/text -->
-            <!-- wp:generateblocks/text {"uniqueId":"team005","tagName":"p","content":"{{loop_item key:role|fallback:Team member}}","styles":{"color":"#5c5c5c"},"css":".gb-text-team005{color:#5c5c5c}","className":"gb-text"} -->
-            <p class="gb-text-team005 gb-text">{{loop_item key:role|fallback:Team member}}</p>
+            <!-- wp:generateblocks/text {"uniqueId":"team5","tagName":"p","content":"{{loop_item key:role|fallback:Team member}}","styles":{"color":"#5c5c5c"},"css":".gb-text-team5{color:#5c5c5c}","className":"gb-text"} -->
+            <p class="gb-text-team5 gb-text">{{loop_item key:role|fallback:Team member}}</p>
             <!-- /wp:generateblocks/text -->
         </div>
         <!-- /wp:generateblocks/loop-item -->

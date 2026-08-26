@@ -2,8 +2,10 @@
 
 > **LEGACY FILE — patterns here predate the hardened serialization rules.**
 > Markup examples may use old class order, unsorted CSS, and descendant
-> selectors. Use `responsive.md` for current patterns; treat this file as
-> historical reference only.
+> selectors. They also use `max-width:768px` as Mobile and often place queries
+> only in `css`; neither is the current native 2.4.1 contract. Use
+> `responsive.md` for current patterns; treat this file as historical reference
+> only and never copy its markup directly.
 
 Handle responsive design, breakpoints, and device-specific layouts in GenerateBlocks.
 
@@ -48,8 +50,8 @@ add_filter( 'generateblocks_breakpoints', function( $breakpoints ) {
 Define base styles for desktop, override for smaller screens:
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"resp001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(4, minmax(0, 1fr))","gap":"2rem","padding":"4rem 2rem"},"css":".gb-element-resp001{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:2rem;padding:4rem 2rem}@media(max-width:1024px){.gb-element-resp001{grid-template-columns:repeat(2, minmax(0, 1fr));gap:1.5rem;padding:3rem 1.5rem}}@media(max-width:768px){.gb-element-resp001{grid-template-columns:1fr;gap:1rem;padding:2rem 1rem}}"} -->
-<div class="gb-element gb-element-resp001">
+<!-- wp:generateblocks/element {"uniqueId":"resp1","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(4, minmax(0, 1fr))","gap":"2rem","padding":"4rem 2rem"},"css":".gb-element-resp1{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:2rem;padding:4rem 2rem}@media(max-width:1024px){.gb-element-resp1{grid-template-columns:repeat(2, minmax(0, 1fr));gap:1.5rem;padding:3rem 1.5rem}}@media(max-width:768px){.gb-element-resp1{grid-template-columns:1fr;gap:1rem;padding:2rem 1rem}}"} -->
+<div class="gb-element gb-element-resp1">
     <!-- Content -->
 </div>
 <!-- /wp:generateblocks/element -->
@@ -60,8 +62,8 @@ Define base styles for desktop, override for smaller screens:
 Define base styles for mobile, enhance for larger screens:
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"resp002","tagName":"div","styles":{"display":"flex","flexDirection":"column","gap":"1rem","padding":"1.5rem"},"css":".gb-element-resp002{display:flex;flex-direction:column;gap:1rem;padding:1.5rem}@media(min-width:768px){.gb-element-resp002{flex-direction:row;gap:2rem;padding:2rem}}@media(min-width:1024px){.gb-element-resp002{gap:3rem;padding:3rem}}"} -->
-<div class="gb-element gb-element-resp002">
+<!-- wp:generateblocks/element {"uniqueId":"resp2","tagName":"div","styles":{"display":"flex","flexDirection":"column","gap":"1rem","padding":"1.5rem"},"css":".gb-element-resp2{display:flex;flex-direction:column;gap:1rem;padding:1.5rem}@media(min-width:768px){.gb-element-resp2{flex-direction:row;gap:2rem;padding:2rem}}@media(min-width:1024px){.gb-element-resp2{gap:3rem;padding:3rem}}"} -->
+<div class="gb-element gb-element-resp2">
     <!-- Content -->
 </div>
 <!-- /wp:generateblocks/element -->
@@ -72,8 +74,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Responsive Grid
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"grid001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(4, minmax(0, 1fr))","gap":"1.5rem"},"css":".gb-element-grid001{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:1.5rem}@media(max-width:1024px){.gb-element-grid001{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media(max-width:768px){.gb-element-grid001{grid-template-columns:1fr}}"} -->
-<div class="gb-element gb-element-grid001">
+<!-- wp:generateblocks/element {"uniqueId":"grid1","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"repeat(4, minmax(0, 1fr))","gap":"1.5rem"},"css":".gb-element-grid1{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:1.5rem}@media(max-width:1024px){.gb-element-grid1{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media(max-width:768px){.gb-element-grid1{grid-template-columns:1fr}}"} -->
+<div class="gb-element gb-element-grid1">
     <!-- Grid items -->
 </div>
 <!-- /wp:generateblocks/element -->
@@ -83,8 +85,8 @@ Define base styles for mobile, enhance for larger screens:
 
 ```html
 <!-- Featured card: 2x2 on desktop, 2x1 on tablet, full width on mobile -->
-<!-- wp:generateblocks/element {"uniqueId":"feat001","tagName":"div","styles":{"gridColumn":"span 2","gridRow":"span 2"},"css":".gb-element-feat001{grid-column:span 2;grid-row:span 2}@media(max-width:1024px){.gb-element-feat001{grid-column:span 2;grid-row:span 1}}@media(max-width:768px){.gb-element-feat001{grid-column:span 1;grid-row:span 1}}"} -->
-<div class="gb-element gb-element-feat001">
+<!-- wp:generateblocks/element {"uniqueId":"feat1","tagName":"div","styles":{"gridColumn":"span 2","gridRow":"span 2"},"css":".gb-element-feat1{grid-column:span 2;grid-row:span 2}@media(max-width:1024px){.gb-element-feat1{grid-column:span 2;grid-row:span 1}}@media(max-width:768px){.gb-element-feat1{grid-column:span 1;grid-row:span 1}}"} -->
+<div class="gb-element gb-element-feat1">
     <!-- Featured content -->
 </div>
 <!-- /wp:generateblocks/element -->
@@ -93,8 +95,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Responsive Flexbox Direction
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"flex001","tagName":"div","styles":{"display":"flex","flexDirection":"row","gap":"2rem","alignItems":"center"},"css":".gb-element-flex001{display:flex;flex-direction:row;gap:2rem;align-items:center}@media(max-width:768px){.gb-element-flex001{flex-direction:column;gap:1.5rem;text-align:center}}"} -->
-<div class="gb-element gb-element-flex001">
+<!-- wp:generateblocks/element {"uniqueId":"flex1","tagName":"div","styles":{"display":"flex","flexDirection":"row","gap":"2rem","alignItems":"center"},"css":".gb-element-flex1{display:flex;flex-direction:row;gap:2rem;align-items:center}@media(max-width:768px){.gb-element-flex1{flex-direction:column;gap:1.5rem;text-align:center}}"} -->
+<div class="gb-element gb-element-flex1">
     <!-- Flex items -->
 </div>
 <!-- /wp:generateblocks/element -->
@@ -111,8 +113,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Fluid Typography with Clamp
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"fluid001","tagName":"h1","styles":{"fontSize":"clamp(2rem, 5vw, 3.5rem)","lineHeight":"1.1"},"css":".gb-text-fluid001{font-size:clamp(2rem, 5vw, 3.5rem);line-height:1.1}"} -->
-<h1 class="gb-text gb-text-fluid001">Fluid Typography</h1>
+<!-- wp:generateblocks/text {"uniqueId":"fluid1","tagName":"h1","styles":{"fontSize":"clamp(2rem, 5vw, 3.5rem)","lineHeight":"1.1"},"css":".gb-text-fluid1{font-size:clamp(2rem, 5vw, 3.5rem);line-height:1.1}"} -->
+<h1 class="gb-text gb-text-fluid1">Fluid Typography</h1>
 <!-- /wp:generateblocks/text -->
 ```
 
@@ -124,8 +126,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Responsive Spacing
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"space001","tagName":"section","styles":{"padding":"6rem 2rem"},"css":".gb-element-space001{padding:6rem 2rem}@media(max-width:1024px){.gb-element-space001{padding:4rem 1.5rem}}@media(max-width:768px){.gb-element-space001{padding:3rem 1rem}}"} -->
-<section class="gb-element gb-element-space001">
+<!-- wp:generateblocks/element {"uniqueId":"space1","tagName":"section","styles":{"padding":"6rem 2rem"},"css":".gb-element-space1{padding:6rem 2rem}@media(max-width:1024px){.gb-element-space1{padding:4rem 1.5rem}}@media(max-width:768px){.gb-element-space1{padding:3rem 1rem}}"} -->
+<section class="gb-element gb-element-space1">
     <!-- Section content -->
 </section>
 <!-- /wp:generateblocks/element -->
@@ -134,8 +136,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Fluid Spacing with Clamp
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"fluid002","tagName":"section","styles":{"padding":"clamp(2rem, 8vw, 6rem) clamp(1rem, 4vw, 2rem)"},"css":".gb-element-fluid002{padding:clamp(2rem, 8vw, 6rem) clamp(1rem, 4vw, 2rem)}"} -->
-<section class="gb-element gb-element-fluid002">
+<!-- wp:generateblocks/element {"uniqueId":"fluid2","tagName":"section","styles":{"padding":"clamp(2rem, 8vw, 6rem) clamp(1rem, 4vw, 2rem)"},"css":".gb-element-fluid2{padding:clamp(2rem, 8vw, 6rem) clamp(1rem, 4vw, 2rem)}"} -->
+<section class="gb-element gb-element-fluid2">
     <!-- Content with fluid padding -->
 </section>
 <!-- /wp:generateblocks/element -->
@@ -147,22 +149,22 @@ Define base styles for mobile, enhance for larger screens:
 
 ```html
 <!-- Desktop only (hide on tablet and mobile) -->
-<!-- wp:generateblocks/element {"uniqueId":"desk001","tagName":"div","styles":{"display":"block"},"css":".gb-element-desk001{display:block}@media(max-width:1024px){.gb-element-desk001{display:none}}"} -->
-<div class="gb-element gb-element-desk001">
+<!-- wp:generateblocks/element {"uniqueId":"desk1","tagName":"div","styles":{"display":"block"},"css":".gb-element-desk1{display:block}@media(max-width:1024px){.gb-element-desk1{display:none}}"} -->
+<div class="gb-element gb-element-desk1">
     Desktop only content
 </div>
 <!-- /wp:generateblocks/element -->
 
 <!-- Tablet and up (hide on mobile) -->
-<!-- wp:generateblocks/element {"uniqueId":"tab001","tagName":"div","styles":{"display":"block"},"css":".gb-element-tab001{display:block}@media(max-width:768px){.gb-element-tab001{display:none}}"} -->
-<div class="gb-element gb-element-tab001">
+<!-- wp:generateblocks/element {"uniqueId":"tab1","tagName":"div","styles":{"display":"block"},"css":".gb-element-tab1{display:block}@media(max-width:768px){.gb-element-tab1{display:none}}"} -->
+<div class="gb-element gb-element-tab1">
     Tablet and desktop content
 </div>
 <!-- /wp:generateblocks/element -->
 
 <!-- Mobile only (hide on tablet and desktop) -->
-<!-- wp:generateblocks/element {"uniqueId":"mob001","tagName":"div","styles":{"display":"none"},"css":".gb-element-mob001{display:none}@media(max-width:768px){.gb-element-mob001{display:block}}"} -->
-<div class="gb-element gb-element-mob001">
+<!-- wp:generateblocks/element {"uniqueId":"mob1","tagName":"div","styles":{"display":"none"},"css":".gb-element-mob1{display:none}@media(max-width:768px){.gb-element-mob1{display:block}}"} -->
+<div class="gb-element gb-element-mob1">
     Mobile only content
 </div>
 <!-- /wp:generateblocks/element -->
@@ -172,15 +174,15 @@ Define base styles for mobile, enhance for larger screens:
 
 ```html
 <!-- Desktop navigation -->
-<!-- wp:generateblocks/element {"uniqueId":"nav001","tagName":"nav","styles":{"display":"flex"},"css":".gb-element-nav001{display:flex}@media(max-width:1024px){.gb-element-nav001{display:none}}"} -->
-<nav class="gb-element gb-element-nav001">
+<!-- wp:generateblocks/element {"uniqueId":"nav1","tagName":"nav","styles":{"display":"flex"},"css":".gb-element-nav1{display:flex}@media(max-width:1024px){.gb-element-nav1{display:none}}"} -->
+<nav class="gb-element gb-element-nav1">
     <!-- Full navigation -->
 </nav>
 <!-- /wp:generateblocks/element -->
 
 <!-- Mobile hamburger menu -->
-<!-- wp:generateblocks/element {"uniqueId":"nav002","tagName":"nav","styles":{"display":"none"},"css":".gb-element-nav002{display:none}@media(max-width:1024px){.gb-element-nav002{display:block}}"} -->
-<nav class="gb-element gb-element-nav002">
+<!-- wp:generateblocks/element {"uniqueId":"nav2","tagName":"nav","styles":{"display":"none"},"css":".gb-element-nav2{display:none}@media(max-width:1024px){.gb-element-nav2{display:block}}"} -->
+<nav class="gb-element gb-element-nav2">
     <!-- Mobile menu -->
 </nav>
 <!-- /wp:generateblocks/element -->
@@ -191,16 +193,16 @@ Define base styles for mobile, enhance for larger screens:
 ### Two-Column to Stacked
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"twocol001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"minmax(0, 1fr) minmax(0, 1fr)","gap":"3rem","alignItems":"center"},"css":".gb-element-twocol001{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:3rem;align-items:center}@media(max-width:768px){.gb-element-twocol001{grid-template-columns:1fr;gap:2rem}}"} -->
-<div class="gb-element gb-element-twocol001">
+<!-- wp:generateblocks/element {"uniqueId":"twocol1","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"minmax(0, 1fr) minmax(0, 1fr)","gap":"3rem","alignItems":"center"},"css":".gb-element-twocol1{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:3rem;align-items:center}@media(max-width:768px){.gb-element-twocol1{grid-template-columns:1fr;gap:2rem}}"} -->
+<div class="gb-element gb-element-twocol1">
 
-    <!-- wp:generateblocks/element {"uniqueId":"twocol002","tagName":"div"} -->
+    <!-- wp:generateblocks/element {"uniqueId":"twocol2","tagName":"div"} -->
     <div class="gb-element">
         <!-- Left content -->
     </div>
     <!-- /wp:generateblocks/element -->
 
-    <!-- wp:generateblocks/element {"uniqueId":"twocol003","tagName":"div"} -->
+    <!-- wp:generateblocks/element {"uniqueId":"twocol3","tagName":"div"} -->
     <div class="gb-element">
         <!-- Right content -->
     </div>
@@ -213,8 +215,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Reverse Order on Mobile
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"rev001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"minmax(0, 1fr) minmax(0, 1fr)","gap":"2rem"},"css":".gb-element-rev001{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:2rem}@media(max-width:768px){.gb-element-rev001{grid-template-columns:1fr}}.gb-element-rev001>:first-child{order:1}@media(max-width:768px){.gb-element-rev001>:first-child{order:2}}.gb-element-rev001>:last-child{order:2}@media(max-width:768px){.gb-element-rev001>:last-child{order:1}}"} -->
-<div class="gb-element gb-element-rev001">
+<!-- wp:generateblocks/element {"uniqueId":"rev1","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"minmax(0, 1fr) minmax(0, 1fr)","gap":"2rem"},"css":".gb-element-rev1{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:2rem}@media(max-width:768px){.gb-element-rev1{grid-template-columns:1fr}}.gb-element-rev1>:first-child{order:1}@media(max-width:768px){.gb-element-rev1>:first-child{order:2}}.gb-element-rev1>:last-child{order:2}@media(max-width:768px){.gb-element-rev1>:last-child{order:1}}"} -->
+<div class="gb-element gb-element-rev1">
     <!-- First child: Image (appears second on mobile) -->
     <!-- Second child: Text (appears first on mobile) -->
 </div>
@@ -224,19 +226,19 @@ Define base styles for mobile, enhance for larger screens:
 ### Sidebar to Full Width
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"side001","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"1fr 300px","gap":"3rem"},"css":".gb-element-side001{display:grid;grid-template-columns:1fr 300px;gap:3rem}@media(max-width:1024px){.gb-element-side001{grid-template-columns:1fr}}"} -->
-<div class="gb-element gb-element-side001">
+<!-- wp:generateblocks/element {"uniqueId":"side1","tagName":"div","styles":{"display":"grid","gridTemplateColumns":"1fr 300px","gap":"3rem"},"css":".gb-element-side1{display:grid;grid-template-columns:1fr 300px;gap:3rem}@media(max-width:1024px){.gb-element-side1{grid-template-columns:1fr}}"} -->
+<div class="gb-element gb-element-side1">
 
     <!-- Main content -->
-    <!-- wp:generateblocks/element {"uniqueId":"side002","tagName":"main"} -->
+    <!-- wp:generateblocks/element {"uniqueId":"side2","tagName":"main"} -->
     <main class="gb-element">
         <!-- Content -->
     </main>
     <!-- /wp:generateblocks/element -->
 
     <!-- Sidebar -->
-    <!-- wp:generateblocks/element {"uniqueId":"side003","tagName":"aside","styles":{"position":"sticky","top":"2rem"},"css":".gb-element-side003{position:sticky;top:2rem}@media(max-width:1024px){.gb-element-side003{position:static}}"} -->
-    <aside class="gb-element gb-element-side003">
+    <!-- wp:generateblocks/element {"uniqueId":"side3","tagName":"aside","styles":{"position":"sticky","top":"2rem"},"css":".gb-element-side3{position:sticky;top:2rem}@media(max-width:1024px){.gb-element-side3{position:static}}"} -->
+    <aside class="gb-element gb-element-side3">
         <!-- Sidebar content -->
     </aside>
     <!-- /wp:generateblocks/element -->
@@ -250,24 +252,24 @@ Define base styles for mobile, enhance for larger screens:
 ### Aspect Ratio Preservation
 
 ```html
-<!-- wp:generateblocks/media {"uniqueId":"img001","htmlAttributes":{"src":"image.jpg","alt":"Description"},"styles":{"width":"100%","height":"auto","aspectRatio":"16/9","objectFit":"cover"},"css":".gb-media-img001{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}@media(max-width:768px){.gb-media-img001{aspect-ratio:4/3}}"} -->
-<img class="gb-media gb-media-img001" src="image.jpg" alt="Description" />
+<!-- wp:generateblocks/media {"uniqueId":"img1","htmlAttributes":{"src":"image.jpg","alt":"Description"},"styles":{"width":"100%","height":"auto","aspectRatio":"16/9","objectFit":"cover"},"css":".gb-media-img1{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}@media(max-width:768px){.gb-media-img1{aspect-ratio:4/3}}"} -->
+<img class="gb-media gb-media-img1" src="image.jpg" alt="Description" />
 <!-- /wp:generateblocks/media -->
 ```
 
 ### Responsive Image Sizes
 
 ```html
-<!-- wp:generateblocks/media {"uniqueId":"img002","htmlAttributes":{"src":"image.jpg","alt":"Description","srcset":"image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w","sizes":"(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"},"styles":{"width":"100%","height":"auto"},"css":".gb-media-img002{width:100%;height:auto}"} -->
-<img class="gb-media gb-media-img002" src="image.jpg" alt="Description" srcset="image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+<!-- wp:generateblocks/media {"uniqueId":"img2","htmlAttributes":{"src":"image.jpg","alt":"Description","srcset":"image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w","sizes":"(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"},"styles":{"width":"100%","height":"auto"},"css":".gb-media-img2{width:100%;height:auto}"} -->
+<img class="gb-media gb-media-img2" src="image.jpg" alt="Description" srcset="image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
 <!-- /wp:generateblocks/media -->
 ```
 
 ### Background Image Responsive
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"bg001","tagName":"section","styles":{"backgroundImage":"url(hero-desktop.jpg)","backgroundSize":"cover","backgroundPosition":"center"},"css":".gb-element-bg001{background-image:url(hero-desktop.jpg);background-size:cover;background-position:center}@media(max-width:1024px){.gb-element-bg001{background-image:url(hero-tablet.jpg)}}@media(max-width:768px){.gb-element-bg001{background-image:url(hero-mobile.jpg);background-position:top center}}"} -->
-<section class="gb-element gb-element-bg001">
+<!-- wp:generateblocks/element {"uniqueId":"bg1","tagName":"section","styles":{"backgroundImage":"url(hero-desktop.jpg)","backgroundSize":"cover","backgroundPosition":"center"},"css":".gb-element-bg1{background-image:url(hero-desktop.jpg);background-size:cover;background-position:center}@media(max-width:1024px){.gb-element-bg1{background-image:url(hero-tablet.jpg)}}@media(max-width:768px){.gb-element-bg1{background-image:url(hero-mobile.jpg);background-position:top center}}"} -->
+<section class="gb-element gb-element-bg1">
     <!-- Content -->
 </section>
 <!-- /wp:generateblocks/element -->
@@ -278,8 +280,8 @@ Define base styles for mobile, enhance for larger screens:
 ### Scrollable Table
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"table001","tagName":"div","styles":{"overflowX":"auto"},"css":".gb-element-table001{overflow-x:auto;-webkit-overflow-scrolling:touch}"} -->
-<div class="gb-element gb-element-table001">
+<!-- wp:generateblocks/element {"uniqueId":"table1","tagName":"div","styles":{"overflowX":"auto"},"css":".gb-element-table1{overflow-x:auto;-webkit-overflow-scrolling:touch}"} -->
+<div class="gb-element gb-element-table1">
     <!-- wp:table -->
     <!-- Table content -->
     <!-- /wp:table -->
@@ -330,29 +332,29 @@ Define base styles for mobile, enhance for larger screens:
 ### Full Example
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"hero001","tagName":"section","styles":{"minHeight":"90vh","display":"flex","alignItems":"center","justifyContent":"center","padding":"6rem 2rem","background":"linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)","color":"#ffffff","textAlign":"center"},"css":".gb-element-hero001{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem;background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);color:#ffffff;text-align:center}@media(max-width:1024px){.gb-element-hero001{min-height:80vh;padding:4rem 1.5rem}}@media(max-width:768px){.gb-element-hero001{min-height:auto;padding:3rem 1rem}}"} -->
-<section class="gb-element gb-element-hero001">
+<!-- wp:generateblocks/element {"uniqueId":"hero1","tagName":"section","styles":{"minHeight":"90vh","display":"flex","alignItems":"center","justifyContent":"center","padding":"6rem 2rem","background":"linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)","color":"#ffffff","textAlign":"center"},"css":".gb-element-hero1{min-height:90vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem;background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);color:#ffffff;text-align:center}@media(max-width:1024px){.gb-element-hero1{min-height:80vh;padding:4rem 1.5rem}}@media(max-width:768px){.gb-element-hero1{min-height:auto;padding:3rem 1rem}}"} -->
+<section class="gb-element gb-element-hero1">
 
-    <!-- wp:generateblocks/element {"uniqueId":"hero002","tagName":"div","styles":{"maxWidth":"900px"},"css":".gb-element-hero002{max-width:900px}@media(max-width:768px){.gb-element-hero002{max-width:100%}}"} -->
-    <div class="gb-element gb-element-hero002">
+    <!-- wp:generateblocks/element {"uniqueId":"hero2","tagName":"div","styles":{"maxWidth":"900px"},"css":".gb-element-hero2{max-width:900px}@media(max-width:768px){.gb-element-hero2{max-width:100%}}"} -->
+    <div class="gb-element gb-element-hero2">
 
-        <!-- wp:generateblocks/text {"uniqueId":"hero003","tagName":"h1","styles":{"fontSize":"4rem","fontWeight":"900","lineHeight":"1.1","marginBottom":"1.5rem"},"css":".gb-text-hero003{font-size:4rem;font-weight:900;line-height:1.1;margin-bottom:1.5rem}@media(max-width:1024px){.gb-text-hero003{font-size:3rem}}@media(max-width:768px){.gb-text-hero003{font-size:2.25rem;margin-bottom:1rem}}"} -->
-        <h1 class="gb-text gb-text-hero003">Build Amazing Websites</h1>
+        <!-- wp:generateblocks/text {"uniqueId":"hero3","tagName":"h1","styles":{"fontSize":"4rem","fontWeight":"900","lineHeight":"1.1","marginBottom":"1.5rem"},"css":".gb-text-hero3{font-size:4rem;font-weight:900;line-height:1.1;margin-bottom:1.5rem}@media(max-width:1024px){.gb-text-hero3{font-size:3rem}}@media(max-width:768px){.gb-text-hero3{font-size:2.25rem;margin-bottom:1rem}}"} -->
+        <h1 class="gb-text gb-text-hero3">Build Amazing Websites</h1>
         <!-- /wp:generateblocks/text -->
 
-        <!-- wp:generateblocks/text {"uniqueId":"hero004","tagName":"p","styles":{"fontSize":"1.25rem","opacity":"0.9","marginBottom":"2.5rem","maxWidth":"600px","margin":"0 auto 2.5rem"},"css":".gb-text-hero004{font-size:1.25rem;opacity:0.9;margin-bottom:2.5rem;max-width:600px;margin:0 auto 2.5rem}@media(max-width:768px){.gb-text-hero004{font-size:1.125rem;margin-bottom:2rem}}"} -->
-        <p class="gb-text gb-text-hero004">Create stunning layouts without writing code. Flexible, lightweight, and powerful.</p>
+        <!-- wp:generateblocks/text {"uniqueId":"hero4","tagName":"p","styles":{"fontSize":"1.25rem","opacity":"0.9","marginBottom":"2.5rem","maxWidth":"600px","margin":"0 auto 2.5rem"},"css":".gb-text-hero4{font-size:1.25rem;opacity:0.9;margin-bottom:2.5rem;max-width:600px;margin:0 auto 2.5rem}@media(max-width:768px){.gb-text-hero4{font-size:1.125rem;margin-bottom:2rem}}"} -->
+        <p class="gb-text gb-text-hero4">Create stunning layouts without writing code. Flexible, lightweight, and powerful.</p>
         <!-- /wp:generateblocks/text -->
 
-        <!-- wp:generateblocks/element {"uniqueId":"hero005","tagName":"div","styles":{"display":"flex","gap":"1rem","justifyContent":"center","flexWrap":"wrap"},"css":".gb-element-hero005{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}@media(max-width:768px){.gb-element-hero005{flex-direction:column;gap:0.75rem}}"} -->
-        <div class="gb-element gb-element-hero005">
+        <!-- wp:generateblocks/element {"uniqueId":"hero5","tagName":"div","styles":{"display":"flex","gap":"1rem","justifyContent":"center","flexWrap":"wrap"},"css":".gb-element-hero5{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}@media(max-width:768px){.gb-element-hero5{flex-direction:column;gap:0.75rem}}"} -->
+        <div class="gb-element gb-element-hero5">
 
-            <!-- wp:generateblocks/text {"uniqueId":"hero006","tagName":"a","htmlAttributes":{"href":"#"},"styles":{"padding":"1rem 2rem","backgroundColor":"#e94560","color":"#ffffff","borderRadius":"0.5rem","textDecoration":"none","fontWeight":"600"},"css":".gb-text-hero006{padding:1rem 2rem;background-color:#e94560;color:#ffffff;border-radius:0.5rem;text-decoration:none;font-weight:600;transition:all 0.3s}.gb-text-hero006:hover{background-color:#d63850;transform:translateY(-2px)}@media(max-width:768px){.gb-text-hero006{padding:0.875rem 1.5rem;width:100%}}"} -->
-            <a class="gb-text gb-text-hero006" href="#">Get Started</a>
+            <!-- wp:generateblocks/text {"uniqueId":"hero6","tagName":"a","htmlAttributes":{"href":"#"},"styles":{"padding":"1rem 2rem","backgroundColor":"#e94560","color":"#ffffff","borderRadius":"0.5rem","textDecoration":"none","fontWeight":"600"},"css":".gb-text-hero6{padding:1rem 2rem;background-color:#e94560;color:#ffffff;border-radius:0.5rem;text-decoration:none;font-weight:600;transition:all 0.3s}.gb-text-hero6:hover{background-color:#d63850;transform:translateY(-2px)}@media(max-width:768px){.gb-text-hero6{padding:0.875rem 1.5rem;width:100%}}"} -->
+            <a class="gb-text gb-text-hero6" href="#">Get Started</a>
             <!-- /wp:generateblocks/text -->
 
-            <!-- wp:generateblocks/text {"uniqueId":"hero007","tagName":"a","htmlAttributes":{"href":"#"},"styles":{"padding":"1rem 2rem","backgroundColor":"transparent","color":"#ffffff","border":"2px solid #ffffff","borderRadius":"0.5rem","textDecoration":"none","fontWeight":"600"},"css":".gb-text-hero007{padding:1rem 2rem;background-color:transparent;color:#ffffff;border:2px solid #ffffff;border-radius:0.5rem;text-decoration:none;font-weight:600;transition:all 0.3s}.gb-text-hero007:hover{background-color:#ffffff;color:#1a1a2e}@media(max-width:768px){.gb-text-hero007{padding:0.875rem 1.5rem;width:100%}}"} -->
-            <a class="gb-text gb-text-hero007" href="#">Learn More</a>
+            <!-- wp:generateblocks/text {"uniqueId":"hero7","tagName":"a","htmlAttributes":{"href":"#"},"styles":{"padding":"1rem 2rem","backgroundColor":"transparent","color":"#ffffff","border":"2px solid #ffffff","borderRadius":"0.5rem","textDecoration":"none","fontWeight":"600"},"css":".gb-text-hero7{padding:1rem 2rem;background-color:transparent;color:#ffffff;border:2px solid #ffffff;border-radius:0.5rem;text-decoration:none;font-weight:600;transition:all 0.3s}.gb-text-hero7:hover{background-color:#ffffff;color:#1a1a2e}@media(max-width:768px){.gb-text-hero7{padding:0.875rem 1.5rem;width:100%}}"} -->
+            <a class="gb-text gb-text-hero7" href="#">Learn More</a>
             <!-- /wp:generateblocks/text -->
 
         </div>

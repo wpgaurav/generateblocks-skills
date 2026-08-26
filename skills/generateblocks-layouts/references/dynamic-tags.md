@@ -208,8 +208,8 @@ conditional output): see `acf-and-custom-fields.md`.
 ### Title linked to post, inside a loop-item
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"card002","tagName":"h3","content":"{{post_title link:post}}","styles":{"fontSize":"1.25rem","fontWeight":"700"},"css":".gb-text-card002{font-size:1.25rem;font-weight:700}","className":"gb-text"} -->
-<h3 class="gb-text-card002 gb-text">{{post_title link:post}}</h3>
+<!-- wp:generateblocks/text {"uniqueId":"card2","tagName":"h3","content":"{{post_title link:post}}","styles":{"fontSize":"1.25rem","fontWeight":"700"},"css":".gb-text-card2{font-size:1.25rem;font-weight:700}","className":"gb-text"} -->
+<h3 class="gb-text-card2 gb-text">{{post_title link:post}}</h3>
 <!-- /wp:generateblocks/text -->
 ```
 
@@ -220,16 +220,16 @@ The plugin only adds srcset/width/height when `mediaId` points at a real
 attachment, which a loop image doesn't.
 
 ```html
-<!-- wp:generateblocks/media {"uniqueId":"card003","tagName":"img","styles":{"width":"100%","objectFit":"cover","aspectRatio":"16/9"},"css":".gb-media-card003{aspect-ratio:16/9;object-fit:cover;width:100%}","htmlAttributes":{"src":"{{featured_image size:large}}","alt":"{{featured_image key:alt}}","loading":"lazy"},"className":"gb-media"} -->
-<img class="gb-media-card003 gb-media" src="{{featured_image size:large}}" alt="{{featured_image key:alt}}" loading="lazy"/>
+<!-- wp:generateblocks/media {"uniqueId":"card3","tagName":"img","styles":{"width":"100%","objectFit":"cover","aspectRatio":"16/9"},"css":".gb-media-card3{aspect-ratio:16/9;object-fit:cover;width:100%}","htmlAttributes":{"src":"{{featured_image size:large}}","alt":"{{featured_image key:alt}}","loading":"lazy"},"className":"gb-media"} -->
+<img class="gb-media-card3 gb-media" src="{{featured_image size:large}}" alt="{{featured_image key:alt}}" loading="lazy"/>
 <!-- /wp:generateblocks/media -->
 ```
 
 ### Card wrapper linking to the post
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"card001","tagName":"a","styles":{"display":"flex","flexDirection":"column"},"css":".gb-element-card001{display:flex;flex-direction:column}","htmlAttributes":{"href":"{{post_permalink}}"},"className":"gb-element"} -->
-<a class="gb-element-card001 gb-element" href="{{post_permalink}}">
+<!-- wp:generateblocks/element {"uniqueId":"card1","tagName":"a","styles":{"display":"flex","flexDirection":"column"},"css":".gb-element-card1{display:flex;flex-direction:column}","htmlAttributes":{"href":"{{post_permalink}}"},"className":"gb-element"} -->
+<a class="gb-element-card1 gb-element" href="{{post_permalink}}">
     <!-- inner blocks -->
 </a>
 <!-- /wp:generateblocks/element -->
@@ -238,26 +238,26 @@ attachment, which a loop image doesn't.
 ### Meta row: date + categories
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"card004","tagName":"p","content":"{{post_date dateFormat:M j, Y}} · {{term_list tax:category|sep:, }}","styles":{"fontSize":"0.875rem","color":"#5c5c5c"},"css":".gb-text-card004{color:#5c5c5c;font-size:0.875rem}","className":"gb-text"} -->
-<p class="gb-text-card004 gb-text">{{post_date dateFormat:M j, Y}} · {{term_list tax:category|sep:, }}</p>
+<!-- wp:generateblocks/text {"uniqueId":"card4","tagName":"p","content":"{{post_date dateFormat:M j, Y}} · {{term_list tax:category|sep:, }}","styles":{"fontSize":"0.875rem","color":"#5c5c5c"},"css":".gb-text-card4{color:#5c5c5c;font-size:0.875rem}","className":"gb-text"} -->
+<p class="gb-text-card4 gb-text">{{post_date dateFormat:M j, Y}} · {{term_list tax:category|sep:, }}</p>
 <!-- /wp:generateblocks/text -->
 ```
 
 ### Footer copyright (Pro)
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"foot001","tagName":"p","content":"© {{current_year}} {{site_title}}. All rights reserved.","styles":{"fontSize":"0.875rem"},"css":".gb-text-foot001{font-size:0.875rem}","className":"gb-text"} -->
-<p class="gb-text-foot001 gb-text">© {{current_year}} {{site_title}}. All rights reserved.</p>
+<!-- wp:generateblocks/text {"uniqueId":"foot1","tagName":"p","content":"© {{current_year}} {{site_title}}. All rights reserved.","styles":{"fontSize":"0.875rem"},"css":".gb-text-foot1{font-size:0.875rem}","className":"gb-text"} -->
+<p class="gb-text-foot1 gb-text">© {{current_year}} {{site_title}}. All rights reserved.</p>
 <!-- /wp:generateblocks/text -->
 ```
 
 ### Prev/next post navigation (Pro)
 
 ```html
-<!-- wp:generateblocks/element {"uniqueId":"nav001","tagName":"a","styles":{"display":"inline-flex"},"css":".gb-element-nav001{display:inline-flex}","htmlAttributes":{"href":"{{post_permalink source:next-post}}","rel":"next"},"className":"gb-element"} -->
-<a class="gb-element-nav001 gb-element" href="{{post_permalink source:next-post}}" rel="next">
-    <!-- wp:generateblocks/text {"uniqueId":"nav002","tagName":"span","content":"Next: {{post_title source:next-post|trunc:50}}","styles":{},"css":"","className":"gb-text"} -->
-    <span class="gb-text-nav002 gb-text">Next: {{post_title source:next-post|trunc:50}}</span>
+<!-- wp:generateblocks/element {"uniqueId":"nav1","tagName":"a","styles":{"display":"inline-flex"},"css":".gb-element-nav1{display:inline-flex}","htmlAttributes":{"href":"{{post_permalink source:next-post}}","rel":"next"},"className":"gb-element"} -->
+<a class="gb-element-nav1 gb-element" href="{{post_permalink source:next-post}}" rel="next">
+    <!-- wp:generateblocks/text {"uniqueId":"nav2","tagName":"span","content":"Next: {{post_title source:next-post|trunc:50}}","styles":{},"css":"","className":"gb-text"} -->
+    <span class="gb-text-nav2 gb-text">Next: {{post_title source:next-post|trunc:50}}</span>
     <!-- /wp:generateblocks/text -->
 </a>
 <!-- /wp:generateblocks/element -->

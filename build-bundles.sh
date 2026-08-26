@@ -21,7 +21,8 @@ for skill in "${SKILLS[@]}"; do
         continue
     fi
     rm -f "importable/$skill.zip" "importable/$skill.skill"
-    (cd skills && zip -rq "../importable/$skill.zip" "$skill" -x "*.DS_Store")
+    (cd skills && zip -rq "../importable/$skill.zip" "$skill" \
+        -x "*.DS_Store" "*/__pycache__/*" "*.pyc")
     cp "importable/$skill.zip" "importable/$skill.skill"
     echo "built importable/$skill.zip + .skill"
 done

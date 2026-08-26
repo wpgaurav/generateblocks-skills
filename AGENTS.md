@@ -6,10 +6,10 @@ Universal instructions for all LLM assistants working in this repo.
 `references/recovery-rules.md` before emitting any GenerateBlocks markup.
 This file is only the orientation summary.
 
-Plugin source in this repo: GenerateBlocks free **2.4** (`generateblocks/`),
-GB Pro **2.7** (`generateblocks-pro/`). All skill claims are verified against
-this source. Canonical online docs for v2: learn.generatepress.com
-(docs.generateblocks.com covers v1 only).
+Plugin source in this repo: GenerateBlocks free **2.4.1** (`generateblocks/`),
+GB Pro **2.7.1** (`generateblocks-pro/`). The skill was also checked against
+the same active versions on WordPress 7.1 at gauravtiwari.org on 2026-08-26.
+Canonical current docs: learn.generatepress.com.
 
 ## V2 block names (never use V1 names)
 
@@ -21,8 +21,10 @@ this source. Canonical online docs for v2: learn.generatepress.com
 | SVG icons | `generateblocks/shape` | — |
 | Dynamic lists | `generateblocks/query` + `looper` + `loop-item` | ❌ `/query-loop` (legacy) |
 
-Class pattern everywhere: `gb-{type}-{uniqueId} gb-{type}` (id-class
-auto-injected first; `className` holds only the base class — Option A).
+Class order varies with the stored convention. New element blocks prefer
+`gb-element-{uniqueId} gb-element` with Option A; editor-authored text/media/
+shape blocks commonly render base-first. Measure and preserve an existing
+target instead of normalizing it.
 
 ## The five serialization rules that break everything
 
@@ -33,10 +35,10 @@ auto-injected first; `className` holds only the base class — Option A).
    `references/recovery-rules.md` §3.4 and `references/pro-interactive.md`.)
 3. **`htmlAttributes` is a plain object** — `{"href":"https://..."}` — never
    an array. Absolute URLs only.
-4. **`css` string**: one line, minified, properties alphabetized, no
-   descendant selectors (two exceptions: own-selector pseudo-elements,
-   parent-hover targeting another GB block's class), no hover/transition
-   (those go in `styles` via `&:hover` keys).
+4. **`styles` is the editable source; `css` is the compiled local cache.**
+   Keep states, transitions, one-level selectors, and `@media`/`@supports`/
+   `@container` in `styles`, then compile the same structure into `css`.
+   CSS Mode is an editor for this data; it has no `cssMode` attribute.
 5. **Links**: element `<a>` wrapping a text `span` child. Text `<a>` strips
    href on save; element `<a>` with raw text triggers recovery.
 
@@ -61,19 +63,21 @@ ACF: `{{post_meta key:acf_field}}`, nested via dot notation
 
 - **No HTML comments** except `<!-- wp:... -->` delimiters.
 - **Compact nesting** — closing comment adjacent to closing tag.
-- **No spaces inside CSS function args**: `clamp(3rem,8vw,5rem)`.
-- **Unique IDs**: `{section}{number}{letter?}` — `hero001`, `card012b`.
-  Never reuse a uniqueId across blocks or posts (styles are coupled to it).
+- New compiled CSS strips spaces after commas, but CSS math keeps required
+  whitespace around `+` and `-`: `clamp(2rem,1rem + 3vw,4rem)`.
+- **Unique IDs**: `{section}-{post_id}-{sequence}{letter?}` —
+  `hero-1173976-1`, `card-1173976-12b`. Resolve the real post ID first.
 - **Output to files**, never inline in chat.
 - Static captioned images → `core/image`; loop images →
   `generateblocks/media` with `{{featured_image size:large}}` src.
 - Lists → `core/list` (`className:"list"`); emoji → `core/paragraph`.
-- Responsive: `@media (max-width:1024px)` / `(max-width:768px)` keys in
-  `styles`, mirrored in `css`.
-- **Invented designs** (no reference provided) must pass the anti-slop gate
-  in `skills/generateblocks-layouts/SKILL.md` ("Design quality — no slop"):
-  no thick borders on rounded containers, no card soup, hierarchy from
-  type/spacing not decoration.
+- Responsive: native Tablet & Mobile is `@media (max-width:1024px)` and native
+  Mobile is `@media (max-width:767px)` in 2.4.1. Pro custom queries are valid;
+  preserve existing custom `768px` boundaries.
+- **Invented/materially changed designs** must pass
+  `references/design-quality.md`: no thick rounded outlines, no card soup,
+  purposeful effects, deliberate mobile composition, real proof/states, and
+  accessible interaction.
 
 ## Skills in this repo
 
@@ -91,6 +95,8 @@ Converters delegate all markup rules to `generateblocks-layouts/references/`
 
 - Recovery errors → `recovery-rules.md` (read EVERY task)
 - Block specs → `block-types.md` · Dynamic data → `dynamic-tags.md`
+- CSS Mode/raw CSS/selectors → `css-mode.md`
+- Invented design/anti-slop gate → `design-quality.md`
 - Query loops → `query-block.md` · ACF → `acf-and-custom-fields.md`
 - Animations → `animations.md` · Conditions → `conditions.md`
 - Forms → `pro-forms.md` · Accordion/tabs/nav → `pro-interactive.md`

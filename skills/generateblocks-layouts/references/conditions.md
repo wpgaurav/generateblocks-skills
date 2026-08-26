@@ -87,7 +87,7 @@ empty wrapper would break layout (e.g. a styled badge), prefer the `:empty`
 CSS pseudo-class in the block's own `css`:
 
 ```json
-"css":".gb-text-badge001:empty{display:none}.gb-text-badge001{...}"
+"css":".gb-text-badge1:empty{display:none}.gb-text-badge1{...}"
 ```
 
 (`:empty` on the block's own selector is allowed — it's not a descendant
@@ -96,7 +96,7 @@ selector.)
 ### Device visibility — media queries
 
 ```json
-"styles":{"display":"none","@media (max-width:768px)":{"display":"block"}}
+"styles":{"display":"none","@media (max-width:767px)":{"display":"block"}}
 ```
 
 ### Template-level conditions — GeneratePress Elements
