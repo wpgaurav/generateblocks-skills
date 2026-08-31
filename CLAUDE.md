@@ -52,6 +52,7 @@ skills/
 │   │   ├── global-styles.md  # Design tokens, theme.json
 │   │   ├── patterns.md       # Block pattern registration
 │   │   ├── performance.md    # CSS delivery optimization
+│   │   ├── mcp-publishing.md # Live-site writes over MCP/REST
 │   │   └── migrations.md     # V1 to V2 migration guide
 │   └── examples/             # Copy-paste ready blocks
 │       ├── basic/            # Single blocks (buttons, containers)

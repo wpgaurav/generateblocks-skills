@@ -154,6 +154,7 @@ generateblocks-skills/
 | `pro-interactive.md` | Accordion, Tabs, Carousel, Navigation, Site Header, Overlays |
 | `css-mode.md` | CSS Mode, CSS Properties, selectors, supported at-rules, `styles`/`css` parity |
 | `design-quality.md` | GenerateBlocks-specific anti-slop and responsive implementation gate |
+| `mcp-publishing.md` | Pushing blocks to a live site over MCP or REST: server choice, round trip, transport hazards |
 | `css-patterns.md` · `svg-icons.md` · `responsive.md` | Durable styling patterns |
 | `global-styles.md` · `patterns.md` · `performance.md` · `migrations.md` · `troubleshooting.md` | Supporting guides |
 
@@ -263,30 +264,53 @@ npm run wp-env:start   # Local WordPress
 
 ---
 
-## Push generated blocks into a live WordPress install
+## Push generated blocks into a live WordPress site
 
-The skills generate block markup as a string. If you want your AI
-assistant to also push that markup into a real WordPress site (read
-the current page, find a container by id or text, swap children, write
-back), pair this repo with an MCP server that exposes a write surface
-for WordPress.
+The skills generate block markup as a string. To get that string into a real
+record — read the current page, splice a section in, write it back — pair this
+repo with an MCP server that exposes a WordPress write surface, or use plain
+REST.
 
-[Respira for WordPress](https://github.com/respira-press/respira-wordpress)
-is one such MCP server. Its native Gutenberg adapter round-trips
-`generateblocks/element`, `generateblocks/text`, `generateblocks/media`,
-and `generateblocks/shape` byte-faithfully, and supports
-snapshot-before-write with one-click rollback for safe iteration.
+Read [`references/mcp-publishing.md`](skills/generateblocks-layouts/references/mcp-publishing.md)
+before the first write. A write that returns `200` can still corrupt the block:
+GenerateBlocks markup is validated by re-serializing it and string-comparing
+against what was stored, so anything in the path that runs `parse_blocks()`,
+`wpautop`, or `wp_kses` over the payload breaks it silently.
+
+**The one requirement for any server: it must read and write raw
+`post_content` as an opaque string.**
+
+| Route | What it is | Licence / cost | Write happens |
+|-------|------------|----------------|---------------|
+| [**WordPress MCP Adapter**](https://github.com/WordPress/mcp-adapter) | Official bridge from the Abilities API to MCP. Successor to the archived `Automattic/wordpress-mcp`. | GPL-2.0-or-later, free | Your server |
+| [**Novamira**](https://github.com/use-novamira/novamira) | Self-hosted plugin + MCP server: PHP execution, WP-CLI, filesystem, block editor workflows. Direct client-to-site connection. | AGPL-3.0-or-later, free; paid Pro tier | Your server |
+| [**WPVibe**](https://wordpress.org/plugins/vibe-ai/) (SeedProd) | Free plugin plus a hosted MCP service. One-click auth from wp-admin, builder skills, approval gates. | Plugin free; hosted service has a free daily allowance | Cloud service brokers the call |
+| [**Respira**](https://github.com/respira-press/respira-wordpress-mcp) | Plugin + MCP server with builder-native adapters; lists GenerateBlocks among 17 supported builders. Snapshots, approval gates, rollback. | Commercial, trial available | Your server |
+| **Plain REST** | `GET/POST /wp-json/wp/v2/pages/{id}` with an Application Password. No plugin, no abstraction to audit. | Built in | Your server |
+
+Whichever route you pick, verify the read-back rather than trusting the status
+code:
+
+```bash
+python3 skills/generateblocks-layouts/scripts/verify_roundtrip.py \
+  --local hero-section.html --remote fetched-raw.html
+```
+
+It names the specific corruption — reversed `\u002d\u002d` escapes, attribute
+key-order drift from a `parse_blocks()` round trip, `wpautop` artifacts,
+`wp_kses`-stripped SVG — instead of leaving you to diff by hand.
 
 Typical pairing:
 
 ```
-Read skills/generateblocks-layouts/SKILL.md, then generate a
-testimonial grid with 3 cards and use the Respira MCP to insert
-it as a new section at the top of /about on my staging site.
+Read skills/generateblocks-layouts/SKILL.md, then generate a testimonial
+grid with 3 cards and insert it as a new section at the top of /about on
+my staging site.
 ```
 
-Any Gutenberg-aware MCP server works the same way. The skills here
-are server-agnostic.
+Staging first, always. Novamira's PHP-execution surface in particular is
+scoped by its own docs to dev and staging — an agent with arbitrary PHP does
+not belong on a production site.
 
 ---
 

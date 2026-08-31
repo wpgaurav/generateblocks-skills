@@ -50,6 +50,7 @@ around the internet (and in old markup) is wrong and silently fails.
 | Performance / CSS delivery | `performance.md` |
 | Inventing or materially changing a visual design | `design-quality.md` (+ `/design-slop` when available) |
 | Migrating V1 blocks (`container`, `headline`, `grid`) | `migrations.md` |
+| **Pushing blocks to a live site: MCP server, REST write, "publish this for me"** | `mcp-publishing.md` |
 | Markup that's failing / debugging | `troubleshooting.md`, `recovery-rules.md` |
 | Hand-converting an existing design / bulk escaping / pre-delivery validation | `field-notes.md` |
 | Core `core/query` loops (only if explicitly requested) | `query-loops.md` |
@@ -81,6 +82,7 @@ references/
 ├── global-styles.md          ← Design tokens, theme.json bridge
 ├── patterns.md               ← Block pattern registration
 ├── performance.md            ← CSS delivery optimization
+├── mcp-publishing.md         ← Live-site writes over MCP/REST: servers, round trip, hazards
 ├── migrations.md             ← V1 → V2 migration guide
 ├── query-loops.md            ← LEGACY core/query patterns (only on request)
 ├── responsive-legacy.md      ← Older breakpoint patterns (reference only)
@@ -101,7 +103,10 @@ references/
    output before saving. Use `scripts/preflight.py <file> --post-id <ID>`.
 4. **Summarize in chat**: purpose, block count, anything that needs Pro,
    anything skipped due to a recovery rule.
-5. **Anti-slop gate**: if you invented or materially changed any part of the
+5. **Writing to a live site** (MCP server or REST) is a separate discipline
+   with its own silent failure modes. Read `mcp-publishing.md` before the
+   first write and verify the read-back with `scripts/verify_roundtrip.py`.
+6. **Anti-slop gate**: if you invented or materially changed any part of the
    design, run `design-quality.md` before delivering and load `/design-slop`
    when it is available. The nearest project design system owns brand-specific
    decisions.

@@ -32,6 +32,10 @@ For styling work, also read:
 - **`references/design-quality.md`** whenever the skill invents or materially
   changes a visual direction.
 
+When the task is to put the markup on a real site rather than hand it over,
+read **`references/mcp-publishing.md`** — MCP servers and REST writes have
+their own silent failure modes and a 200 response proves nothing.
+
 If the task involves dynamic data at all, `references/dynamic-tags.md` is
 mandatory — the tag syntax is precise and wrong forms fail silently.
 
@@ -127,6 +131,11 @@ Before serialization, apply these 2 default presentation rules:
   Pass the actual WordPress post ID with `--post-id N`; new output fails if any
   GenerateBlocks ID is outside that post namespace. Add `--links N` to assert
   the internal link count survived a conversion.
+- **If you are also writing to a live site**, follow the round trip in
+  `references/mcp-publishing.md`: draft first for the real post ID, read
+  `content.raw`, splice, preflight, write, read back, and verify with
+  `scripts/verify_roundtrip.py`. Never write to production without a snapshot
+  or a saved copy of the original `content.raw`.
 - Summarize in chat: what was built, block count, anything needing Pro.
 
 ## Tooling
@@ -135,6 +144,7 @@ Before serialization, apply these 2 default presentation rules:
 |---|---|
 | `scripts/gb_serialize.py` | `make_unique_id()` for post-scoped IDs, `build_css()` for `styles`→`css`, `serialize_attrs()` for all five WP substitutions, and `ordered()` for canonical key order. Import these; don't re-derive them by hand. |
 | `scripts/preflight.py` | Pre-delivery validation. Run with `--post-id N` for all new output. Exit 0 = clean. |
+| `scripts/verify_roundtrip.py` | Post-write validation. Compare what you sent against the `content.raw` you read back; names the specific corruption (escape reversal, re-serialization, `wpautop`, `wp_kses`) instead of leaving you to diff by hand. |
 
 For anything beyond a few blocks, **generate the markup from a script** rather
 than hand-typing it. Hand-authored escapes and key order drift; a generator plus
