@@ -68,6 +68,9 @@ ACF: `{{post_meta key:acf_field}}`, nested via dot notation
 - **Unique IDs**: `{section}-{post_id}-{sequence}{letter?}` —
   `hero-1173976-1`, `card-1173976-12b`. Resolve the real post ID first.
 - **Output to files**, never inline in chat.
+- **Writing to a live site** (MCP server or REST) needs `content.raw` in and
+  out, a splice rather than a regenerate, and a byte-diff of the read-back.
+  See `references/mcp-publishing.md`.
 - Static captioned images → `core/image`; loop images →
   `generateblocks/media` with `{{featured_image size:large}}` src.
 - Lists → `core/list` (`className:"list"`); emoji → `core/paragraph`.
@@ -101,3 +104,4 @@ Converters delegate all markup rules to `generateblocks-layouts/references/`
 - Animations → `animations.md` · Conditions → `conditions.md`
 - Forms → `pro-forms.md` · Accordion/tabs/nav → `pro-interactive.md`
 - Full-site templates → `template-authoring.md` · Pro map → `gb-pro.md`
+- Pushing blocks to a live site over MCP/REST → `mcp-publishing.md`
