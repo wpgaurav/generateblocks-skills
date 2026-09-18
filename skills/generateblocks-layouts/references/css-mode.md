@@ -12,6 +12,15 @@ not introduce a `cssMode` block attribute.
 Verified against GenerateBlocks 2.4.1 and GenerateBlocks Pro 2.7.1. CSS Mode
 was introduced in Pro 2.6.
 
+## Pro 2.8 beta extension
+
+The managed `:root` style can be edited as token CSS; Global Styles can have
+supported base/additional selectors. See `design-systems-beta.md` for the
+storage and save contract. On the tested beta, `gbp.stylesBuilder.getCss()` is
+asynchronous. Its `cssToStyles()` parser plus awaited compiler preserved the
+kit's root tokens and mobile branch exactly. This does not expand the local
+block CSS grammar or add a `cssMode` attribute.
+
 ## The Data Contract
 
 | Layer | Purpose | Saved where |
@@ -139,6 +148,11 @@ These are valid single selectors. This is not:
 Flatten it to `&:hover > .child`. Never add a wrapper solely to make a
 decorative selector easier.
 
+The Pro 2.8 beta compiler substitutes a leading `&`; an ancestor form such as
+`html[data-theme="dark"] &` compiled incorrectly in the About test. Use the
+verified relative form `&:is(html[data-theme="dark"] *)` and check the generated
+selector. Keep these theme/state rules in the block's `styles`.
+
 ### At-rules
 
 Use the target site's registered query exactly:
@@ -214,9 +228,10 @@ CSS Mode does not support:
 - selectors that attempt to edit the fixed parent selector in the Global
   Styles modal.
 
-Put keyframes, font declarations, and genuinely page-scoped stylesheet logic
-in the owning theme/plugin stylesheet or another project-approved CSS surface.
-Do not hide unsupported CSS in a block's `css` attribute and call it durable.
+For a GenerateBlocks design, keep supported rules in their owning blocks and
+simplify unsupported effects. Do not introduce another CSS surface merely to
+preserve source code. External stylesheets, Scripts Manager, and theme/plugin
+code require an explicit user request. Do not hide unsupported CSS in `css`.
 
 ## Copy and Paste Rules
 
@@ -261,8 +276,8 @@ design, repair the pair, and record that normalization in the handoff.
 ## Global Styles
 
 CSS Mode can edit Pro Global Styles with the same selector and at-rule limits.
-Global Styles are appropriate for repeated component primitives such as a
-button, content rail, or shared card shell. They are not a reason to turn every
+After explicit opt-in under `styling-scope.md`, Global Styles can serve repeated
+components such as a button, content rail, or shared card shell. They are not a reason to turn every
 one-off visual choice into a global class.
 
 Before renaming a Global Style, check its usage. Renaming the stored selector

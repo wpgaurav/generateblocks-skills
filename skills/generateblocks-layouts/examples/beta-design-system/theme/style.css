@@ -1,0 +1,6 @@
+/*
+Theme Name: GB Beta Kit Canvas
+Version: 1.0.0
+Description: Minimal local test canvas. All visual design lives in GenerateBlocks Global Styles and Design Tokens.
+*/
+*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%;height:auto}button,input,textarea,select{font:inherit}.screen-reader-text{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.screen-reader-text:focus{position:fixed;inset:1rem auto auto 1rem;width:auto;height:auto;clip-path:none;z-index:9999;background:white;color:black;padding:1rem}

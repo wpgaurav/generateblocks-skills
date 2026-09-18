@@ -22,3 +22,5 @@ __pycache__/
 
 # Plugin sources kept locally for reference, not versioned
 generateblocks-pro/
+generateblocks 2/
+generateblocks-pro 2/

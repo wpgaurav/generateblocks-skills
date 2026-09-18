@@ -6,8 +6,9 @@ description: Create, register, import, and verify reusable WordPress patterns co
 # GenerateBlocks Patterns
 
 A pattern packages block structure and content for insertion. It is not a
-substitute for a design system. Use Pro Global Styles for reusable style
-contracts and patterns for reusable compositions.
+substitute for a design system. Patterns can use local styles. Add Pro Global
+Styles or Design Tokens only when the user opts in under `styling-scope.md`.
+Prompt before importing a pattern that would silently add those dependencies.
 
 ## Choose the Reuse Model
 
@@ -50,8 +51,9 @@ version. A pattern that depends on a missing class or Pro block is incomplete.
 ## Unique IDs
 
 GenerateBlocks styles are coupled to `uniqueId`. Before inserting hand-authored
-markup directly into a real record, resolve that record's numeric post ID and
-generate post-scoped IDs.
+markup into a known record, use its numeric post ID for new blocks. If no record
+exists, use one random four-digit layout scope as described in the authoring
+contract. Preserve existing IDs unless they collide with the destination.
 
 For patterns inserted through the editor, verify what the installed build does
 with IDs during insertion/copy. Do not assume an old export's IDs are safe on a
@@ -106,6 +108,18 @@ Styles. Before importing:
 
 A same-named Global Style can still mean something different. Treat selector
 collisions as semantic conflicts.
+
+## Pro 2.8 token-aware imports
+
+Read `design-systems-beta.md` before moving a token-dependent pattern. The beta
+can carry recursively referenced registered tokens, including responsive values.
+A variable that exists only in an external stylesheet is not automatically
+portable. Full design-system file import was tested across two local sites;
+a live GenerateCloud provider/consumer flow was not tested.
+
+The bundled `../examples/beta-design-system/` includes six section exports and
+a native editor builder that remaps page, form, and query IDs. Its raw HTML
+exports retain their source-site IDs and URLs; regenerate them for a new target.
 
 ## Synced Patterns
 

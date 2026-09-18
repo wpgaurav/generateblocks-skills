@@ -1,0 +1,347 @@
+{
+  "sourceUrl": "https://gauravtiwari.org/about/",
+  "sourceId": 16260,
+  "draftId": 1178400,
+  "previewUrl": "https://gauravtiwari.org/?page_id=1178400&preview=true",
+  "newStyling": "local",
+  "claimBoundary": "A complex real-page validation with corrections, not a controlled full-guide versus compact-guide experiment.",
+  "transport": {
+    "sourceId": 16260,
+    "sourceStatus": "publish",
+    "sourceContentUnchanged": true,
+    "sourceScriptsUnchanged": true,
+    "sourceSha256": "136daf13809d12930dd52909f5228da62add28efd2892392c638d541a0536cf3",
+    "draftId": 1178400,
+    "draftStatus": "draft",
+    "draftRawEqualsPayload": true,
+    "draftBytes": 80977,
+    "originalAssetsPreserved": true,
+    "pageOnlyAdapterBytes": 964,
+    "editorAssetPreview": false
+  },
+  "editor": {
+    "blocks": 346,
+    "dirty": false,
+    "invalid": [],
+    "lastSaveSucceeded": true,
+    "postId": 1178400
+  },
+  "styles": [
+    {
+      "theme": "light",
+      "width": 375,
+      "elements": 172,
+      "textAndStyleDifferences": [],
+      "overflow": [
+        false,
+        false
+      ],
+      "heightDelta": 0
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "elements": 172,
+      "textAndStyleDifferences": [],
+      "overflow": [
+        false,
+        false
+      ],
+      "heightDelta": 0
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "elements": 172,
+      "textAndStyleDifferences": [],
+      "overflow": [
+        false,
+        false
+      ],
+      "heightDelta": 0
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "elements": 172,
+      "textAndStyleDifferences": [],
+      "overflow": [
+        false,
+        false
+      ],
+      "heightDelta": 0
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "elements": 172,
+      "textAndStyleDifferences": [],
+      "overflow": [
+        false,
+        false
+      ],
+      "heightDelta": 0
+    }
+  ],
+  "faq": {
+    "source": {
+      "answerMargin": "0px",
+      "height": 262.59375,
+      "summaryRadius": "0px"
+    },
+    "draft": {
+      "answerMargin": "0px",
+      "height": 262.59375,
+      "summaryRadius": "0px"
+    },
+    "match": true
+  },
+  "ornaments": {
+    "pieces": [
+      5,
+      5
+    ],
+    "match": true,
+    "source": [
+      {
+        "after": {
+          "background": "rgba(36, 35, 33, 0.14)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "63.1953px"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "1px solid rgba(36, 35, 33, 0.14)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 39.248046875,
+        "marginLeft": "0px",
+        "width": 177.42201232910156
+      },
+      {
+        "after": {
+          "background": "rgba(36, 35, 33, 0.14)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "63.1953px"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "1px solid rgba(36, 35, 33, 0.14)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 39.248046875,
+        "marginLeft": "0px",
+        "width": 177.4219970703125
+      },
+      {
+        "after": {
+          "background": "rgb(255, 255, 252)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "35.3516px"
+        },
+        "background": "rgb(192, 57, 43)",
+        "border": "0px none rgb(192, 57, 43)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 30.04443359375,
+        "marginLeft": "0px",
+        "width": 72.2222900390625
+      },
+      {
+        "after": {
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "height": "auto",
+          "width": "auto"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "6px solid rgb(192, 57, 43)",
+        "borderRadius": "40px",
+        "display": "block",
+        "height": 84.52392578125,
+        "marginLeft": "0px",
+        "width": 110.8779296875
+      },
+      {
+        "after": {
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "height": "auto",
+          "width": "auto"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "6px solid rgb(192, 57, 43)",
+        "borderRadius": "40px",
+        "display": "block",
+        "height": 84.52392578125,
+        "marginLeft": "-28px",
+        "width": 110.87786865234376
+      }
+    ],
+    "draft": [
+      {
+        "after": {
+          "background": "rgba(36, 35, 33, 0.14)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "63.1953px"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "1px solid rgba(36, 35, 33, 0.14)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 39.248046875,
+        "marginLeft": "0px",
+        "width": 177.42201232910156
+      },
+      {
+        "after": {
+          "background": "rgba(36, 35, 33, 0.14)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "63.1953px"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "1px solid rgba(36, 35, 33, 0.14)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 39.248046875,
+        "marginLeft": "0px",
+        "width": 177.4219970703125
+      },
+      {
+        "after": {
+          "background": "rgb(255, 255, 252)",
+          "content": "\"\"",
+          "height": "3px",
+          "width": "35.3516px"
+        },
+        "background": "rgb(192, 57, 43)",
+        "border": "0px none rgb(192, 57, 43)",
+        "borderRadius": "3px",
+        "display": "flex",
+        "height": 30.04443359375,
+        "marginLeft": "0px",
+        "width": 72.2222900390625
+      },
+      {
+        "after": {
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "height": "auto",
+          "width": "auto"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "6px solid rgb(192, 57, 43)",
+        "borderRadius": "40px",
+        "display": "block",
+        "height": 84.52392578125,
+        "marginLeft": "0px",
+        "width": 110.8779296875
+      },
+      {
+        "after": {
+          "background": "rgba(0, 0, 0, 0)",
+          "content": "none",
+          "height": "auto",
+          "width": "auto"
+        },
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "6px solid rgb(192, 57, 43)",
+        "borderRadius": "40px",
+        "display": "block",
+        "height": 84.52392578125,
+        "marginLeft": "-28px",
+        "width": 110.87786865234376
+      }
+    ]
+  },
+  "interactions": {
+    "problemClick": {
+      "selected": "problem-tab-product",
+      "visible": [
+        "problem-product"
+      ]
+    },
+    "problemKeyboard": {
+      "focused": "problem-tab-content",
+      "visible": [
+        "problem-content"
+      ]
+    },
+    "processClick": {
+      "count": "Step 2 of 4",
+      "visible": [
+        "process-panel-2"
+      ]
+    },
+    "processKeyboard": {
+      "button": "Back to the start \u2192",
+      "count": "Step 4 of 4",
+      "focused": "process-tab-4"
+    },
+    "faqOpen": "",
+    "openFaqGeometryMatches": true
+  },
+  "motionAndErrors": {
+    "openFaqGeometryAndStylesMatch": true,
+    "motionToggle": [
+      {
+        "name": "source",
+        "motion": "off",
+        "pressed": "true"
+      },
+      {
+        "name": "draft",
+        "motion": "off",
+        "pressed": "true"
+      }
+    ],
+    "errors": []
+  },
+  "installation": {
+    "generateblocks-layouts": {
+      "files": 60,
+      "sha256": "2072ae3610ffdc7bdcf1596eecc25a2e52c477ce429479d59187e34d1c2a5c74",
+      "installedPath": "~/.claude/skills/generateblocks-layouts"
+    },
+    "html-to-generateblocks": {
+      "files": 63,
+      "sha256": "956eb4782d080d0bd529360b6fda4fb31e968f29fa4b94c659d581271b90dcd3",
+      "installedPath": "~/.claude/skills/html-to-generateblocks"
+    },
+    "elementor-to-generateblocks": {
+      "files": 63,
+      "sha256": "ccb43018ca0287f3b9edd093555b2f0dc03e233e25999eb0a6601aae3a389718",
+      "installedPath": "~/.claude/skills/elementor-to-generateblocks"
+    },
+    "figma-to-generateblocks": {
+      "files": 63,
+      "sha256": "fd60e49ed3f7efa1b2d8db89b32e4a0b1a529f57e98a45d9eb8870074793fdf3",
+      "installedPath": "~/.claude/skills/figma-to-generateblocks"
+    }
+  },
+  "coverage": {
+    "blocks": 346,
+    "blockCounts": {
+      "generateblocks/element": 163,
+      "generateblocks/shape": 1,
+      "generateblocks/media": 1,
+      "generateblocks/text": 174,
+      "core/details": 7
+    },
+    "headings": 43,
+    "sourceIds": 39,
+    "sourceLinks": 27,
+    "sourceSections": 12,
+    "sourceDetails": 7,
+    "localStyleBlocks": 23
+  },
+  "regressionTestsPassed": 11,
+  "semanticAttributes": {
+    "sourceIdsPreservedExactlyOnce": 39,
+    "linksAndAttributesEqual": 27,
+    "imagesAndAttributesEqual": 1
+  }
+}

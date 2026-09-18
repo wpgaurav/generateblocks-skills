@@ -18,34 +18,17 @@ conflicts with `SKILL.md` or `block-types.md`, **this file and
 Don't try to hand-type `\u002d\u002d` while authoring — you'll miss some and
 mangle others. Author with **literal** `--`, `<`, `>`, `&`, then run a
 post-processor that applies the substitutions to **the JSON inside block
-delimiters only**, leaving the rendered HTML body untouched. (Five
-substitutions exist — see `recovery-rules.md` §1; the script below covers the
-four character ones. The fifth, `\"` → `\u0022`, only matters when a JSON
-string value contains a double quote, e.g. inline HTML in `content` — add it
-as the LAST replace step if needed.)
-
-This mirrors what WordPress does: `serialize_block_attributes()` applies the
-substitutions to the whole serialized JSON string, but the HTML body
-between the delimiters is plain HTML and keeps literal characters.
+delimiters only**, leaving the rendered HTML body untouched. Use
+`gb_serialize.serialize_attrs()` instead of maintaining another escape table.
+On WordPress 7.1.1 it handles all six substitutions, including literal backslashes.
 
 ```python
 import re, json
-lines = open('section.html').read().split('\n')
-out = []
-delim = re.compile(r'^(<!-- wp:[^\s]+ )(\{.*\})( -->)$')   # opening delimiters only
-for ln in lines:
-    m = delim.match(ln)
-    if m:
-        pre, j, post = m.groups()
-        json.loads(j)                                       # validate structure BEFORE escaping
-        j = (j.replace('--', '\\u002d\\u002d')              # order matters: -- first
-               .replace('<', '\\u003c')
-               .replace('>', '\\u003e')
-               .replace('&', '\\u0026'))
-        out.append(pre + j + post)
-    else:
-        out.append(ln)                                      # HTML body: leave literal
-open('section.html','w').write('\n'.join(out))
+from gb_serialize import serialize_attrs
+source = open('section.html').read()
+pattern = re.compile(r'(<!-- wp:[^\s]+ )(\{.*?\})( -->)', re.DOTALL)
+source = pattern.sub(lambda m: m[1] + serialize_attrs(json.loads(m[2])) + m[3], source)
+open('section.html', 'w').write(source)
 ```
 
 Consequences you must keep straight — the same value appears in **two** forms:
@@ -220,7 +203,7 @@ single recovery error.
 
 What this means in practice:
 
-- **Recovery is driven by:** JSON key order, the five escapes, `htmlAttributes`
+- **Recovery is driven by:** JSON key order, the six escapes, `htmlAttributes`
   shape, and the rendered class list. Get those right and blocks validate.
 - **`css` still has to be CORRECT**, because it is what actually renders until
   someone re-saves the block from the editor.

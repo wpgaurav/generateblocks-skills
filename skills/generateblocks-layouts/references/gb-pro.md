@@ -3,7 +3,7 @@ title: GenerateBlocks Pro overview (2.7)
 description: What Pro adds on top of free GenerateBlocks — block catalog, global classes, query extensions, conditions, forms, overlays — with pointers to the deep-dive references.
 ---
 
-# GenerateBlocks Pro (2.7.1)
+# GenerateBlocks Pro (stable guidance plus 2.8 beta)
 
 Use Pro features only when the user has GB Pro installed. If unsure, default
 to free-plugin patterns and say in chat which parts would need Pro.
@@ -14,10 +14,15 @@ and Pro requires PHP 7.4+. Recheck the target instead of assuming these
 versions. GenerateBlocks 2.3 disabled the legacy core Additional CSS field on
 GB blocks by default; Pro 2.6 added the structured CSS Editor/CSS Mode.
 
+For Pro 2.8.0-beta.1, read `design-systems-beta.md`: Design Tokens, Style Book,
+expanded selectors, categories, portable files, and verified local workflows.
+Forms, CSS Mode, overlays, carousels, and Editor Access predate this beta.
+
 ## What Pro adds — map
 
 | Capability | Detail file |
 |---|---|
+| Design Tokens, Style Book, broader selectors, design-system imports — **2.8 beta** | `design-systems-beta.md` |
 | Accordion, Tabs, Carousel, Navigation, Site Header, Overlays, Mega Menus | `pro-interactive.md` |
 | Forms (fields, validation, email/webhook/ESP integrations, Turnstile) — **2.6** | `pro-forms.md` |
 | Block/menu conditions (`gbBlockCondition` → Conditions CPT) | `conditions.md` |
@@ -40,8 +45,9 @@ Navigation (2.2):navigation, menu-toggle, menu-container, classic-menu, classic-
 Header (2.2):    site-header
 ```
 
-All namespaced `generateblocks-pro/{slug}`, class pattern
-`gb-{slug}-{uniqueId}`, same recovery rules — but **attribute declaration
+All namespaced `generateblocks-pro/{slug}`, with block-specific class patterns
+(including `gb-accordion__toggle-{id}`); see `pro-interactive.md` rather than
+guessing a prefix. Same recovery rules — but **attribute declaration
 order differs per block**: see `pro-interactive.md` top section before
 emitting any Pro block JSON.
 
@@ -51,6 +57,9 @@ they're CPT-backed systems (`gblocks_overlay`, `gblocks_condition`,
 dashboard and referenced from blocks by ID or applied globally.
 
 ## Global classes
+
+Follow `styling-scope.md`: prompt before introducing shared styles or tokens and
+use local styles unless the user explicitly opts in. Preserve existing references.
 
 - Created/managed in the **Global Styles dashboard**; current styles are
   `gblocks_styles` records (`gblocks_global_style` is the deprecated V1 CPT),
@@ -65,7 +74,7 @@ dashboard and referenced from blocks by ID or applied globally.
 <a class="gb-element-cta1 gb-element button-primary" href="...">
 ```
 
-- Use global classes when the same component style repeats across the site
+- After explicit opt-in, use global classes when a component repeats across the site
   (buttons, cards, badges). The per-block `styles`/`css` then carries only
   instance-specific overrides.
 - 2.6 adds **CSS Mode** and a CSS Properties panel. CSS Mode parses supported
@@ -115,6 +124,7 @@ editors can change content but not design.
 | 2.4 | Conditions system (blocks + menu items) |
 | 2.5 | Carousel, site logo/URL tags, grid-template controls |
 | 2.6 | Forms system + integrations, CSS Mode |
+| 2.8 beta | Design Tokens, Design workspace/Style Book, selectors/targets, categories, token-aware imports |
 | 2.7 | Editor Access + Control Sets, content-only/read-only editing (needs free 2.4); forms editing now needs `edit_others_posts` |
 
 ## When to recommend Pro

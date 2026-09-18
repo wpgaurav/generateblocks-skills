@@ -1,0 +1,198 @@
+{
+  "supersedes": "initial external-CSS About test",
+  "draft_id": 1178400,
+  "final": {
+    "count": 348,
+    "dirty": false,
+    "id": 1178400,
+    "invalid": [],
+    "scripts": {
+      "body_class": "about-page",
+      "editor_preview_footer": false,
+      "editor_preview_header": false,
+      "footer_scripts": "",
+      "header_scripts": "",
+      "scripts_manager": []
+    },
+    "sourceStatus": "publish",
+    "styled": 333,
+    "unexpectedBlocks": [],
+    "sourceUnchanged": true
+  },
+  "editor": {
+    "invalid": [],
+    "count": 348,
+    "dirty": false
+  },
+  "responsive": [
+    {
+      "theme": "light",
+      "width": 375,
+      "matched": 155,
+      "overflow": false,
+      "diffs": []
+    },
+    {
+      "theme": "light",
+      "width": 768,
+      "matched": 155,
+      "overflow": false,
+      "diffs": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "matched": 155,
+      "overflow": false,
+      "diffs": []
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "matched": 155,
+      "overflow": false,
+      "diffs": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "matched": 155,
+      "overflow": false,
+      "diffs": []
+    }
+  ],
+  "interactions": {
+    "problemClick": {
+      "panel": "problem-product",
+      "selected": "problem-tab-product"
+    },
+    "problemKeyboard": {
+      "focus": "problem-tab-content",
+      "panel": "problem-content"
+    },
+    "processKeyboard": {
+      "focus": "process-tab-4",
+      "panel": "process-panel-4"
+    },
+    "faqKeyboard": true
+  },
+  "installation": {
+    "generateblocks-layouts": {
+      "files": 60,
+      "installedDifferences": [],
+      "valid": true
+    },
+    "html-to-generateblocks": {
+      "files": 3,
+      "installedDifferences": [],
+      "valid": true
+    },
+    "elementor-to-generateblocks": {
+      "files": 3,
+      "installedDifferences": [],
+      "valid": true
+    },
+    "figma-to-generateblocks": {
+      "files": 3,
+      "installedDifferences": [],
+      "valid": true
+    }
+  },
+  "faqPaddingFollowUp": {
+    "verification": {
+      "draft_id": 1178400,
+      "unchanged_outside_faq": true,
+      "header_and_footer_assets_added": false,
+      "all_7_question_side_padding": {
+        "desktop": "24px",
+        "mobile": "16px"
+      },
+      "all_7_answer_side_padding": {
+        "desktop": "24px",
+        "mobile": "16px"
+      },
+      "native_parser_invalid_blocks": 0,
+      "stored_content_exact": true,
+      "editor_canvas_dom_unavailable": true
+    },
+    "responsive": [
+      {
+        "items": [
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          },
+          {
+            "answer": "16px 16px 27px",
+            "question": "20px 16px"
+          }
+        ],
+        "overflow": false,
+        "width": 375
+      },
+      {
+        "items": [
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          },
+          {
+            "answer": "20px 24px 27px",
+            "question": "24px"
+          }
+        ],
+        "overflow": false,
+        "width": 1061
+      }
+    ],
+    "expanded": {
+      "open": true,
+      "padding": "20px 24px 27px"
+    },
+    "editor": {
+      "invalid": 0,
+      "dirty": false,
+      "canvasAccessible": false
+    }
+  }
+}

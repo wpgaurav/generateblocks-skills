@@ -14,13 +14,16 @@ or raw CSS and `design-quality.md` before inventing a visual direction.
 | Need | Preferred layer |
 |---|---|
 | One block's layout, spacing, color, type, or state | local `styles` + compiled `css` |
-| Repeated component primitive | Pro Global Style |
-| Project design token | theme/project variable |
-| Keyframes, font declarations, page-level selector graph | owning theme/plugin stylesheet |
+| Repeated component primitive | local styles by default; offer a Global Style and use it only after opt-in |
+| Project design token | preserve existing references; introduce new shared dependencies only after opt-in |
+| Unsupported keyframes or font declarations | simplify; external code only when explicitly requested |
+| Page-level selector graph | distribute supported rules to owning blocks and flatten selectors |
 | Small inline rich-text exception | inline markup only when the editor truly owns it |
 
-Do not scatter static site-wide CSS across dozens of block attributes. Do not
-promote one-off nudges into Global Styles.
+Follow `styling-scope.md` before introducing shared styles or tokens. Repetition
+alone is not consent. Token-valued examples below assume existing or explicitly
+chosen variables; use local values when the user has not chosen shared styling.
+Do not promote one-off nudges into Global Styles.
 
 ## Base, State, and At-Rule Shape
 
@@ -276,8 +279,9 @@ and small transforms for interactive feedback.
 }
 ```
 
-CSS Mode does not support `@keyframes`. Put necessary keyframes in the owning
-project stylesheet and keep a no-motion fallback.
+CSS Mode does not support `@keyframes`. Simplify the effect for native-only
+work. An external stylesheet requires an explicit request; retain a no-motion
+fallback when such an extension is requested.
 
 ## Final Checks
 

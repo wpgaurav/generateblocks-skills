@@ -6,9 +6,9 @@ description: Source-verified GenerateBlocks 2.4 CSS delivery modes, cache invali
 # CSS Delivery and Performance
 
 GenerateBlocks V2 saves compiled CSS with each local block, collects CSS for
-the blocks present on the request, and delivers the result inline or through a
-generated file. Performance work starts by measuring the site's current mode,
-not by adding guessed filters.
+the blocks present on the request, and delivers the result according to the
+installed version. Free 2.5 is inline-only for local CSS; free 2.4 supports the
+older file/inline modes. Pro Global Styles have a separate delivery path.
 
 Verified against GenerateBlocks 2.4.1 and GenerateBlocks Pro 2.7.1.
 
@@ -24,7 +24,20 @@ declarations from `styles` on every frontend request. This makes
 `styles`/`css` parity a correctness and maintenance concern, not merely an
 editor concern.
 
-## Delivery Modes
+## Free 2.5 beta: inline-only local CSS
+
+Tested with 2.5.0-beta.1 on WordPress 7.1.1. `GenerateBlocks_Inline_CSS`
+owns local output. The former enqueue class is a compatibility shim; its file
+methods are inert. The local print-method setting/filter, inline-length
+threshold, and regeneration endpoint are retired. A frontend probe confirmed
+inline local CSS with no per-page stylesheet request.
+
+Pro 2.8 Global Styles still support file delivery through
+`generateblocks_global_css_print_method`, with inline fallback. Offer shared
+component rules as an option under `styling-scope.md`; keep styling local unless
+the user opts in. Measure before claiming a speed gain. See `design-systems-beta.md`.
+
+## Free 2.4 and earlier: delivery modes
 
 GenerateBlocks' default option is:
 
@@ -72,7 +85,12 @@ Observed 2026-08-26:
 
 Recheck before future work. These are site state, not universal defaults.
 
-## Cache Invalidation
+## Older generated-file cache invalidation
+
+This file-regeneration guidance applies to the older local CSS implementation,
+not free 2.5. For 2.5, verify the stored block CSS, current inline HTML output,
+and page-cache state; manage Pro Global Style caches through their normal saves.
+
 
 When a post containing GenerateBlocks saves, the plugin records its current GB
 version and marks generated CSS for refresh. Reusable block changes can
@@ -94,7 +112,9 @@ Do not delete the entire uploads directory to solve one stale file.
 Identical local block styles still produce selectors scoped to each unique ID.
 Do not assume GenerateBlocks deduplicates 20 copied local cards into one rule.
 
-Use Pro Global Styles for a genuinely repeated component contract:
+If a component contract repeats, prompt about Pro Global Styles under
+`styling-scope.md`. Create or introduce them only after explicit opt-in. Possible
+contracts include:
 
 - primary/secondary actions;
 - shared content rails;
@@ -121,7 +141,8 @@ Do not turn one-off spacing values into global utility noise.
   parent layout change solves the problem.
 
 CSS Mode supports only one selector level and `@media`, `@supports`, and
-`@container`. Keyframes and fonts belong in the owning project stylesheet.
+`@container`. Use available fonts and native transitions; external keyframes or
+font declarations require an explicit request rather than an automatic fallback.
 
 ## DOM Discipline
 

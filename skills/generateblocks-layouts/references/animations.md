@@ -9,8 +9,9 @@ GenerateBlocks handles ordinary interactive feedback through CSS properties and
 one-level selectors in `styles`. Pro CSS Mode edits the same data. Keep the
 compiled local `css` cache aligned.
 
-CSS Mode does not support `@keyframes`. Put keyframes in the owning theme/plugin
-stylesheet or another project-approved CSS surface.
+CSS Mode does not support `@keyframes`. For GenerateBlocks-only work, use native
+transitions/components or simplify the effect. External CSS/JavaScript requires
+an explicit user request; preserving a source effect is not authorization.
 
 ## Choose Motion by Job
 
@@ -20,9 +21,9 @@ stylesheet or another project-approved CSS surface.
 | Child response to parent interaction | one structured selector such as `&:hover > .child` or a post-scoped parent selector on the child |
 | Pseudo-element response | `&::before` / `&::after` and matching state branch |
 | Reduced-motion fallback | `@media (prefers-reduced-motion:reduce)` in `styles` |
-| Keyframe animation | owning project stylesheet, not CSS Mode |
+| Keyframe animation | simplify; external stylesheet only when explicitly requested |
 | Accordion/tabs/carousel/navigation motion | Pro component settings and frontend behavior |
-| Custom scroll-trigger behavior | project script/style layer with visible no-JS content |
+| Custom scroll-trigger behavior | omit/simplify; custom scripts only when explicitly requested |
 
 ## Interactive State Pattern
 
@@ -53,12 +54,12 @@ Keep one selector level:
 ```json
 {
   "transition":"transform .18s ease",
-  ".gb-element-card:hover &":{"transform":"translateX(0.25rem)"},
+  "&:is(.gb-element-card:hover *)":{"transform":"translateX(0.25rem)"},
   "@media (prefers-reduced-motion:reduce)":{"transition":"none"}
 }
 ```
 
-When hand-authoring, replace the parent with its real post-scoped class. A
+When hand-authoring, replace the parent with its actual layout-scoped class. A
 generic `.card:hover` selector can leak or collide.
 
 You can also attach the rule to the parent:
@@ -100,7 +101,8 @@ Use this for a real affordance, not on every heading or card.
 ## Keyframes
 
 `@keyframes`, `@font-face`, and arbitrary at-rules cannot round-trip through
-CSS Mode's structured styles model. If a component genuinely needs keyframes:
+CSS Mode's structured styles model. The following is only for a user who
+explicitly requests an external-code extension, not ordinary GenerateBlocks work:
 
 1. give the animation a component-scoped name;
 2. put the keyframes in the owning project stylesheet;

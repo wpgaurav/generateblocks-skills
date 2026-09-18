@@ -49,16 +49,19 @@ error()   { echo -e "${RED}✗${NC} $*"; }
 copy_skill_dir() {
   local src="$1" dest="$2"
   mkdir -p "$dest"
-  # Copy SKILL.md + references/ + examples/ if they exist
-  cp -f "$src/SKILL.md" "$dest/SKILL.md" 2>/dev/null || true
-  if [ -d "$src/references" ]; then
-    mkdir -p "$dest/references"
-    cp -rf "$src/references/"* "$dest/references/" 2>/dev/null || true
-  fi
-  if [ -d "$src/examples" ]; then
-    mkdir -p "$dest/examples"
-    cp -rf "$src/examples/"* "$dest/examples/" 2>/dev/null || true
-  fi
+  # Preserve the routed references and executable validation dependencies.
+  python3 - "$src" "$dest" <<'PYCOPY'
+from pathlib import Path
+import shutil
+import sys
+source, target = map(Path, sys.argv[1:])
+if source.resolve() != target.resolve():
+    shutil.copy2(source / 'SKILL.md', target / 'SKILL.md')
+    for name in ('references', 'examples', 'scripts', 'assets', 'agents'):
+        if (source / name).is_dir():
+            shutil.copytree(source / name, target / name, dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.DS_Store'))
+PYCOPY
 }
 
 build_combined_instructions() {
@@ -66,6 +69,13 @@ build_combined_instructions() {
   local output="$1"
   {
     cat "$AGENTS_FILE"
+    echo ""
+    echo "## Reference roots for this installation"
+    echo "Resolve skill-relative references against these source folders:"
+    for skill in "${SKILLS[@]}"; do
+      echo "- $skill: $SKILLS_DIR/$skill"
+    done
+    echo "Keep this checkout available; the combined file is a routed entrypoint, not an embedded manual."
     echo ""
     echo "---"
     echo ""

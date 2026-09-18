@@ -1,0 +1,468 @@
+{
+  "measured": "2026-09-18",
+  "unit": "words",
+  "scope": "Routed GenerateBlocks guidance only; not model tokens or latency. Conditional external brand/design guidance is excluded.",
+  "routes": {
+    "mandatory_base": {
+      "beforeWords": 6609,
+      "afterWords": 2019,
+      "reductionPercent": 69.5,
+      "afterFiles": [
+        "SKILL.md",
+        "references/authoring-contract.md",
+        "references/_index.md"
+      ]
+    },
+    "responsive_static_supplied_design": {
+      "beforeWords": 11446,
+      "afterWords": 2019,
+      "reductionPercent": 82.4,
+      "afterFiles": [
+        "SKILL.md",
+        "references/authoring-contract.md",
+        "references/_index.md"
+      ]
+    },
+    "responsive_static_new_design": {
+      "beforeWords": 12422,
+      "afterWords": 3049,
+      "reductionPercent": 75.5,
+      "afterFiles": [
+        "SKILL.md",
+        "references/authoring-contract.md",
+        "references/_index.md",
+        "references/design-quality.md"
+      ]
+    },
+    "responsive_query_supplied_design": {
+      "beforeWords": 12489,
+      "afterWords": 5509,
+      "reductionPercent": 55.9,
+      "afterFiles": [
+        "SKILL.md",
+        "references/authoring-contract.md",
+        "references/_index.md",
+        "references/query-block.md",
+        "references/dynamic-tags.md"
+      ]
+    },
+    "shared_beta_new_design": {
+      "beforeWords": 15205,
+      "afterWords": 7388,
+      "reductionPercent": 51.4,
+      "afterFiles": [
+        "SKILL.md",
+        "references/authoring-contract.md",
+        "references/_index.md",
+        "references/design-quality.md",
+        "references/styling-scope.md",
+        "references/global-styles.md",
+        "references/design-systems-beta.md",
+        "references/css-mode.md"
+      ]
+    }
+  },
+  "entrypoints": {
+    "generateblocks-layouts": {
+      "beforeWords": 1997,
+      "afterWords": 449,
+      "reductionPercent": 77.5,
+      "afterCharacters": 3471
+    },
+    "html-to-generateblocks": {
+      "beforeWords": 2433,
+      "afterWords": 415,
+      "reductionPercent": 82.9,
+      "afterCharacters": 3151
+    },
+    "elementor-to-generateblocks": {
+      "beforeWords": 2261,
+      "afterWords": 424,
+      "reductionPercent": 81.2,
+      "afterCharacters": 3304
+    },
+    "figma-to-generateblocks": {
+      "beforeWords": 2568,
+      "afterWords": 450,
+      "reductionPercent": 82.5,
+      "afterCharacters": 3398
+    }
+  },
+  "forwardTest": {
+    "independentCases": 2,
+    "sourceChecks": {
+      "case-a": {
+        "actual_block_count": 19,
+        "preflight_attributed_block_count": 19,
+        "block_types": {
+          "element": 9,
+          "text": 10
+        },
+        "preflight_exit_code": 0,
+        "warnings": 0,
+        "source_structure_assertions": "passed",
+        "styles_css_parity": "passed",
+        "editor_validation": "not performed"
+      },
+      "case-b": {
+        "actual_block_count": 8,
+        "preflight_attributed_block_count": 7,
+        "block_types": {
+          "text": 4,
+          "query": 1,
+          "looper": 1,
+          "loop-item": 1,
+          "query-no-results": 1
+        },
+        "preflight_exit_code": 0,
+        "warnings": 0,
+        "source_structure_assertions": "passed",
+        "styles_css_parity": "passed",
+        "editor_validation": "not performed"
+      }
+    },
+    "nativeInitial": [
+      {
+        "count": 19,
+        "id": 49,
+        "invalid": [],
+        "nativeSerializeEqual": false,
+        "rawEqual": true
+      },
+      {
+        "count": 8,
+        "id": 50,
+        "invalid": [],
+        "nativeSerializeEqual": false,
+        "rawEqual": true
+      }
+    ],
+    "nativeSaves": [
+      {
+        "blocks": 19,
+        "byteEqual": true,
+        "canonicalEqual": true,
+        "id": 49,
+        "invalid": [],
+        "saved": true
+      },
+      {
+        "blocks": 8,
+        "byteEqual": true,
+        "canonicalEqual": true,
+        "id": 50,
+        "invalid": [],
+        "saved": true
+      }
+    ],
+    "responsive": [
+      {
+        "id": 49,
+        "width": 375,
+        "articles": 3,
+        "grids": [
+          {
+            "columns": "327px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Choose a useful starting point",
+          "Plan",
+          "Build",
+          "Review"
+        ],
+        "links": [
+          {
+            "href": "https://example.com/plan/",
+            "text": "Open planning"
+          },
+          {
+            "href": "https://example.com/build/",
+            "text": "Open building"
+          },
+          {
+            "href": "https://example.com/review/",
+            "text": "Open review"
+          }
+        ],
+        "overflow": false,
+        "viewport": 375
+      },
+      {
+        "id": 49,
+        "width": 767,
+        "articles": 3,
+        "grids": [
+          {
+            "columns": "719px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Choose a useful starting point",
+          "Plan",
+          "Build",
+          "Review"
+        ],
+        "links": [
+          {
+            "href": "https://example.com/plan/",
+            "text": "Open planning"
+          },
+          {
+            "href": "https://example.com/build/",
+            "text": "Open building"
+          },
+          {
+            "href": "https://example.com/review/",
+            "text": "Open review"
+          }
+        ],
+        "overflow": false,
+        "viewport": 767
+      },
+      {
+        "id": 49,
+        "width": 768,
+        "articles": 3,
+        "grids": [
+          {
+            "columns": "224px 224px 224px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Choose a useful starting point",
+          "Plan",
+          "Build",
+          "Review"
+        ],
+        "links": [
+          {
+            "href": "https://example.com/plan/",
+            "text": "Open planning"
+          },
+          {
+            "href": "https://example.com/build/",
+            "text": "Open building"
+          },
+          {
+            "href": "https://example.com/review/",
+            "text": "Open review"
+          }
+        ],
+        "overflow": false,
+        "viewport": 768
+      },
+      {
+        "id": 49,
+        "width": 1440,
+        "articles": 3,
+        "grids": [
+          {
+            "columns": "288px 288px 288px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Choose a useful starting point",
+          "Plan",
+          "Build",
+          "Review"
+        ],
+        "links": [
+          {
+            "href": "https://example.com/plan/",
+            "text": "Open planning"
+          },
+          {
+            "href": "https://example.com/build/",
+            "text": "Open building"
+          },
+          {
+            "href": "https://example.com/review/",
+            "text": "Open review"
+          }
+        ],
+        "overflow": false,
+        "viewport": 1440
+      },
+      {
+        "id": 50,
+        "width": 375,
+        "articles": 2,
+        "grids": [
+          {
+            "columns": "375px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Field notes",
+          "Start with the decisions that repeat",
+          "Build a page from useful sections"
+        ],
+        "links": [
+          {
+            "href": "http://localhost:8922/2026/09/18/start-with-the-decisions-that-repeat/",
+            "text": "Start with the decisions that repeat"
+          },
+          {
+            "href": "http://localhost:8922/2026/09/18/build-a-page-from-useful-sections/",
+            "text": "Build a page from useful sections"
+          }
+        ],
+        "overflow": false,
+        "viewport": 375
+      },
+      {
+        "id": 50,
+        "width": 767,
+        "articles": 2,
+        "grids": [
+          {
+            "columns": "767px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Field notes",
+          "Start with the decisions that repeat",
+          "Build a page from useful sections"
+        ],
+        "links": [
+          {
+            "href": "http://localhost:8922/2026/09/18/start-with-the-decisions-that-repeat/",
+            "text": "Start with the decisions that repeat"
+          },
+          {
+            "href": "http://localhost:8922/2026/09/18/build-a-page-from-useful-sections/",
+            "text": "Build a page from useful sections"
+          }
+        ],
+        "overflow": false,
+        "viewport": 767
+      },
+      {
+        "id": 50,
+        "width": 768,
+        "articles": 2,
+        "grids": [
+          {
+            "columns": "372px 372px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Field notes",
+          "Start with the decisions that repeat",
+          "Build a page from useful sections"
+        ],
+        "links": [
+          {
+            "href": "http://localhost:8922/2026/09/18/start-with-the-decisions-that-repeat/",
+            "text": "Start with the decisions that repeat"
+          },
+          {
+            "href": "http://localhost:8922/2026/09/18/build-a-page-from-useful-sections/",
+            "text": "Build a page from useful sections"
+          }
+        ],
+        "overflow": false,
+        "viewport": 768
+      },
+      {
+        "id": 50,
+        "width": 1440,
+        "articles": 2,
+        "grids": [
+          {
+            "columns": "708px 708px",
+            "gap": "24px"
+          }
+        ],
+        "headings": [
+          "Field notes",
+          "Start with the decisions that repeat",
+          "Build a page from useful sections"
+        ],
+        "links": [
+          {
+            "href": "http://localhost:8922/2026/09/18/start-with-the-decisions-that-repeat/",
+            "text": "Start with the decisions that repeat"
+          },
+          {
+            "href": "http://localhost:8922/2026/09/18/build-a-page-from-useful-sections/",
+            "text": "Build a page from useful sections"
+          }
+        ],
+        "overflow": false,
+        "viewport": 1440
+      }
+    ],
+    "emptyState": {
+      "articles": 0,
+      "text": "Field notes\n\nNo field notes yet."
+    },
+    "focusOutline": "2px solid",
+    "noSharedDependencies": true
+  },
+  "bundles": {
+    "generateblocks-layouts": {
+      "files": 60,
+      "sha256": "484c0c50a9bfd8a879dae89e4f97e87854d71770d9c9255ebc47f41992dfeb55",
+      "bytes": 172376,
+      "includesGeneratedLayoutDependency": false
+    },
+    "html-to-generateblocks": {
+      "files": 63,
+      "sha256": "b3ad1589d47063353505309585bc3d47aeba7da448baab813a6c5c7c36d708cf",
+      "bytes": 180408,
+      "includesGeneratedLayoutDependency": true
+    },
+    "elementor-to-generateblocks": {
+      "files": 63,
+      "sha256": "f705b60c5eefcad12fcd50dfdde35139fd6f419cb0a216aad6716e8d2d99d616",
+      "bytes": 181107,
+      "includesGeneratedLayoutDependency": true
+    },
+    "figma-to-generateblocks": {
+      "files": 63,
+      "sha256": "ea8e133934d7e23dd8659fc69716e6992c4526fd05063262cbe75b54b8f30053",
+      "bytes": 181193,
+      "includesGeneratedLayoutDependency": true
+    }
+  },
+  "latestValidation": {
+    "helperTestsPassed": 15,
+    "realPostOrRandomFourDigitScope": true,
+    "wrongCssBlockPrefixRegression": true,
+    "installedAndStandaloneBundles": {
+      "generateblocks-layouts": {
+        "installedFiles": 60,
+        "archiveFiles": 60,
+        "sourceParity": true,
+        "standaloneValid": true
+      },
+      "html-to-generateblocks": {
+        "installedFiles": 3,
+        "archiveFiles": 63,
+        "sourceParity": true,
+        "standaloneValid": true
+      },
+      "elementor-to-generateblocks": {
+        "installedFiles": 3,
+        "archiveFiles": 63,
+        "sourceParity": true,
+        "standaloneValid": true
+      },
+      "figma-to-generateblocks": {
+        "installedFiles": 3,
+        "archiveFiles": 63,
+        "sourceParity": true,
+        "standaloneValid": true
+      }
+    }
+  }
+}

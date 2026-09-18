@@ -4,7 +4,21 @@
 
 LLM-optimized skill documentation and development resources for the [GenerateBlocks](https://generateblocks.com/) WordPress plugin.
 
-**Source-verified against GenerateBlocks free 2.4.1 and GB Pro 2.7.1** (August 2026), including a read-only check of the same active versions on WordPress 7.1 at gauravtiwari.org. The styling guidance covers Pro CSS Mode, structured selectors, native/custom at-rules, CSS delivery, and a GenerateBlocks-specific anti-slop gate.
+**Beta workflow tested with GenerateBlocks 2.5.0-beta.1 and Pro 2.8.0-beta.1** on two local WordPress 7.1.1 / PHP 8.4 sites (September 18, 2026). Includes Design Tokens, Style Book guidance, shared selectors, portable design systems, and a working two-brand product-page kit. Older 2.4.1 / 2.7.1 guidance remains versioned; the old local Pro reference folder actually reports 2.7.0-rc.1. See the [beta guide](skills/generateblocks-layouts/references/design-systems-beta.md) for the test boundary.
+
+**Styling defaults:** local block styles. The skills prompt before introducing
+shared Global Styles or Design Tokens and add them only when the user explicitly
+opts in. Existing references are preserved during edits.
+
+**Native authoring:** GenerateBlocks/Pro and appropriate core blocks only.
+Styling stays in editable block attributes; interactions use native blocks.
+Scripts Manager, custom HTML/CSS/JavaScript, and other builders require an
+explicit request. Accordion checks include padded questions and answers,
+expanded states, and mobile layouts.
+
+## Compact loading
+
+Start with the selected skill, the shared [authoring contract](skills/generateblocks-layouts/references/authoring-contract.md), and the [router](skills/generateblocks-layouts/references/_index.md). Familiar static layouts do not require the full recovery, CSS, and breakpoint manuals. Load a diagnostic or mapping reference when the task needs it; keep native editor and preflight validation. Standalone converter bundles carry their layout dependency in `references/generateblocks-layouts/`.
 
 ## What the skills can build
 
@@ -15,6 +29,10 @@ LLM-optimized skill documentation and development resources for the [GenerateBlo
 - **Conditions** — GB Pro block/menu conditions, form-field conditions, free-plugin alternatives
 - **GB Pro blocks** — accordion, tabs, carousel, navigation, site header, overlays/mega menus, the 2.6 Forms system
 - **Full-site templates** — GeneratePress Elements (loop templates, page heroes, hooks, display rules), FSE block themes
+
+## Reusable beta kit
+
+[Paper and Ink product-page kit](skills/generateblocks-layouts/examples/beta-design-system/README.md): 19 tokens, 23 shared styles, six reusable sections, native query/accordion/form blocks, and two brand presets. Both 65-block pages survived real editor reload/save with byte-identical content. Imports, collision preservation, CSS parser/compiler parity, responsive layout, and local form behavior were checked.
 
 ## Quick Install
 
@@ -95,7 +113,7 @@ Query/Looper grid, and SVGs. Every file passes the bundled `preflight.py`.
 Before inserting one into WordPress:
 
 1. create/resolve the destination record;
-2. regenerate every ID with the real numeric post ID;
+2. use the real post ID if available, otherwise a random four-digit layout scope;
 3. replace example URLs/content/media;
 4. inherit the destination's design system and registered at-rules;
 5. run `preflight.py <file> --post-id <ID>`.
@@ -125,7 +143,7 @@ generateblocks-skills/
 ├── importable/                # .skill and .zip files for upload
 ├── examples/                  # Historical exploration/exports; not current copy-paste fixtures
 ├── generateblocks/            # Plugin source (2.4.1) for reference
-└── generateblocks-pro/        # Pro plugin source (2.7.1, git-ignored) for reference
+└── generateblocks-pro/        # Pro plugin source (local 2.7.0-rc.1 header; git-ignored) for reference
 ```
 
 ### Skills
@@ -142,6 +160,7 @@ generateblocks-skills/
 | File | Covers |
 |------|--------|
 | `_index.md` | Task router — which file to load for which job |
+| `authoring-contract.md` | Compact required authoring, scope, serialization, styles, and validation contract |
 | `recovery-rules.md` | Every known cause of "Attempt Recovery" errors + exact fixes |
 | `field-notes.md` | Real-conversion lessons: escaping workflow, validation scripts |
 | `block-types.md` | Element/Text/Media/Shape verified attribute schemas |
@@ -154,6 +173,7 @@ generateblocks-skills/
 | `gb-pro.md` | Pro feature map (27 blocks, global classes, Editor Access, version timeline) |
 | `pro-forms.md` | Pro Forms (2.6+): fields, validation, ESP integrations, Turnstile |
 | `pro-interactive.md` | Accordion, Tabs, Carousel, Navigation, Site Header, Overlays |
+| `design-systems-beta.md` | Pro 2.8 tokens, Style Book, selectors, managed-root API, native imports, tested example |
 | `css-mode.md` | CSS Mode, CSS Properties, selectors, supported at-rules, `styles`/`css` parity |
 | `design-quality.md` | GenerateBlocks-specific anti-slop and responsive implementation gate |
 | `mcp-publishing.md` | Pushing blocks to a live site over MCP or REST: server choice, round trip, transport hazards |

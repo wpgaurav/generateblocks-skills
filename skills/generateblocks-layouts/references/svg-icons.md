@@ -138,13 +138,13 @@ Best for: Simple inline icons alongside text (badges, labels). For buttons with 
 ### Action Label with Arrow (inside a linked card)
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"arrow1","tagName":"span","styles":{"display":"flex","alignItems":"center","gap":"0.5rem","fontSize":"0.875rem","fontWeight":"600","color":"#c0392b","svg":{"height":"1rem","transition":"transform .18s ease","width":"1rem"},".gb-element-card1:hover \u0026 svg":{"transform":"translateX(4px)"},"@media (prefers-reduced-motion:reduce)":{"svg":{"transition":"none"}}},"css":".gb-text-arrow1{align-items:center;color:#c0392b;display:flex;font-size:0.875rem;font-weight:600;gap:0.5rem}.gb-text-arrow1 svg{height:1rem;transition:transform .18s ease;width:1rem}.gb-element-card1:hover .gb-text-arrow1 svg{transform:translateX(4px)}@media (prefers-reduced-motion:reduce){.gb-text-arrow1 svg{transition:none}}","className":"gb-text"} -->
+<!-- wp:generateblocks/text {"uniqueId":"arrow1","tagName":"span","styles":{"display":"flex","alignItems":"center","gap":"0.5rem","fontSize":"0.875rem","fontWeight":"600","color":"#c0392b","svg":{"height":"1rem","transition":"transform .18s ease","width":"1rem"},"\u0026:is(.gb-element-card1:hover *) svg":{"transform":"translateX(4px)"},"@media (prefers-reduced-motion:reduce)":{"svg":{"transition":"none"}}},"css":".gb-text-arrow1{align-items:center;color:#c0392b;display:flex;font-size:0.875rem;font-weight:600;gap:0.5rem}.gb-text-arrow1 svg{height:1rem;transition:transform .18s ease;width:1rem}.gb-text-arrow1:is(.gb-element-card1:hover *) svg{transform:translateX(4px)}@media (prefers-reduced-motion:reduce){.gb-text-arrow1 svg{transition:none}}","className":"gb-text"} -->
 <span class="gb-text-arrow1 gb-text">View details<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
 <!-- /wp:generateblocks/text -->
 ```
 
 **Note:** The parent-hover selector and reduced-motion branch live in
-`styles` and the compiled `css`. Replace `card1` with the real post-scoped
+`styles` and the compiled `css`. Replace `card1` with the actual layout-scoped
 parent ID.
 
 ### Button with Icon (use Element block)

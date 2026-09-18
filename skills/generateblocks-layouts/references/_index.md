@@ -1,147 +1,40 @@
 ---
-title: Skill router (read first)
-description: Tells Claude which reference file to open for which task. Always check this before generating GenerateBlocks markup.
+title: GenerateBlocks reference router
+description: Load the authoring contract, then only the references needed by the task.
 ---
 
-# GenerateBlocks Skill Router
+# Reference router
 
-Read this file FIRST, then load only what the task needs. Loading the wrong
-file (or loading too much) wastes context — be precise.
+For markup, read `authoring-contract.md` once, then select matching references
+below. Reuse already-loaded guidance in the same task. Read-only questions need
+only the relevant topic. The diagnostic catalog is not a prerequisite for every
+layout. Examples never authorize shared styles, tokens, or publication.
 
-Verified against: GenerateBlocks free **2.4.1**, GB Pro **2.7.1** on
-WordPress **7.1** (live + installed source, 2026-08-26).
-
-## Before doing anything
-
-**Always read these two, every task:**
-
-1. `references/recovery-rules.md` — every cause of "Attempt Recovery" errors
-   plus the exact fix. The bug-prevention manual. Non-negotiable.
-2. The task file(s) from the table below.
-
-If the task touches dynamic data in ANY way (loops, custom fields, dates,
-titles, archives), also read `dynamic-tags.md` — older tag syntax floating
-around the internet (and in old markup) is wrong and silently fails.
-
----
-
-## Task → file routing
-
-| If the user is asking for... | Read |
+| Task or uncertainty | Read |
 |---|---|
-| A static section / hero / cards / grid (no dynamic data) | `block-types.md`, `css-patterns.md` |
-| **CSS Mode, CSS Properties, raw CSS, nested selectors, `styles` vs `css`** | `css-mode.md` |
-| Hover, focus, transitions, pseudo-elements, child selectors | `css-mode.md`, `css-patterns.md` |
-| Entrance animations, scroll effects, micro-interactions, motion | `animations.md` |
-| SVG icons or decorative shapes | `svg-icons.md` |
-| Responsive layout / breakpoints | `responsive.md` |
-| Container queries, `@supports`, reduced motion, forced colors | `css-mode.md`, `responsive.md` |
-| **Blog grid, archive, related posts, any dynamic post list** | `query-block.md` + `dynamic-tags.md` |
-| Pagination on a query | `query-block.md` §1.5 |
-| Dynamic titles, dates, images, meta, author boxes | `dynamic-tags.md` |
-| **ACF fields, repeaters, options pages, Meta Box, custom fields** | `acf-and-custom-fields.md` |
-| Conditional visibility (roles, devices, scheduling, meta) | `conditions.md` |
-| Accordion / tabs / carousel / mega menu / modal / site header | `pro-interactive.md` |
-| Contact form, newsletter signup, any form | `pro-forms.md` |
-| **Full site: headers, footers, archive/single templates, FSE, GeneratePress Elements** | `template-authoring.md` |
-| "What needs Pro?" / Pro feature overview / global classes | `gb-pro.md` |
-| Design tokens, theme.json bridge | `global-styles.md` |
-| Block patterns / pattern registration | `patterns.md` |
-| Performance / CSS delivery | `performance.md` |
-| Inventing or materially changing a visual design | `design-quality.md` (+ `/design-slop` when available) |
-| Migrating V1 blocks (`container`, `headline`, `grid`) | `migrations.md` |
-| **Pushing blocks to a live site: MCP server, REST write, "publish this for me"** | `mcp-publishing.md` |
-| Markup that's failing / debugging | `troubleshooting.md`, `recovery-rules.md` |
-| Hand-converting an existing design / bulk escaping / pre-delivery validation | `field-notes.md` |
-| Core `core/query` loops (only if explicitly requested) | `query-loops.md` |
+| Familiar static Element/Text layout, ordinary states, native breakpoints | Contract is sufficient; optional `examples/basic/` or `examples/layouts/` |
+| Unfamiliar tag/attribute; Media or Shape save markup | Relevant block in `block-types.md`; `svg-icons.md` for SVG |
+| New or materially changed visual direction | `design-quality.md` and nearest brand guidance; broader design critique only when needed |
+| Raw CSS editing, complex selectors, CSS Mode parsing | `css-mode.md`; `css-patterns.md` only for a needed recipe |
+| Custom breakpoints, container queries, responsive cascade problem | `responsive.md` |
+| Hover/reduced-motion or other animation beyond the contract | `animations.md` |
+| Dynamic post lists | `query-block.md` + `dynamic-tags.md` |
+| Custom fields, ACF repeaters/options | `acf-and-custom-fields.md` + `dynamic-tags.md`; query guide when looping |
+| Conditional rendering | `conditions.md` |
+| Forms | `pro-forms.md`; native editor output for field serialization |
+| Accordion, tabs, carousel, navigation, header, overlays | Relevant section of `pro-interactive.md` |
+| Which features require Pro? | `gb-pro.md` |
+| Shared styling choice unclear or implicit pattern dependencies | `styling-scope.md` |
+| Explicitly requested Global Styles/tokens | `global-styles.md`; add `design-systems-beta.md` for Pro 2.8 |
+| Reusable compositions/pattern imports | `patterns.md` |
+| Full-site templates or GeneratePress Elements | `template-authoring.md` |
+| CSS delivery, caches, performance | `performance.md` |
+| Authorized MCP/REST publishing | `mcp-publishing.md` before writing |
+| V1 migration | `migrations.md` |
+| Explicit legacy core/query request | `query-loops.md`; otherwise use the V2 query family |
+| Recovery or preflight failure | Matching topic in `recovery-rules.md`; `troubleshooting.md` if unresolved |
+| Target convention inspection or bulk conversion diagnostics | Relevant section of `field-notes.md` |
 
----
-
-## File map
-
-```
-references/
-├── _index.md                 ← you are here
-├── recovery-rules.md         ← MUST read every task. Recovery error catalog.
-├── field-notes.md            ← Real-conversion lessons: escaping workflow, validation script
-├── block-types.md            ← Element/Text/Media/Shape verified specs
-├── css-mode.md               ← Pro CSS Mode, supported selectors/at-rules, styles/css contract
-├── design-quality.md         ← GenerateBlocks-specific anti-slop implementation gate
-├── dynamic-tags.md           ← Canonical tag catalog + syntax. Wins all conflicts.
-├── query-block.md            ← Query/Looper/Loop-Item + Pro query extensions
-├── acf-and-custom-fields.md  ← ACF patterns, repeater loops, options pages
-├── conditions.md             ← Pro conditions + free alternatives
-├── template-authoring.md     ← Full-site building: FSE, GP Elements, templates
-├── animations.md             ← Motion: hover, keyframes, scroll-driven, a11y
-├── gb-pro.md                 ← Pro overview + feature map (2.7)
-├── pro-forms.md              ← Forms system deep dive
-├── pro-interactive.md        ← Accordion/Tabs/Carousel/Nav/Header/Overlays
-├── css-patterns.md           ← Durable states, surfaces, buttons, selectors
-├── svg-icons.md              ← Shape block + inline SVG patterns
-├── responsive.md             ← Native/custom at-rules + responsive composition
-├── global-styles.md          ← Design tokens, theme.json bridge
-├── patterns.md               ← Block pattern registration
-├── performance.md            ← CSS delivery optimization
-├── mcp-publishing.md         ← Live-site writes over MCP/REST: servers, round trip, hazards
-├── migrations.md             ← V1 → V2 migration guide
-├── query-loops.md            ← LEGACY core/query patterns (only on request)
-├── responsive-legacy.md      ← Older breakpoint patterns (reference only)
-└── troubleshooting.md        ← Debug recipes for known failures
-```
-
----
-
-## Output rules (always apply)
-
-1. **Output to a file**, never inline in chat. Filename: `{section}-section.html`
-   or `{slug}.html`. Place in `output/` if working in this repo, otherwise
-   wherever the user wants.
-2. **Resolve the actual WordPress post ID before serialization.** A new record
-   must be created as a draft first. Generate new IDs as
-   `{section}-{post_id}-{sequence}` and never leave `{post_id}` literal.
-3. **Run the pre-flight checklist** from `recovery-rules.md` §7 against your
-   output before saving. Use `scripts/preflight.py <file> --post-id <ID>`.
-4. **Summarize in chat**: purpose, block count, anything that needs Pro,
-   anything skipped due to a recovery rule.
-5. **Writing to a live site** (MCP server or REST) is a separate discipline
-   with its own silent failure modes. Read `mcp-publishing.md` before the
-   first write and verify the read-back with `scripts/verify_roundtrip.py`.
-6. **Anti-slop gate**: if you invented or materially changed any part of the
-   design, run `design-quality.md` before delivering and load `/design-slop`
-   when it is available. The nearest project design system owns brand-specific
-   decisions.
-
----
-
-## Decision shortcuts
-
-- **Static image with caption?** → `core/image`, not `generateblocks/media`.
-- **Dynamic image inside a loop?** → `generateblocks/media` with
-  `{{featured_image size:large}}` in `htmlAttributes.src`.
-- **Action link / button-styled link?** → element `<a>` wrapping a text `span`
-  child. Never text `<a>` with href (stripped). Never element `<a>` with raw
-  text (recovery).
-- **Inline link inside a sentence?** → write the `<a>` in the text block's
-  rich-text content (escaped in JSON, literal in HTML body).
-- **List?** → `core/list` with `className:"list"`.
-- **Emoji?** → `core/paragraph`.
-- **Dynamic tag?** → `{{tag option:value|option2:value}}` — space after tag
-  name, pipes between options, NO quotes. `dynamic-tags.md` is law.
-- **ACF field?** → `{{post_meta key:field_name}}` (no `{{acf}}` tag exists).
-- **ACF repeater loop?** → Pro `queryType:"post_meta"` — `acf-and-custom-fields.md` §4.
-- **Related posts?** → Pro `"post__not_in":["current"]` + tax_query
-  `"terms":["current"]`.
-- **Inheriting an archive query?** → `"inheritQuery":true,"query":{}`.
-- **Conditional block?** → Pro `"gbBlockCondition":<condition post ID>` —
-  rules are built in the dashboard, not inline.
-- **CSS variable in JSON?** → escape it: `var(\u002d\u002dgb-foo)`.
-- **CSS variable in inline `style=""`?** → literal: `var(--gb-foo)`.
-- **Quote inside a JSON string value?** → `\u0022`, never `\"`.
-- **GenerateBlocks Mobile?** → `@media (max-width:767px)` in 2.4.1.
-- **Existing `max-width:768px` rule?** → preserve it as a custom boundary
-  unless a breakpoint migration was explicitly approved.
-- **CSS Mode?** → edit `styles`; compile the same structure into local `css`.
-  Never invent a `cssMode` attribute.
-
-Default minimum context for any task: `recovery-rules.md` + `block-types.md`
-+ the task file. Add `dynamic-tags.md` whenever data is dynamic.
+The stable references record earlier free 2.4.1/Pro 2.7.1 observations. The beta
+workflow was tested with free 2.5.0-beta.1/Pro 2.8.0-beta.1 on WordPress 7.1.1.
+Verify the target instead of treating those observations as its installed state.

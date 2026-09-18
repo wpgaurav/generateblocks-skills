@@ -1,19 +1,21 @@
 ---
-title: Recovery Error Rules (read FIRST)
+title: Recovery Error Rules (diagnostic catalog)
 description: Every known cause of "Attempt Recovery" errors in the WordPress block editor when emitting GenerateBlocks markup, with the exact fix.
 ---
 
 # Recovery Error Rules
 
-This file is the authoritative checklist. Read it before generating any GB markup.
-Every rule below comes from a real failure observed in production.
+Read `authoring-contract.md` before generating markup. Use this detailed catalog
+for the specific recovery/preflight symptom or unresolved serialization question;
+a routine task does not require the entire catalog.
+The rules cover production failures and explicitly labeled local beta tests.
 
 ## The meta-rule (read this first)
 
-> **The WordPress block editor validates blocks by re-serializing the
-> attributes and string-comparing against the markup you pasted. Any
-> deviation — even semantically-equivalent JSON or HTML — is treated as
-> corruption and triggers "Attempt Recovery".**
+> **Use the installed block's own save output as the serialization reference.**
+> Gutenberg validates saved HTML against the block's save function. Separately,
+> a byte comparison of `content.raw` detects transport and server normalization.
+> JSON key order or escape spelling alone does not establish a recovery error.
 
 This is the unifying principle behind every rule in this file. The goal isn't
 "valid JSON and valid HTML." The goal is **byte-identical to what the editor
@@ -37,30 +39,42 @@ what you think is correct**.
 
 ## 1. JSON encoding rules (the silent killers)
 
-WordPress's `serialize_block_attributes()` runs five substitutions on the JSON
+WordPress 7.1.1's `serialize_block_attributes()` runs six substitutions on the JSON
 string after `wp_json_encode()` to make it safe for the HTML comment context
 the block delimiter lives in:
 
 | Literal | Canonical form | Why |
 |---|---|---|
+| Literal backslash (JSON `\\`) | `\u005c` | Preserve literal CSS/text escapes; substitute before adding other escape sequences |
 | `--` | `\u002d\u002d` | Avoids HTML comment terminator collision |
 | `<` | `\u003c` | Defends against `</script>` injection |
 | `>` | `\u003e` | Same |
 | `&` | `\u0026` | Defends against entity injection |
 | `\"` (escaped quote) | `\u0022` | Quote inside a JSON string value |
 
-If you emit the literal form, the editor re-serializes to the escaped form,
-the strings differ, recovery fires. **Apply all five substitutions to every
+If you emit a different form, a save may normalize it and break byte parity.
+Malformed comment JSON can also break parsing. **Apply all six substitutions to every
 JSON string value** inside block delimiter attributes (`styles` values, `css`
 strings, `htmlAttributes` values, content strings — everywhere).
 
-The fifth matters whenever a string value contains a double quote — e.g.
+The escaped-quote substitution matters whenever a string value contains a double quote — e.g.
 inline HTML in a text block's `content` or an SVG string in a text block's
 `icon` attribute. Never emit `\"` — the canonical form is `\u0022`:
 
 ```json
 "content":"Read the \u003ca href=\u0022https://example.com/\u0022\u003eguide\u003c/a\u003e now"
 ```
+
+Check the installed core serializer on older WordPress versions. The helper's
+six-substitution output was checked against the local WordPress 7.1.1 source.
+
+Omit an unused `htmlAttributes` attribute. In the tested beta, an explicitly
+empty object `{}` became `[]` during server serialization; omission retained
+byte-identical `content.raw`. Nonempty attributes remain plain objects.
+The live About-page conversion reproduced the same normalization for empty
+`styles:{}`. Omit unused `styles` instead of serializing an empty object. A
+stored `styles` array is not the declared block attribute type; inspect the
+transport rather than silently treating it as a valid styles object.
 
 ### 1.1 Escape `--` as `\u002d\u002d`
 
@@ -140,7 +154,7 @@ newline inside content, encode `\n`.
 
 Inside the rendered HTML body (e.g. `style="..."` on a real `<span>`), use
 literal characters: `var(--foo)`, `&amp;`, `<`, `>`. The HTML body is not
-JSON-parsed, so the five substitutions above do not apply there.
+JSON-parsed, so the six substitutions above do not apply there.
 
 This is why the canonical link with a multi-param URL has `&amp;` in the
 HTML body and `\u0026` in the JSON — same character, different escape rules
@@ -211,7 +225,8 @@ CSS Mode and the `styles` object support:
 
 They support one at-rule level, optionally combined with one selector level.
 Do not put `@keyframes`, `@font-face`, `@import`, or nested at-rules into
-structured block styles. Use the owning project stylesheet.
+structured block styles. Simplify unsupported effects and flatten supported
+rules; an external stylesheet requires an explicit user request.
 
 ### 2.4 Canonical generated CSS is compact
 
@@ -260,8 +275,9 @@ other valid orders.
 ### 2.7 Comments and global CSS
 
 CSS Mode strips comments. It also rejects unrelated site-wide selectors. Keep
-block CSS scoped to the block. Put page-wide selector graphs, font declarations,
-and keyframes in the project-approved stylesheet layer.
+block CSS scoped to its owning block. Distribute page-wide rules to their owners
+and flatten supported selectors. Simplify unsupported effects unless the user
+explicitly requests an external stylesheet extension.
 
 ---
 
@@ -340,7 +356,7 @@ emits the duplicate.
 `gb-loop-item-{id}`, `gb-query-page-numbers-{id}` all auto-inject the same
 way.
 
-**When `styles` is empty** (e.g. an empty `"styles":{}`), the plugin does NOT
+**When local styles are absent** (omit unused `styles` rather than emitting `{}`), the plugin does NOT
 auto-inject the id-class. In that case the rendered HTML class list is exactly
 what you put in `className`. This is rare — most blocks have non-empty styles.
 
@@ -580,15 +596,17 @@ If the rule is only cosmetic and adds brittle selector coupling, remove it.
 
 Before saving any output to a file, verify:
 
-**Post-scoped unique IDs**
-- [ ] The actual numeric WordPress post ID was resolved before serialization
-- [ ] Every newly generated ID matches `{section}-{post_id}-{sequence}{optional_suffix}`
+**Layout-scoped unique IDs**
+- [ ] Use the actual post ID if available, otherwise one random four-digit scope
+- [ ] Every newly generated ID matches `{section}-{id_scope}-{sequence}{optional_suffix}`
 - [ ] The sequence is not zero-padded
-- [ ] No literal `{post_id}` token, slug, guessed ID, product-detail ID, or variation ID is used
+- [ ] No literal placeholder, slug, product-detail ID, or variation ID is used
+- [ ] The fallback is not treated as a WordPress record ID for publishing
 - [ ] Existing stored IDs are preserved unless their blocks are being replaced
-- [ ] `scripts/preflight.py <file> --post-id <ID>` passes
+- [ ] `scripts/preflight.py <file> --id-scope <SCOPE>` passes
 
-**JSON string escapes (the five substitutions)**
+**JSON string escapes (the six substitutions)**
+- [ ] Literal backslashes use `\u005c` on the verified WordPress 7.1.1 target
 - [ ] Every `--` inside JSON strings is `\u002d\u002d`
 - [ ] Every `&` inside JSON strings is `\u0026`
 - [ ] Every `<` inside JSON strings is `\u003c`

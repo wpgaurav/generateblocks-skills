@@ -5,14 +5,26 @@ description: Source-verified GenerateBlocks Pro Global Styles storage, CSS Mode 
 
 # Global Styles and Design Tokens
 
-GenerateBlocks Pro Global Styles are reusable CSS class contracts. Use them for
+Shared styling is opt-in. Follow `styling-scope.md`: prompt once, default to
+local block styles, and create/import/modify shared records or introduce shared
+dependencies only when explicitly requested. Preserve existing references.
+
+GenerateBlocks Pro Global Styles are reusable CSS contracts. Pro 2.7 primarily
+uses classes; Pro 2.8 adds supported base and additional selectors. Use them for
 styles that genuinely repeat across blocks and pages, not as a dumping ground
 for one-off values.
 
 Read `css-mode.md` for selector and at-rule grammar and `design-quality.md`
 before creating a visual system.
 
-## Current Storage Model
+## Pro 2.8 beta extension
+
+Read `design-systems-beta.md` for managed root tokens, selector grammar,
+`gb_style_targets`/`gb_style_targets_css`, categories, checksum-aware saves,
+and tested missing-only design-system imports. Only class selectors belong in
+`globalClasses`; tag styles and other selectors apply through the cascade.
+
+## Pro 2.7 storage model
 
 In Pro 2.7.1, each current Global Style is a published `gblocks_styles` record.
 Important meta fields are:
@@ -63,13 +75,14 @@ Weak candidates:
 - a selector named only for where it currently sits.
 
 Global Styles reduce local CSS only when the contract really repeats. They do
-not replace the theme's tokens or every local block style.
+not automatically replace the theme's tokens or every local block style. Pro
+2.8 can own the token layer when the project deliberately chooses it.
 
 ## Token Layering
 
 Use this priority:
 
-1. theme/project tokens and variables;
+1. the chosen theme/project token owner (including Pro 2.8 Design Tokens);
 2. reusable Global Style contracts;
 3. local block styles for the instance;
 4. inline values only when they are genuinely dynamic.

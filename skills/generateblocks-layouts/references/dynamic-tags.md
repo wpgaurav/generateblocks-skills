@@ -74,7 +74,7 @@ put tags there.
 
 **JSON escaping still applies.** A tag inside a JSON attribute value follows
 the normal recovery rules: if the tag value contains `--`, `&`, `<`, `>`, use
-the five substitutions (rare — tag syntax avoids these characters by design).
+the six substitutions (rare — tag syntax avoids these characters by design).
 The same tag string must appear identically in the JSON attribute and the
 rendered HTML body.
 
@@ -256,7 +256,7 @@ attachment, which a loop image doesn't.
 ```html
 <!-- wp:generateblocks/element {"uniqueId":"nav1","tagName":"a","styles":{"display":"inline-flex"},"css":".gb-element-nav1{display:inline-flex}","htmlAttributes":{"href":"{{post_permalink source:next-post}}","rel":"next"},"className":"gb-element"} -->
 <a class="gb-element-nav1 gb-element" href="{{post_permalink source:next-post}}" rel="next">
-    <!-- wp:generateblocks/text {"uniqueId":"nav2","tagName":"span","content":"Next: {{post_title source:next-post|trunc:50}}","styles":{},"css":"","className":"gb-text"} -->
+    <!-- wp:generateblocks/text {"uniqueId":"nav2","tagName":"span","content":"Next: {{post_title source:next-post|trunc:50}}","className":"gb-text"} -->
     <span class="gb-text-nav2 gb-text">Next: {{post_title source:next-post|trunc:50}}</span>
     <!-- /wp:generateblocks/text -->
 </a>

@@ -18,7 +18,7 @@ filter. Contributors/Authors can no longer author form posts.
 ## 1. Architecture — how forms actually work
 
 1. A form lives in a **`gblocks_form` post** (Dashboard → GenerateBlocks →
-   Forms). Its block content defines the fields; its `gblocks_form` post meta
+   Forms). Its block content defines the fields; its `_gb_form` post meta
    holds the config (actions, integrations, notifications).
 2. The form is embedded anywhere with the tiny **`generateblocks-pro/form-render`**
    block: `{"formId":123}`.
@@ -31,6 +31,11 @@ filter. Contributors/Authors can no longer author form posts.
    (max 500 per form, 180-day retention, GDPR export/erase wired up).
 
 ## 2. Recommended workflow
+
+The tested Pro 2.8 REST base is `/wp/v2/gblocks-forms` (hyphenated plural),
+not the `gblocks_form` post-type name. Config lives in `meta._gb_form.config`.
+Discover the installed post type's `rest_base` before writing. The bundled beta
+kit demonstrates native form serialization and a localhost-only mail sink.
 
 **Build the form's processing config in the editor UI; author the field
 markup as blocks.** The config (where emails go, integrations, Turnstile) is

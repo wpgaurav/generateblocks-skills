@@ -5,9 +5,10 @@ Reproduces two things the plugin/WordPress do, so hand-authored markup round-tri
 
   build_css(selector, styles)  -> the `css` attribute the plugin compiles from `styles`
   serialize_attrs(attrs)       -> WordPress serialize_block_attributes() incl. all
-                                  five substitutions
+                                  six substitutions
   ordered(block_type, attrs)   -> canonical block.json key order, className last
-  make_unique_id(...)          -> {section}-{post_id}-{sequence}{suffix}
+  make_layout_id(...)          -> actual post ID or random four-digit layout scope
+  make_unique_id(...)          -> {section}-{id_scope}-{sequence}{suffix}
 
 The base/at-rule compiler was validated against 467 production blocks. It also
 supports the one-selector/one-at-rule grammar exposed by Pro CSS Mode. Algorithm
@@ -24,9 +25,26 @@ See also scripts/preflight.py for the pre-delivery validation pass.
 """
 import json
 import re
+import secrets
+
+def make_layout_id(post_id=None, used_ids=()):
+    """Choose one numeric scope per layout; this does not create a WP record.
+
+    Pass known occupied numeric scopes in used_ids when combining layouts.
+    Reuse the returned value for all blocks in this layout.
+    """
+    if post_id is not None:
+        if isinstance(post_id, bool) or not isinstance(post_id, int) or post_id < 1:
+            raise ValueError("post_id must be a positive integer or None")
+        return post_id
+    occupied = set(used_ids)
+    available = [number for number in range(1000, 10000) if number not in occupied]
+    if not available:
+        raise ValueError("no unused four-digit layout IDs remain")
+    return secrets.choice(available)
 
 def make_unique_id(section, post_id, sequence, suffix=''):
-    """Return a post-scoped, unpadded GenerateBlocks uniqueId."""
+    """Return a layout-scoped ID using a real post ID or make_layout_id fallback."""
     if not isinstance(section, str) or not re.fullmatch(r'[a-z][a-z0-9-]*', section):
         raise ValueError("section must be a lowercase component name")
     if section.endswith('-'):
@@ -202,9 +220,19 @@ SUBS = [('--', _U('002d') + _U('002d')),
         (chr(38), _U('0026'))]
 
 def serialize_attrs(attrs):
-    """json_encode + the five substitutions, preserving key insertion order."""
+    """json_encode + the six substitutions, preserving key insertion order.
+
+    Order matters. A literal backslash is folded to \u005c FIRST, because every
+    later substitution injects backslashes of its own that must not be folded
+    again. Verified against WordPress serialize_block_attributes() on
+    WP 7.1 (2026-08-27):
+
+        {"css":".x::before{content:'\u005ce9d9'}","q":"say \u0022hi\u0022",
+         "amp":"a\u0026b","lt":"\u003cb\u003e","dd":"var(\u002d\u002dx)"}
+    """
     s = json.dumps(attrs, separators=(',', ':'), ensure_ascii=False)
-    s = s.replace(_BS + '"', _U('0022'))          # escaped quote -> \u0022
+    s = s.replace(_BS + _BS, _U('005c'))          # literal backslash -> \u005c
+    s = s.replace(_BS + '"', _U('0022'))          # escaped quote     -> \u0022
     for lit, esc in SUBS:
         s = s.replace(lit, esc)
     return s

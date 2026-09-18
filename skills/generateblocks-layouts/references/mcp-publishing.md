@@ -78,19 +78,18 @@ Practical notes:
   is a fine trade for many sites and a policy question for others. Decide it
   before the first write, not after.
 
-## 2. Resolve the post ID before you generate anything
+## 2. Distinguish block IDs from the write target
 
-Unchanged from `SKILL.md`, and more important here because an MCP server makes
-it easy to skip.
+Use the real post ID for new block IDs when it exists. For offline or pre-record
+layouts, choose one random four-digit scope with `make_layout_id()` and reuse it
+in `make_unique_id(section, scope, n)`. Check collisions in the destination;
+preserve valid existing IDs instead of regenerating a layout merely because a
+record was created later. Validate with `preflight.py FILE --id-scope SCOPE`.
 
-1. Create the record as a **draft with empty content** first.
-2. Read back the numeric `id` from the response.
-3. Generate `uniqueId`s with `make_unique_id(section, post_id, n)`.
-4. Then serialize, preflight, and write.
-
-Never mint IDs against a slug, a guessed number, or a literal `{post_id}`. A
-draft costs one API call; renaming every ID in a shipped page costs an
-afternoon.
+Before an authorized write, resolve the actual WordPress record and verify its
+numeric ID, slug, URL, and status. Create a draft only when the task requires a
+record. A four-digit block-ID fallback is never authorization to write to the
+WordPress record with that number, nor a substitute for a real form/query ID.
 
 ## 3. The round trip
 
@@ -133,7 +132,7 @@ changes.
 
 These are the failures that survive a 200 response.
 
-**The five substitutions get reversed.** Block attribute JSON stores `--` as
+**The six substitutions get reversed.** Block attribute JSON stores `--` as
 `\u002d\u002d`, `<` as `\u003c`, `>` as `\u003e`, `&` as `\u0026`, and `\"` as
 `\u0022`. A transport that JSON-decodes the content and re-encodes it will
 emit the literal characters instead. The markup still looks right in a diff
@@ -154,11 +153,13 @@ from this; fix the transport rather than the markup.
 
 **Attribute key order drift.** If the read-back has the same JSON semantically
 but a different key order, the server parsed and re-serialized the blocks.
-Every block on the page is now a recovery candidate, not just yours. Stop and
-switch routes.
+Compare the full byte diff and validate the parsed blocks. Key order alone
+is not proof of a recovery error; unexplained semantic/markup changes must be
+resolved before continuing.
 
 **Stale CSS after the write.** GenerateBlocks collects block CSS at save time
-and delivers it inline or as generated files depending on site settings. An
+and, through free 2.4, delivers it inline or as generated files. Free 2.5 local
+CSS is always inline; Pro Global Styles keep a separate delivery path. An
 API or MCP write does not always trigger that collection. If the section
 renders unstyled on the frontend but correct in the editor, the CSS cache is
 stale — re-save from the editor, or flush the GB CSS cache, before concluding

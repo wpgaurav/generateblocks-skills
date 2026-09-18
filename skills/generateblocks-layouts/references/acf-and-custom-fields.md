@@ -52,7 +52,7 @@ field label or the `field_xxxxx` key.
 ```html
 <!-- wp:generateblocks/element {"uniqueId":"prod3","tagName":"a","styles":{"display":"inline-block","backgroundColor":"#c0392b","color":"#ffffff","padding":"0.75rem 1.5rem","borderRadius":"0.375rem"},"css":".gb-element-prod3{background-color:#c0392b;border-radius:0.375rem;color:#ffffff;display:inline-block;padding:0.75rem 1.5rem}","htmlAttributes":{"href":"{{post_meta key:cta_link.url}}"},"className":"gb-element"} -->
 <a class="gb-element-prod3 gb-element" href="{{post_meta key:cta_link.url}}">
-    <!-- wp:generateblocks/text {"uniqueId":"prod4","tagName":"span","content":"{{post_meta key:cta_link.title}}","styles":{},"css":"","className":"gb-text"} -->
+    <!-- wp:generateblocks/text {"uniqueId":"prod4","tagName":"span","content":"{{post_meta key:cta_link.title}}","className":"gb-text"} -->
     <span class="gb-text-prod4 gb-text">{{post_meta key:cta_link.title}}</span>
     <!-- /wp:generateblocks/text -->
 </a>

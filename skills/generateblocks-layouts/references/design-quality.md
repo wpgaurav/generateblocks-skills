@@ -6,9 +6,14 @@ description: GenerateBlocks-specific anti-slop checks for hierarchy, surfaces, c
 # GenerateBlocks Design Quality Gate
 
 Use this before styling a layout the user did not fully specify and before
-shipping any material redesign. Load `/design-slop` when available. The nearest
-project design system owns brand decisions; this file owns the GenerateBlocks
-implementation check.
+shipping a material redesign. The nearest project design system owns brand
+decisions; this file supplies the focused GenerateBlocks quality gate.
+
+A new record is not automatically a new visual direction. Preserving theme
+typography and choosing functional spacing does not require loading a separate
+design catalog. Use `/design-slop` when a broader critique, substantial redesign,
+or unresolved visual issue warrants it; do not load its full reference chain
+solely because this file was selected. The checks below still apply.
 
 ## Start With Context
 
@@ -135,7 +140,8 @@ when the composition, not merely a number, needs to change.
 - Keep `styles` and compiled `css` semantically aligned.
 - Use CSS Mode's supported one-level selectors and at-rules; do not bury a
   site-wide stylesheet in a block.
-- Reuse an existing Global Style when the component contract is truly shared.
+- Preserve existing Global Style references. For new shared usage, prompt first
+  and follow `styling-scope.md`; local styling is the default.
 - Do not create global classes for one-off spacing nudges.
 - Name section and component IDs semantically and scope them to the real post.
 - Keep core blocks for prose, lists, tables, and captioned images when they are

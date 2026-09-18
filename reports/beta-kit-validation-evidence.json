@@ -1,0 +1,267 @@
+{
+  "verified": "2026-09-18",
+  "versions": {
+    "wordpress": "7.1.1",
+    "php": "8.4",
+    "generateblocks": "2.5.0-beta.1",
+    "generateblocks-pro": "2.8.0-beta.1"
+  },
+  "editor": {
+    "paper": {
+      "blockCount": 65,
+      "contentUnchanged": true,
+      "invalid": [],
+      "saved": true
+    },
+    "ink": {
+      "blockCount": 65,
+      "contentUnchanged": true,
+      "invalid": [],
+      "saved": true
+    }
+  },
+  "native": {
+    "accent": "#a8e1ca",
+    "brandPreserved": true,
+    "cssModeRoundtrip": true,
+    "imported": {
+      "existingStyles": 23,
+      "importedStyles": 0,
+      "importedTokens": 0,
+      "rootChanged": false
+    },
+    "parsedTokenCount": 19,
+    "staleChecksum": "gb_style_checksum_conflict"
+  },
+  "responsive": [
+    {
+      "name": "paper",
+      "width": 360,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "320px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 360
+    },
+    {
+      "name": "paper",
+      "width": 390,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "350px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 390
+    },
+    {
+      "name": "paper",
+      "width": 767,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "705.641px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 767
+    },
+    {
+      "name": "paper",
+      "width": 768,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "381.273px 293.289px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "80px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 768
+    },
+    {
+      "name": "paper",
+      "width": 1024,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "514.398px 395.695px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "80px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 1024
+    },
+    {
+      "name": "paper",
+      "width": 1025,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "514.906px 396.094px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "80px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 1025
+    },
+    {
+      "name": "paper",
+      "width": 1440,
+      "background": "rgb(250, 247, 241)",
+      "buttonBackground": "rgb(148, 63, 40)",
+      "buttonColor": "rgb(255, 255, 255)",
+      "columns": "583.297px 448.695px",
+      "headingFont": "Georgia, serif",
+      "overflow": false,
+      "sectionPadding": "80px",
+      "text": "rgb(36, 35, 31)",
+      "viewport": 1440
+    },
+    {
+      "name": "ink",
+      "width": 360,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "320px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 360
+    },
+    {
+      "name": "ink",
+      "width": 390,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "350px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 390
+    },
+    {
+      "name": "ink",
+      "width": 767,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "705.641px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "48px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 767
+    },
+    {
+      "name": "ink",
+      "width": 768,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "381.273px 293.289px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "72px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 768
+    },
+    {
+      "name": "ink",
+      "width": 1024,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "514.398px 395.695px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "72px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 1024
+    },
+    {
+      "name": "ink",
+      "width": 1025,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "514.906px 396.094px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "72px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 1025
+    },
+    {
+      "name": "ink",
+      "width": 1440,
+      "background": "rgb(16, 44, 40)",
+      "buttonBackground": "rgb(168, 225, 202)",
+      "buttonColor": "rgb(16, 44, 40)",
+      "columns": "583.297px 448.695px",
+      "headingFont": "system-ui, sans-serif",
+      "overflow": false,
+      "sectionPadding": "72px",
+      "text": "rgb(241, 246, 238)",
+      "viewport": 1440
+    }
+  ],
+  "bundles": {
+    "generateblocks-layouts": {
+      "files": 60,
+      "sha256": "484c0c50a9bfd8a879dae89e4f97e87854d71770d9c9255ebc47f41992dfeb55",
+      "bytes": 172376,
+      "includesGeneratedLayoutDependency": false
+    },
+    "html-to-generateblocks": {
+      "files": 63,
+      "sha256": "b3ad1589d47063353505309585bc3d47aeba7da448baab813a6c5c7c36d708cf",
+      "bytes": 180408,
+      "includesGeneratedLayoutDependency": true
+    },
+    "elementor-to-generateblocks": {
+      "files": 63,
+      "sha256": "f705b60c5eefcad12fcd50dfdde35139fd6f419cb0a216aad6716e8d2d99d616",
+      "bytes": 181107,
+      "includesGeneratedLayoutDependency": true
+    },
+    "figma-to-generateblocks": {
+      "files": 63,
+      "sha256": "ea8e133934d7e23dd8659fc69716e6992c4526fd05063262cbe75b54b8f30053",
+      "bytes": 181193,
+      "includesGeneratedLayoutDependency": true
+    }
+  },
+  "checks": {
+    "toolingTestsPassed": 10,
+    "nativeKeyboardAccordionSites": 2,
+    "successfulLocalFormSites": 2,
+    "interceptedMailAttemptsPerSite": 1,
+    "inlineLocalCssProbe": true,
+    "globalCssFile": true
+  },
+  "stylingScopeUpdate": {
+    "date": "2026-09-18",
+    "default": "local block styles",
+    "promptBeforeShared": true,
+    "explicitOptInRequired": true,
+    "installedCopiesVerified": 4,
+    "starterGuardChecksPassed": true
+  },
+  "referenceCorrectionsAfterEfficiencyTest": [
+    "Opt-in rule in CSS pattern layer table",
+    "Native Pro accordion selector naming",
+    "Preserve native rich-text objects when cloning"
+  ]
+}

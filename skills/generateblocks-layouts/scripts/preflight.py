@@ -18,7 +18,7 @@ _BS = chr(92)
 _U = lambda c: _BS + 'u' + c
 
 def unsub(s):
-    """Reverse the five WordPress substitutions so the JSON can be parsed."""
+    """Reverse the WordPress comment escapes so the JSON can be parsed."""
     s = s.replace(_U('002d') + _U('002d'), '--')
     s = s.replace(_U('003c'), '<').replace(_U('003e'), '>')
     s = s.replace(_U('0026'), chr(38))
@@ -81,14 +81,29 @@ def style_has_at_rule_family(styles, family):
     )
 
 
-def _length_px(value):
-    """Return the largest absolute px-equivalent length found in a CSS value."""
+BACKSLASH_PAIR = chr(92) * 2
+BACKSLASH_ESCAPE = chr(92) + 'u005c'
+assert BACKSLASH_PAIR != BACKSLASH_ESCAPE
+
+
+def _length_px(value, require_unit=False):
+    """Return the largest absolute px-equivalent length found in a CSS value.
+
+    `require_unit` ignores bare numbers and percentages, which is what a
+    border-width check wants: a width must carry a length unit, so the 88 in
+    `1px solid color-mix(in srgb, var(--x) 88%, transparent)` is a colour stop,
+    not an 88px border. The permissive form still counts percentages so a
+    `border-radius: 50%` reads as rounded.
+    """
     if not isinstance(value, str):
         value = str(value)
     found = []
-    for number, unit in re.findall(r'(?<![\w.#-])(-?\d*\.?\d+)\s*(px|rem|em)?\b', value, re.I):
+    for number, unit in re.findall(r'(?<![\w.#-])(-?\d*\.?\d+)\s*(px|rem|em|%)?', value, re.I):
+        unit = unit.lower()
+        if require_unit and unit in {'', '%'}:
+            continue
         amount = abs(float(number))
-        found.append(amount * (16 if unit.lower() in {'rem', 'em'} else 1))
+        found.append(amount * (16 if unit in {'rem', 'em'} else 1))
     return max(found, default=0)
 
 
@@ -111,7 +126,7 @@ def _has_thick_border(styles):
         low = key.lower() if isinstance(key, str) else ''
         if not low.startswith('border') or 'radius' in low or 'color' in low or 'style' in low:
             continue
-        if _length_px(value) >= 2:
+        if _length_px(value, require_unit=True) >= 2:
             return True
     return False
 
@@ -189,14 +204,14 @@ def top_keys(raw):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('file')
-    ap.add_argument('--post-id', type=int,
-                    help='require all GenerateBlocks uniqueIds to use this WordPress post ID')
+    ap.add_argument('--post-id', '--id-scope', dest='post_id', type=int,
+                    help='require this numeric block-ID scope: actual post ID or four-digit fallback')
     ap.add_argument('--links', type=int, help='expected count of unique internal hrefs')
     ap.add_argument('--allow-thick-rounded', action='store_true',
                     help='downgrade the thick-border + rounded-surface gate to a warning')
     a = ap.parse_args()
     if a.post_id is not None and a.post_id < 1:
-        ap.error('--post-id must be a positive integer')
+        ap.error('--post-id/--id-scope must be a positive integer')
     src = open(a.file, encoding='utf-8').read()
 
     fails, warns, oks = [], [], []
@@ -219,7 +234,7 @@ def main():
     chk(bad, f"JSON parses: {len(blocks)-bad}/{len(blocks)}")
 
     jsons = [r for _, r in blocks]
-    # --- §1 the five substitutions ------------------------------------------
+    # --- §1 the six substitutions ------------------------------------------
     chk([j for j in jsons if '--' in j], "literal '--' in block JSON (want 0)")
     chk([j for j in jsons if chr(38) in j], "literal '&' in block JSON (want 0)")
     chk([j for j in jsons if '<' in j or '>' in j], "literal '<'/'>' in block JSON (want 0)")
@@ -231,15 +246,31 @@ def main():
     orphan_hover = []
     orphan_at_rules = []
     unsupported_css_at_rules = []
+    wrong_css_owner = []
     style_structure = []
     thick_rounded = []
 
     for name, raw, attrs in parsed_blocks:
         uid = attrs.get('uniqueId', '?')
+        if 'styles' in attrs and not isinstance(attrs['styles'], dict):
+            style_structure.append(f'{name} {uid}: styles is not an object')
+        elif 'styles' in attrs and attrs['styles'] == {}:
+            style_structure.append(f'{name} {uid}: explicit empty styles; omit to avoid server object-to-array conversion')
         styles = attrs.get('styles') if isinstance(attrs.get('styles'), dict) else {}
         css_value = attrs.get('css') if isinstance(attrs.get('css'), str) else ''
         if css_value:
             css_values.append(css_value)
+            kind = name.removeprefix('generateblocks/')
+            if kind in {'element', 'text', 'media', 'shape'} and uid != '?':
+                # Only inspect selector headers for this block's own ID. Rules
+                # targeting a child with a different ID are legitimate.
+                for selector in re.findall(r'([^{}]+)\{', css_value):
+                    for prefix in re.findall(
+                        r'\.gb-(element|text|media|shape)-' + re.escape(uid) + r'(?![\w-])',
+                        selector,
+                    ):
+                        if prefix != kind:
+                            wrong_css_owner.append(f'{name} {uid}: compiled as gb-{prefix}')
         style_structure.extend(
             f'{name} {uid}: {issue}' for issue in structured_style_issues(styles)
         )
@@ -257,8 +288,20 @@ def main():
         for at_rule in re.findall(r'@(?!media\b|supports\b|container\b)([a-z-]+)', css_value, re.I):
             unsupported_css_at_rules.append(f'{name} {uid}: @{at_rule}')
 
+    stray_backslash = [
+        f'{name} {uid}'
+        for name, raw, attrs in parsed_blocks
+        for uid in [attrs.get('uniqueId', '?')]
+        if BACKSLASH_PAIR in raw
+    ]
+    chk(stray_backslash,
+        f"literal backslash in block JSON (want 0, use {BACKSLASH_ESCAPE})"
+        + (' -> ' + str(stray_backslash[:3]) if stray_backslash else ''))
+
     chk(style_structure,
         f"structured styles exceed CSS Mode grammar (want 0){' -> '+str(style_structure[:3]) if style_structure else ''}")
+    chk(wrong_css_owner,
+        f"compiled CSS block-type prefix mismatch (want 0){' -> '+str(wrong_css_owner[:3]) if wrong_css_owner else ''}")
     chk(orphan_transition,
         f"transition in css without styles source (want 0){' -> '+str(orphan_transition[:3]) if orphan_transition else ''}")
     chk(orphan_hover,
@@ -285,6 +328,11 @@ def main():
 
     # --- §3 html attributes / links -----------------------------------------
     chk(re.findall(r'"htmlAttributes":\[', src), "htmlAttributes as array (want 0)")
+    empty_attributes = [
+        name for name, raw, attrs in parsed_blocks
+        if 'htmlAttributes' in attrs and attrs['htmlAttributes'] == {}
+    ]
+    chk(empty_attributes, "explicit empty htmlAttributes (omit to avoid server object-to-array conversion)")
     rel = re.findall(r'"href":"(?!https?://|#|mailto:|tel:|\{\{)([^"]*)"', src)
     chk(rel, f"relative hrefs in JSON (want 0){' -> '+str(rel[:3]) if rel else ''}")
     chk(re.findall(r'<a class="gb-element-[^"]*"[^>]*>\s*[^<\s][^<]*</a>', src),
@@ -342,7 +390,7 @@ def main():
             rf'^[a-z][a-z0-9-]*-{a.post_id}-[1-9][0-9]*[a-z]?$'
         )
         outside = [uid for uid in ids if not isinstance(uid, str) or not namespace.fullmatch(uid)]
-        chk(outside, f"post-scoped uniqueIds for post {a.post_id}"
+        chk(outside, f"uniqueIds use numeric scope {a.post_id}"
                      f"{' -> '+str(outside[:4]) if outside else ''}")
 
     # --- link count ----------------------------------------------------------

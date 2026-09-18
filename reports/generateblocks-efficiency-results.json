@@ -1,0 +1,240 @@
+{
+  "date": "2026-09-18",
+  "instructionLoad": {
+    "mandatory_base": {
+      "files": 4,
+      "words": 6609,
+      "characters": 47662,
+      "paths": [
+        "SKILL.md",
+        "references/_index.md",
+        "references/recovery-rules.md",
+        "references/styling-scope.md"
+      ]
+    },
+    "responsive_static_supplied_design": {
+      "files": 8,
+      "words": 11446,
+      "characters": 88239,
+      "paths": [
+        "SKILL.md",
+        "references/_index.md",
+        "references/recovery-rules.md",
+        "references/styling-scope.md",
+        "references/block-types.md",
+        "references/css-patterns.md",
+        "references/css-mode.md",
+        "references/responsive.md"
+      ]
+    },
+    "responsive_static_new_design": {
+      "files": 9,
+      "words": 12422,
+      "characters": 94719,
+      "paths": [
+        "SKILL.md",
+        "references/_index.md",
+        "references/recovery-rules.md",
+        "references/styling-scope.md",
+        "references/block-types.md",
+        "references/css-patterns.md",
+        "references/css-mode.md",
+        "references/responsive.md",
+        "references/design-quality.md"
+      ]
+    },
+    "responsive_query_supplied_design": {
+      "files": 8,
+      "words": 12489,
+      "characters": 93889,
+      "paths": [
+        "SKILL.md",
+        "references/_index.md",
+        "references/recovery-rules.md",
+        "references/styling-scope.md",
+        "references/query-block.md",
+        "references/dynamic-tags.md",
+        "references/css-mode.md",
+        "references/responsive.md"
+      ]
+    },
+    "shared_beta_new_design": {
+      "files": 11,
+      "words": 15205,
+      "characters": 115296,
+      "paths": [
+        "SKILL.md",
+        "references/_index.md",
+        "references/recovery-rules.md",
+        "references/styling-scope.md",
+        "references/block-types.md",
+        "references/css-patterns.md",
+        "references/css-mode.md",
+        "references/responsive.md",
+        "references/design-quality.md",
+        "references/design-systems-beta.md",
+        "references/global-styles.md"
+      ]
+    },
+    "entire_layout_reference_library": {
+      "files": 29,
+      "words": 39013,
+      "characters": 321457
+    }
+  },
+  "contextBoundary": "Exact words/characters in routed GenerateBlocks files only; excludes external design skills, project instructions, tools, conversation, and generated output. Not a model-token count.",
+  "helperPreflight": {
+    "shared": {
+      "medianMs": 29.6305000083521,
+      "samplesMs": [
+        30.72404200793244,
+        29.6305000083521,
+        29.766666004434228,
+        29.434708005283028,
+        29.268625017721206,
+        30.002832994796336,
+        29.528541985200718
+      ],
+      "passed": true,
+      "includesProcessStartup": true
+    },
+    "local": {
+      "medianMs": 30.830874980892986,
+      "samplesMs": [
+        31.18604200426489,
+        31.172749993856996,
+        30.498000007355586,
+        30.830874980892986,
+        30.955374997574836,
+        30.47574998345226,
+        30.451791011728346
+      ],
+      "passed": true,
+      "includesProcessStartup": true
+    }
+  },
+  "toolingTestsPassed": 10,
+  "nativeTimingMedianMs": {
+    "localCompileAndSerialize": 5.4649999886751175,
+    "sharedParseAndSerialize": 1.1899999976158142
+  },
+  "nativeTimingBoundary": "Local conversion includes resolving styles, native selector discovery, compiling and serializing. Shared measurement parses and serializes existing markup. Not an AI generation latency comparison.",
+  "pageMarkupBytes": {
+    "local": 28909,
+    "shared": 13117
+  },
+  "formMarkupBytes": {
+    "local": 2734,
+    "shared": 1142
+  },
+  "cssBytes": {
+    "localPageAndForm": 8489,
+    "existingSharedSystem": 4369
+  },
+  "logicalSharedRecordBytes": 15940,
+  "storageBoundary": "Logical serialized fields only; excludes physical database overhead, revisions, snapshots and indexes.",
+  "gzipModelPageBytes": {
+    "shared": 2180,
+    "local": 4020
+  },
+  "gzipBoundary": "Offline compression illustration; not measured HTTP transfer.",
+  "browserMedians": {
+    "shared": {
+      "ttfb": 56,
+      "fcp": 152,
+      "lcp": 152,
+      "cls": 0,
+      "domElements": 133,
+      "totalRequests": 9,
+      "pageWeightBytes": 84244
+    },
+    "local": {
+      "ttfb": 57,
+      "fcp": 160,
+      "lcp": 160,
+      "cls": 0,
+      "domElements": 137,
+      "totalRequests": 8,
+      "pageWeightBytes": 88969
+    }
+  },
+  "browserRunsPerVariant": 3,
+  "browserBoundary": "Alternating anonymous Studio audits on one localhost site with no added network/CPU throttle or controlled browser-cache state. Tool-reported page weight. Not production or field Core Web Vitals.",
+  "renderParity": [
+    {
+      "width": 360,
+      "textEqual": true,
+      "nodeCounts": [
+        47,
+        47
+      ],
+      "overflow": [
+        false,
+        false
+      ],
+      "differences": []
+    },
+    {
+      "width": 767,
+      "textEqual": true,
+      "nodeCounts": [
+        47,
+        47
+      ],
+      "overflow": [
+        false,
+        false
+      ],
+      "differences": []
+    },
+    {
+      "width": 768,
+      "textEqual": true,
+      "nodeCounts": [
+        47,
+        47
+      ],
+      "overflow": [
+        false,
+        false
+      ],
+      "differences": []
+    },
+    {
+      "width": 1440,
+      "textEqual": true,
+      "nodeCounts": [
+        47,
+        47
+      ],
+      "overflow": [
+        false,
+        false
+      ],
+      "differences": []
+    }
+  ],
+  "localAccentDeclarationValues": 17,
+  "skillEntrypoints": {
+    "generateblocks-layouts": {
+      "words": 1997,
+      "characters": 14256,
+      "lines": 257
+    },
+    "html-to-generateblocks": {
+      "words": 2433,
+      "characters": 24792,
+      "lines": 450
+    },
+    "elementor-to-generateblocks": {
+      "words": 2261,
+      "characters": 22997,
+      "lines": 541
+    },
+    "figma-to-generateblocks": {
+      "words": 2568,
+      "characters": 23779,
+      "lines": 685
+    }
+  }
+}

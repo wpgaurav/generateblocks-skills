@@ -79,7 +79,7 @@ object, absolute URL):
 ```html
 <!-- wp:generateblocks/element {"uniqueId":"link1","tagName":"a","styles":{"display":"block","textDecoration":"none"},"css":".gb-element-link1{display:block;text-decoration:none}","htmlAttributes":{"href":"https://example.com/page/","target":"_blank","rel":"noopener"},"className":"gb-element"} -->
 <a class="gb-element-link1 gb-element" href="https://example.com/page/" target="_blank" rel="noopener">
-    <!-- wp:generateblocks/text {"uniqueId":"link2","tagName":"span","styles":{},"css":""} -->
+    <!-- wp:generateblocks/text {"uniqueId":"link2","tagName":"span"} -->
     <span class="gb-text">Read the guide →</span>
     <!-- /wp:generateblocks/text -->
 </a>
@@ -102,6 +102,20 @@ For ordinary static rich text, the editor normally derives `content` from the
 HTML body and omits it from the delimiter JSON. Preserve a target that already
 uses another convention; do not add `content` merely to duplicate body text.
 
+When cloning native parsed blocks programmatically, preserve rich-text values.
+On the tested WordPress 7.1.1 editor they can be objects with behavior, not plain
+strings. `structuredClone(block.attributes)` stripped that behavior and produced
+empty text even though the resulting empty blocks validated. A shallow copy of
+attributes with targeted copies of edited plain objects preserved the text.
+Compare visible content as well as block validity when testing conversions.
+
+Native RichText can discard empty formatting tags even on the first save. The
+About-page test lost five decorative `<i>` elements while all blocks validated.
+Represent such artwork with native empty elements/Shape as appropriate, using
+matching rules in the owning block's `styles` when a tag changes. Check decorative DOM,
+media, IDs, and behavior as well as text. Do not silently drop it or wrap the
+whole page in Custom HTML.
+
 **tagName enum (verified):** `p`, `span`, `div`, `h1`–`h6`, `a`, `button`,
 `figcaption`, `li`
 
@@ -117,7 +131,7 @@ uses another convention; do not add `content` merely to duplicate body text.
 
 Inline links go in the rich-text body, not separate blocks. If the target
 convention genuinely serializes a `content` attribute (for example a dynamic
-binding), escape its inline HTML with the five substitutions. Ordinary static
+binding), escape its inline HTML with the six substitutions. Ordinary static
 rich text can remain body-only:
 
 ```html

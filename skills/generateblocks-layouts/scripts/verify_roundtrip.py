@@ -23,7 +23,7 @@ _U = lambda c: _BS + 'u' + c
 ESCAPES = [_U('002d') + _U('002d'), _U('003c'), _U('003e'), _U('0026'), _U('0022')]
 
 def unsub(s):
-    """Reverse the five WordPress substitutions so the JSON can be parsed."""
+    """Reverse the WordPress comment escapes so the JSON can be parsed."""
     s = s.replace(_U('002d') + _U('002d'), '--')
     s = s.replace(_U('003c'), '<').replace(_U('003e'), '>')
     s = s.replace(_U('0026'), chr(38))

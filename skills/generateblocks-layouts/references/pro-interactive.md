@@ -6,9 +6,16 @@ description: Accordion, Tabs, Carousel, Navigation, Site Header, Overlays, Mega 
 # GB Pro Interactive Blocks
 
 All of these require GB Pro. They follow the same serialization rules as free
-blocks (`recovery-rules.md` applies in full), with their own `gb-{slug}-{uniqueId}`
+blocks (`recovery-rules.md` applies in full), with block-specific generated
 class patterns and frontend JS that the plugin enqueues automatically when the
 block is present.
+
+Do not derive every Pro selector as `gb-{slug}-{uniqueId}`. Native save output
+in Pro 2.8.0-beta.1 uses `gb-accordion__item-{id}`,
+`gb-accordion__toggle-{id}`, and `gb-accordion__content-{id}` for those children.
+For programmatic styling, obtain the class from that block's native save output
+before compiling local CSS. A guessed class can yield valid saved blocks whose
+styles never apply; the local efficiency benchmark exposed this distinction.
 
 ## ⚠ Attribute declaration order differs per block
 
@@ -62,6 +69,16 @@ generateblocks-pro/accordion                tagName: div|section|aside|nav|ul|ol
 - FAQ schema is available as an accordion option in the editor UI.
 - Frontend: `dist/accordion.js` + `accordion-style.css`, auto-enqueued.
 
+**Padding is required for every accordion, including core Details.** Give the
+question/toggle and expanded answer explicit, consistent inline padding; keep
+text and icons clear of borders. A useful starting point is 24px on desktop and
+16px on mobile, with sufficient block padding and space around the toggle icon.
+Verify both closed and expanded states in the editor and frontend. Do not carry
+zero-padding source rules into a bordered accordion without correcting them.
+Inspect computed padding as well as stored values: theme logical properties can
+override physical padding. If the editor canvas cannot be inspected, report that
+limit separately from successful block parsing or frontend checks.
+
 **Hand-authoring guidance:** the toggle/content wiring (IDs, aria, state
 classes) is generated. Build one accordion in the editor, copy its serialized
 markup as your template, then replicate items. Do not invent the rendered
@@ -79,8 +96,10 @@ generateblocks-pro/tabs
 
 - The Nth `tab-menu-item` controls the Nth `tab-item` — order is the link.
 - Set `tabItemOpen:true` on exactly one menu item AND its matching item.
-- ARIA roles (`tablist`/`tab`/`tabpanel`, `aria-selected`, `aria-controls`)
-  are generated. Same guidance as accordion: copy from editor output.
+- In Pro 2.8 beta, supply stable IDs and `tablist`/`tab`/`tabpanel` roles through
+  native `htmlAttributes` when save output does not include them. The plugin
+  runtime manages `aria-selected`, `tabindex`, and ID-based control/label links.
+  Verify click and arrow/Home/End behavior against the installed version.
 - Frontend: `dist/tabs.js`.
 
 ## 3. Carousel (Pro 2.5+)
@@ -146,12 +165,12 @@ generateblocks-pro/site-header              tagName: div|section|aside|nav|heade
 | Testimonial/logo slider | Carousel |
 | Site header + menu (FSE-free) | Site Header + Navigation + Classic Menu |
 | Modal / slide-in panel / mega menu | Overlay |
-| One-off collapsible without Pro | `<details>`/`<summary>` is NOT in GB tag enums — use a Pro accordion, or core blocks with a custom HTML block |
+| One-off collapsible without Pro | Native `core/details`; do not invent GB details tags or use Custom HTML |
 
 ## 7. Free-plugin fallbacks
 
 Without Pro, tell the user the section needs Pro, and offer:
-- Accordion → stacked sections (always-open), or core `details` via Custom HTML
+- Accordion → native `core/details` or stacked sections (always-open)
 - Tabs → anchor-linked sections
 - Carousel → CSS scroll-snap row (overflow-x scroll on an element block —
   works with free GB, no JS; see `css-patterns.md`)
