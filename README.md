@@ -4,6 +4,8 @@
 
 LLM-optimized skill documentation and development resources for the [GenerateBlocks](https://generateblocks.com/) WordPress plugin.
 
+**Documentation:** [Wiki](https://github.com/wpgaurav/generateblocks-skills/wiki) · [Getting started](https://github.com/wpgaurav/generateblocks-skills/wiki/Getting-Started) · [Installation](https://github.com/wpgaurav/generateblocks-skills/wiki/Installation) · [Latest release](https://github.com/wpgaurav/generateblocks-skills/releases/latest)
+
 **Beta workflow tested with GenerateBlocks 2.5.0-beta.1 and Pro 2.8.0-beta.1** on two local WordPress 7.1.1 / PHP 8.4 sites (September 18, 2026). Includes Design Tokens, Style Book guidance, shared selectors, portable design systems, and a working two-brand product-page kit. Older 2.4.1 / 2.7.1 guidance remains versioned; the old local Pro reference folder actually reports 2.7.0-rc.1. See the [beta guide](skills/generateblocks-layouts/references/design-systems-beta.md) for the test boundary.
 
 **Styling defaults:** local block styles. The skills prompt before introducing
@@ -25,7 +27,7 @@ Start with the selected skill, the shared [authoring contract](skills/generatebl
 - **Static sections** — heroes, pricing, cards, FAQs, CTAs, full landing pages
 - **Dynamic content** — query loops (blog grids, related posts, archives), 27 dynamic tags with exact syntax
 - **Custom fields** — ACF text/image/link/group fields, repeater loops, options pages, meta queries
-- **Animations** — hover micro-interactions, keyframe entrances, CSS scroll-driven reveals, reduced-motion guards
+- **Motion** — native transitions, hover/focus feedback and reduced-motion guards; unsupported effects are simplified unless external code is explicitly requested
 - **Conditions** — GB Pro block/menu conditions, form-field conditions, free-plugin alternatives
 - **GB Pro blocks** — accordion, tabs, carousel, navigation, site header, overlays/mega menus, the 2.6 Forms system
 - **Full-site templates** — GeneratePress Elements (loop templates, page heroes, hooks, display rules), FSE block themes
@@ -54,11 +56,17 @@ This launches an interactive installer that sets up skills for your preferred to
 | **Claude Code** | `~/.claude/skills/` | Skill directories |
 | **Cursor** | `~/.cursor/skills/` | Skill directories |
 | **Windsurf** | `~/.windsurf/rules/` | Combined markdown |
-| **OpenAI Codex CLI** | `~/.codex/instructions.md` | Combined markdown |
+| **OpenAI Codex CLI (legacy installer output)** | `~/.codex/instructions.md` | Combined markdown; see native installation below |
 | **Gemini CLI** | `GEMINI.md` (project root) | Combined markdown |
 | **GitHub Copilot** | `.github/copilot-instructions.md` | Combined markdown |
 | **Cline / Roo Code** | `.clinerules` (project root) | Combined markdown |
 | **Aider** | `CONVENTIONS.md` (project root) | Combined markdown |
+
+This table describes files written by the installer, not a guarantee of automatic
+loading by every client version. For current Codex skill-directory installation,
+see the [wiki installation guide](https://github.com/wpgaurav/generateblocks-skills/wiki/Installation#codex).
+Combined rule files reference this checkout and replace their target files;
+preserve unrelated instructions before installing over them.
 
 ### Install Options
 
@@ -78,7 +86,10 @@ If you prefer not to use the installer, you have two options:
 
 ### Option A: Upload a Skill File
 
-Download a `.skill` file and upload it at the start of a new chat in Claude.ai, ChatGPT, Gemini, or any AI assistant.
+Download a `.skill` or `.zip` archive and use your assistant's supported skill or
+file workflow. Archive support, persistent installation and script execution vary
+by client. If it cannot inspect the archive, extract it and provide access to the
+complete folder. See [Installation](https://github.com/wpgaurav/generateblocks-skills/wiki/Installation).
 
 | Skill | Download |
 |-------|----------|
@@ -112,11 +123,11 @@ Query/Looper grid, and SVGs. Every file passes the bundled `preflight.py`.
 
 Before inserting one into WordPress:
 
-1. create/resolve the destination record;
+1. identify the destination theme and plugin versions; resolve the record if one exists;
 2. use the real post ID if available, otherwise a random four-digit layout scope;
 3. replace example URLs/content/media;
 4. inherit the destination's design system and registered at-rules;
-5. run `preflight.py <file> --post-id <ID>`.
+5. run `preflight.py <file> --id-scope <SCOPE>`; resolve the actual record separately before an authorized write.
 
 The root [`examples/`](examples/) gallery contains older exploration and
 production exports. Treat it as historical visual/structural reference, not as
@@ -183,7 +194,7 @@ generateblocks-skills/
 ### Importable Formats
 
 The `importable/` folder contains two formats for each skill:
-- **`.skill`** — Upload to any AI chat (Claude.ai, ChatGPT, Gemini)
+- **`.skill`** — Skill archive for clients that support this format
 - **`.zip`** — Compressed skill with references included
 
 After editing any skill, regenerate all bundles with `./build-bundles.sh`.
