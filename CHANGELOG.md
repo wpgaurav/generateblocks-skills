@@ -3,7 +3,7 @@
 Notable changes to GenerateBlocks Skills. Entries describe this repository, not
 releases of the GenerateBlocks plugins themselves.
 
-## Unreleased
+## [2026.09.20] - 2026-09-20
 
 ### Fixed
 
@@ -14,6 +14,13 @@ releases of the GenerateBlocks plugins themselves.
   block versions from editor labels or changing shared sources implicitly.
 - Added native before/after/icon-only fixtures and preflight regression checks
   for missing label wrappers, conflicting outer classes and incorrect icon order.
+
+### Documentation and validation
+
+- Published the wiki handbook and clarified installation guidance, including the
+  released installer's legacy Codex output path.
+- 22 tooling tests, seven native icon variants and an embedded-pattern round trip
+  passed. The reported customer pattern has not yet been supplied for verification.
 
 ## [2026.09.18] - 2026-09-18
 
@@ -70,3 +77,5 @@ Changes since `v2026.09.12`.
   the editor canvas could not be inspected visually during that follow-up.
 
 [2026.09.18]: https://github.com/wpgaurav/generateblocks-skills/compare/v2026.09.12...v2026.09.18
+
+[2026.09.20]: https://github.com/wpgaurav/generateblocks-skills/compare/v2026.09.18...v2026.09.20
