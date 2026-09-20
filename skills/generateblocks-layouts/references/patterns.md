@@ -23,6 +23,36 @@ Prompt before importing a pattern that would silently add those dependencies.
 Do not save every finished section as a pattern. A useful pattern has a clear
 repeat case, safe defaults, and replaceable content.
 
+## Existing local patterns: read the stored source
+
+"Local pattern" does not identify its storage or block version. Inspect the
+page's raw block tree before editing:
+
+- Inline/unsynced content is already a tree of ordinary blocks. Preserve the
+  stored structure and change only the requested attributes/content.
+- A `core/block` with `ref` points to a pattern record. Read that record's raw
+  content to understand the blocks; do not guess them from the page reference or
+  rendered HTML. Preserve the reference unless detaching/replacing it is requested.
+- A `core/pattern` with `slug` refers to a registered pattern; resolve its actual
+  content through the site's pattern registry rather than inventing a layout.
+
+Reading a shared source does not authorize changing every consumer. An edit to
+the synced source requires that scope; a requested page-only variation needs an
+intentional independent copy. If the pattern source cannot be read, report the
+missing source rather than reconstructing it from a screenshot.
+
+For icon headings, use the actual block name: V2's editor label **Headline** is
+a `generateblocks/text` variation, while `generateblocks/headline` is legacy.
+Keep the icon-bearing Text block's native `.gb-shape` and `.gb-text` sibling
+wrappers, icon order and rich-text formatting. Do not replace it with a generic
+heading or a different icon composition merely to suppress a recovery warning.
+See `block-types.md` under Icon support for native save output.
+
+When inserting an independent copy, let the native inserter handle IDs or remap
+IDs together with their classes and CSS. During an in-place edit, preserve IDs.
+Validate the expanded block tree, label/icon content, and serialization after
+insertion; a successful pattern preview alone is not proof of valid saved blocks.
+
 ## Before Building
 
 Read:

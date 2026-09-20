@@ -27,6 +27,7 @@ layout. Examples never authorize shared styles, tokens, or publication.
 | Shared styling choice unclear or implicit pattern dependencies | `styling-scope.md` |
 | Explicitly requested Global Styles/tokens | `global-styles.md`; add `design-systems-beta.md` for Pro 2.8 |
 | Reusable compositions/pattern imports | `patterns.md` |
+| Existing local/synced pattern or an icon-bearing heading that breaks | `patterns.md`; Icon support in `block-types.md` |
 | Full-site templates or GeneratePress Elements | `template-authoring.md` |
 | CSS delivery, caches, performance | `performance.md` |
 | Authorized MCP/REST publishing | `mcp-publishing.md` before writing |

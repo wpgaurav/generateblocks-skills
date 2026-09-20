@@ -142,20 +142,45 @@ rich text can remain body-only:
 
 ### Icon support (`icon`, `iconLocation`, `iconOnly`)
 
-A text block can carry an inline SVG icon. The icon HTML is stored in the
-`icon` attribute (sourced from the `.gb-shape` span in the body):
+A V2 heading is `generateblocks/text` with an `h1`–`h6` tag. The editor's
+**Headline** label is a variation, not proof that the block uses the legacy
+`generateblocks/headline` schema. Preserve the actual block name in an existing
+pattern; do not mix legacy and V2 attributes/markup.
+
+With an icon present, the native save function emits a `span.gb-shape` for the
+icon and, when there is label content, a sibling `span.gb-text` for that content.
+The outer tag does **not** receive the plain `gb-text` class in this branch;
+its local ID class remains when it has local styles.
+
+This example is native serializer output (free 2.5.0-beta.1 / WordPress 7.1.1):
 
 ```html
-<!-- wp:generateblocks/text {"uniqueId":"feat1","tagName":"p","content":"Fast delivery","styles":{"display":"flex","alignItems":"center","columnGap":"0.5rem"},"css":".gb-text-feat1{align-items:center;column-gap:0.5rem;display:flex}","icon":"\u003csvg viewBox=\u00220 0 24 24\u0022 fill=\u0022none\u0022 stroke=\u0022currentColor\u0022 stroke-width=\u00222\u0022\u003e\u003cpath d=\u0022M5 13l4 4L19 7\u0022/\u003e\u003c/svg\u003e","iconLocation":"before","className":"gb-text"} -->
-<p class="gb-text-feat1 gb-text"><span class="gb-shape"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg></span>Fast delivery</p>
+<!-- wp:generateblocks/text {"uniqueId":"icon-4821-1","tagName":"h2","styles":{"display":"inline-flex","alignItems":"center","columnGap":"0.5em",".gb-shape svg":{"width":"1em","height":"1em"}},"css":".gb-text-icon-4821-1{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-1 .gb-shape svg{height:1em;width:1em}"} -->
+<h2 class="gb-text-icon-4821-1"><span class="gb-shape"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span><span class="gb-text">Fast delivery</span></h2>
 <!-- /wp:generateblocks/text -->
 ```
 
-`iconLocation`: `"before"` (default) or `"after"`. `iconOnly:true` hides the
-text visually. The icon SVG appears twice — escaped in the JSON `icon`
-attribute AND literally inside the `.gb-shape` span in the body; they must
-match. If this dual-encoding feels risky, use a separate
-`generateblocks/shape` block instead (simpler, same visual result).
+`content` and `icon` are HTML-sourced attributes. Supply them to
+`wp.blocks.createBlock()` when authoring, then let `wp.blocks.serialize()` emit
+the markup. Native serialization normally omits them from comment JSON; **do not
+require a second escaped SVG copy in the JSON**. Adding `icon` only to comment
+JSON cannot replace the saved `.gb-shape` markup.
+
+`iconLocation` is `before` by default or `after`; preserve the corresponding
+sibling order. `iconOnly:true` omits the label from the saved HTML rather than
+merely hiding it visually. An empty label also produces no text span. Give
+icon-only controls a suitable accessible name.
+
+Do not flatten the icon and label into heading rich text, delete the inner text
+span, add `className:"gb-text"` to the icon-bearing outer element, or inject a
+standalone Shape block inside the leaf Text block. A separate Shape and Text can
+be siblings in an Element for an intentionally different native composition;
+it is not the default repair for an existing icon-heading pattern.
+
+See `examples/basic/text-icons.html` for before/after/icon-only examples. The
+same wrapper behavior was checked in the bundled 2.4.1 and 2.5.0-beta.1 save
+functions. Preflight catches the observed structural errors; native validation
+and visible-content checks still decide whether a full pattern is correct.
 
 ### Button-tag text (for JS-triggered actions, not links)
 

@@ -3,6 +3,18 @@
 Notable changes to GenerateBlocks Skills. Entries describe this repository, not
 releases of the GenerateBlocks plugins themselves.
 
+## Unreleased
+
+### Fixed
+
+- Corrected the native Text/Headline icon example: preserve separate icon and
+  label wrappers, omit the outer plain `gb-text` class, and let HTML-sourced
+  fields serialize from the body.
+- Clarified inline, synced and registered pattern handling without inferring
+  block versions from editor labels or changing shared sources implicitly.
+- Added native before/after/icon-only fixtures and preflight regression checks
+  for missing label wrappers, conflicting outer classes and incorrect icon order.
+
 ## [2026.09.18] - 2026-09-18
 
 Changes since `v2026.09.12`.

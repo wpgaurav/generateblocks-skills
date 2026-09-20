@@ -5,6 +5,11 @@ description: Shape block patterns and inline SVG techniques for GenerateBlocks
 
 # SVG Icons Reference
 
+The native Text/Headline **Icon control** is distinct from putting SVG into rich
+text. It saves sibling `span.gb-shape` and `span.gb-text` wrappers inside the
+chosen tag. Use the native example in `block-types.md` under Icon support; do not
+flatten those wrappers or duplicate the HTML-sourced icon into comment JSON.
+
 Three approaches for icons in GenerateBlocks V2:
 
 1. **Shape Block** - `generateblocks/shape` for standalone SVG icons

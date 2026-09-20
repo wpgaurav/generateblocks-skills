@@ -89,6 +89,9 @@ implementations unless debugging requires it.
   attributes object can lose their behavior and produce valid but empty blocks.
   RichText can also discard empty formatting tags such as decorative `<i>`;
   validate the rendered elements, not just their text or block validity.
+- Icon-bearing Text/Headline blocks require their native icon and label wrappers;
+  use Icon support in `block-types.md`. Resolve embedded pattern references before
+  editing their contents (`patterns.md`); do not infer a block version from its UI label.
 - Emit only WordPress block comments, balance blocks/tags, and keep generated
   nesting compact. Byte parity checks transport integrity; JSON formatting
   differences alone do not prove a Gutenberg recovery error.

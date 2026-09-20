@@ -1,0 +1,48 @@
+{
+  "provenance": "Captured from the installed GenerateBlocks 2.5.0-beta.1 native WordPress 7.1.1 editor serializer. All positive cases parsed, retained their labels/icons and reserialized byte-identically.",
+  "cases": [
+    {
+      "name": "before",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-1\",\"tagName\":\"h2\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-1{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-1 .gb-shape svg{height:1em;width:1em}\"} -->\n<h2 class=\"gb-text-icon-4821-1\"><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span><span class=\"gb-text\">Fast delivery</span></h2>\n<!-- /wp:generateblocks/text -->",
+      "label": "Fast delivery",
+      "icons": 1
+    },
+    {
+      "name": "after",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-2\",\"tagName\":\"h3\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-2{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-2 .gb-shape svg{height:1em;width:1em}\",\"iconLocation\":\"after\"} -->\n<h3 class=\"gb-text-icon-4821-2\"><span class=\"gb-text\">More details</span><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span></h3>\n<!-- /wp:generateblocks/text -->",
+      "label": "More details",
+      "icons": 1
+    },
+    {
+      "name": "icon-only",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-3\",\"tagName\":\"button\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-3{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-3 .gb-shape svg{height:1em;width:1em}\",\"htmlAttributes\":{\"aria-label\":\"Confirm\",\"type\":\"button\"},\"iconOnly\":true} -->\n<button class=\"gb-text-icon-4821-3\" aria-label=\"Confirm\" type=\"button\"><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span></button>\n<!-- /wp:generateblocks/text -->",
+      "label": "",
+      "icons": 1
+    },
+    {
+      "name": "unstyled",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-4\",\"tagName\":\"h2\"} -->\n<h2><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span><span class=\"gb-text\">Unstyled heading</span></h2>\n<!-- /wp:generateblocks/text -->",
+      "label": "Unstyled heading",
+      "icons": 1
+    },
+    {
+      "name": "empty-label",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-5\",\"tagName\":\"p\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-5{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-5 .gb-shape svg{height:1em;width:1em}\"} -->\n<p class=\"gb-text-icon-4821-5\"><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span><span class=\"gb-text\"></span></p>\n<!-- /wp:generateblocks/text -->",
+      "label": "",
+      "icons": 1
+    },
+    {
+      "name": "rich-text",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-6\",\"tagName\":\"h2\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-6{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-6 .gb-shape svg{height:1em;width:1em}\"} -->\n<h2 class=\"gb-text-icon-4821-6\"><span class=\"gb-shape\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 13l4 4L19 7\"></path></svg></span><span class=\"gb-text\">Fast <em>and</em> reliable &amp; clear</span></h2>\n<!-- /wp:generateblocks/text -->",
+      "label": "Fast and reliable & clear",
+      "icons": 1
+    },
+    {
+      "name": "without-icon",
+      "serialized": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-7\",\"tagName\":\"h2\",\"styles\":{\"display\":\"inline-flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5em\",\".gb-shape svg\":{\"width\":\"1em\",\"height\":\"1em\"}},\"css\":\".gb-text-icon-4821-7{align-items:center;column-gap:0.5em;display:inline-flex}.gb-text-icon-4821-7 .gb-shape svg{height:1em;width:1em}\"} -->\n<h2 class=\"gb-text gb-text-icon-4821-7\">Plain heading</h2>\n<!-- /wp:generateblocks/text -->",
+      "label": "Plain heading",
+      "icons": 0
+    }
+  ],
+  "brokenExample": "<!-- wp:generateblocks/text {\"uniqueId\":\"icon-4821-8\",\"tagName\":\"p\",\"content\":\"Fast delivery\",\"styles\":{\"display\":\"flex\",\"alignItems\":\"center\",\"columnGap\":\"0.5rem\"},\"css\":\".gb-text-icon-4821-8{align-items:center;column-gap:0.5rem;display:flex}\",\"icon\":\"\\u003csvg viewBox=\\u00220 0 24 24\\u0022 fill=\\u0022none\\u0022 stroke=\\u0022currentColor\\u0022 stroke-width=\\u00222\\u0022\\u003e\\u003cpath d=\\u0022M5 13l4 4L19 7\\u0022/\\u003e\\u003c/svg\\u003e\",\"iconLocation\":\"before\",\"className\":\"gb-text\"} -->\n<p class=\"gb-text-icon-4821-8 gb-text\"><span class=\"gb-shape\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 13l4 4L19 7\"/></svg></span>Fast delivery</p>\n<!-- /wp:generateblocks/text -->\n"
+}

@@ -13,6 +13,7 @@ missing from styles, class-list drift, and thick rounded surfaces.
 Exit 0 = clean, 1 = failures. Warnings never fail the run.
 """
 import re, json, sys, argparse, collections
+from html.parser import HTMLParser
 
 _BS = chr(92)
 _U = lambda c: _BS + 'u' + c
@@ -41,6 +42,89 @@ ORDER = {
 }
 
 SUPPORTED_AT_RULES = ('@media', '@supports', '@container')
+
+
+class _IconMarkup(HTMLParser):
+    """Small DOM projection for Text icon checks, not a Gutenberg parser."""
+    VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+            'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.root = {'tag': None, 'attrs': {}, 'children': []}
+        self.stack = [self.root]
+
+    def handle_starttag(self, tag, attrs):
+        node = {'tag': tag, 'attrs': dict(attrs), 'children': []}
+        self.stack[-1]['children'].append(node)
+        if tag not in self.VOID:
+            self.stack.append(node)
+
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+        if tag not in self.VOID:
+            self.handle_endtag(tag)
+
+    def handle_endtag(self, tag):
+        for i in range(len(self.stack) - 1, 0, -1):
+            if self.stack[i]['tag'] == tag:
+                del self.stack[i:]
+                break
+
+    def handle_data(self, data):
+        self.stack[-1]['children'].append(data)
+
+
+def text_icon_issues(source):
+    """Catch the observed V2 native icon wrapper failures in leaf Text blocks.
+
+    HTML-sourced icons can be absent from comment JSON. Empty/icon-only blocks
+    legitimately have no label. Legacy Headline and standalone Shape blocks are
+    outside this check; native editor validation remains authoritative.
+    """
+    def has_class(node, name):
+        return isinstance(node, dict) and name in (node['attrs'].get('class') or '').split()
+
+    def walk(node):
+        yield node
+        for child in node['children']:
+            if isinstance(child, dict):
+                yield from walk(child)
+
+    failures = []
+    pattern = r'<!-- wp:generateblocks/text(?: (\{.*?\}))? -->\s*(.*?)\s*<!-- /wp:generateblocks/text -->'
+    for match in re.finditer(pattern, source, re.S):
+        try:
+            attrs = json.loads(unsub(match[1] or '{}'))
+        except (ValueError, TypeError):
+            continue  # The existing JSON check reports this failure.
+        label = f"generateblocks/text {attrs.get('uniqueId', '?')}"
+        parser = _IconMarkup()
+        parser.feed(match[2])
+        roots = [n for n in parser.root['children'] if isinstance(n, dict)]
+        if len(roots) != 1:
+            continue  # Leave general HTML validity to the native validator.
+        root = roots[0]
+        icons = [n for n in walk(root) if has_class(n, 'gb-shape')]
+        if not icons:
+            if attrs.get('icon'):
+                failures.append(f'{label}: icon must be present in the saved HTML')
+            continue
+        if has_class(root, 'gb-text'):
+            failures.append(f'{label}: outer gb-text class captures the icon as label content')
+        children = [n for n in root['children'] if isinstance(n, dict) or n.strip()]
+        if len(icons) != 1 or icons[0]['tag'] != 'span' or not any(n is icons[0] for n in children):
+            failures.append(f'{label}: expected one direct span.gb-shape icon wrapper')
+            continue
+        others = [n for n in children if n is not icons[0]]
+        if attrs.get('iconOnly') and others:
+            failures.append(f'{label}: iconOnly must not render label content')
+        elif others and not (len(others) == 1 and has_class(others[0], 'gb-text') and others[0]['tag'] == 'span'):
+            failures.append(f'{label}: icon label requires a direct span.gb-text wrapper')
+        location = attrs.get('iconLocation', 'before')
+        if location not in ('before', 'after') or icons[0] is not children[0 if location == 'before' else -1]:
+            failures.append(f'{label}: saved icon order does not match iconLocation')
+    return failures
 
 
 def style_nodes(node):
@@ -232,6 +316,9 @@ def main():
             bad += 1
             if bad <= 3: F(f"invalid JSON in {name}: {e}")
     chk(bad, f"JSON parses: {len(blocks)-bad}/{len(blocks)}")
+
+    icon_issues = text_icon_issues(src)
+    chk(icon_issues, f"native Text icon structure (want 0 issues){' -> '+str(icon_issues[:4]) if icon_issues else ''}")
 
     jsons = [r for _, r in blocks]
     # --- §1 the six substitutions ------------------------------------------

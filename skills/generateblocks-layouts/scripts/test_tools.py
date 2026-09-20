@@ -20,6 +20,7 @@ from gb_serialize import (
 
 HERE = Path(__file__).resolve().parent
 PREFLIGHT = HERE / 'preflight.py'
+ICON_FIXTURES = json.loads((HERE / 'fixtures/text-icons.json').read_text())
 
 
 class SerializerTests(unittest.TestCase):
@@ -142,6 +143,62 @@ class PreflightTests(unittest.TestCase):
     def test_valid_css_mode_markup_passes(self):
         result = self.run_preflight(self.block_markup())
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_native_text_icon_fixtures_pass(self):
+        for case in ICON_FIXTURES['cases']:
+            with self.subTest(case=case['name']):
+                result = self.run_preflight(case['serialized'], '--id-scope', '4821')
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_broken_published_icon_example_is_rejected(self):
+        result = self.run_preflight(ICON_FIXTURES['brokenExample'], '--id-scope', '4821')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('icon label requires a direct span.gb-text wrapper', result.stdout)
+        self.assertIn('outer gb-text class', result.stdout)
+
+    def test_missing_icon_label_wrapper_is_rejected(self):
+        source = ICON_FIXTURES['cases'][0]['serialized']
+        broken = source.replace('<span class="gb-text">Fast delivery</span>', 'Fast delivery')
+        self.assertNotEqual(source, broken)
+        result = self.run_preflight(broken, '--id-scope', '4821')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('icon label requires a direct span.gb-text wrapper', result.stdout)
+
+    def test_incorrect_icon_order_is_rejected(self):
+        source = ICON_FIXTURES['cases'][1]['serialized']
+        broken = source.replace('"iconLocation":"after"', '"iconLocation":"before"')
+        self.assertNotEqual(source, broken)
+        result = self.run_preflight(broken, '--id-scope', '4821')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('saved icon order does not match iconLocation', result.stdout)
+
+    def test_icon_only_with_saved_label_is_rejected(self):
+        source = ICON_FIXTURES['cases'][0]['serialized']
+        end = source.index(' -->')
+        start = source.index('{')
+        attrs = json.loads(source[start:end])
+        attrs['iconOnly'] = True
+        broken = source[:start] + serialize_attrs(ordered('text', attrs)) + source[end:]
+        result = self.run_preflight(broken, '--id-scope', '4821')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('iconOnly must not render label content', result.stdout)
+
+    def test_icon_in_json_cannot_replace_html_source(self):
+        source = ICON_FIXTURES['cases'][-1]['serialized']
+        end = source.index(' -->')
+        start = source.index('{')
+        attrs = json.loads(source[start:end])
+        attrs['icon'] = '<svg viewBox="0 0 24 24"></svg>'
+        broken = source[:start] + serialize_attrs(ordered('text', attrs)) + source[end:]
+        result = self.run_preflight(broken, '--id-scope', '4821')
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn('icon must be present in the saved HTML', result.stdout)
+
+    def test_standalone_shape_and_legacy_headline_are_not_text_icons(self):
+        from preflight import text_icon_issues
+        source = '<!-- wp:generateblocks/shape {"uniqueId":"icon-4821-9"} --><span class="gb-shape"><svg></svg></span><!-- /wp:generateblocks/shape -->'
+        source += '<!-- wp:generateblocks/headline {"uniqueId":"old"} --><h2 class="gb-headline"><span class="gb-icon">Icon</span>Label</h2><!-- /wp:generateblocks/headline -->'
+        self.assertEqual(text_icon_issues(source), [])
 
     def test_preflight_accepts_fallback_layout_scope(self):
         scope = make_layout_id()

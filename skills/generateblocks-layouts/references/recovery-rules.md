@@ -283,6 +283,24 @@ explicitly requests an external stylesheet extension.
 
 ## 3. Block-level HTML rules
 
+### Icon-bearing Text/Headline recovery
+
+For `generateblocks/text` with an icon, native save output uses a direct
+`span.gb-shape` plus a direct `span.gb-text` for a nonempty label. The outer tag
+does not carry the plain `gb-text` class: that would cause the content selector
+to read the whole heading, including its icon. Local ID classes are separate.
+`iconOnly:true` and empty labels legitimately omit the label span.
+
+The `icon` and `content` fields are HTML-sourced and normally absent from comment
+JSON. Preserve icon order and the native wrappers; use the serializer rather than
+embedding SVG in a generic heading string. The example formerly in `block-types.md`
+failed native validation because it omitted the label wrapper and put `gb-text`
+on the outer element. See its corrected Icon support section and
+`examples/basic/text-icons.html`. Preflight now rejects those observed failures.
+
+The UI name "Headline" is also used by a V2 Text variation. Check the actual block
+name, and resolve a local/synced pattern's source before editing it (`patterns.md`).
+
 ### 3.1 `htmlAttributes` MUST be a plain object, never an array
 
 ```json
