@@ -125,6 +125,13 @@ Notes verified in source:
 - `posts_per_page: -1` = all posts (no pagination). On 2.5 the editor preview
   is capped server-side at 50 posts (`generateblocks_query_loop_editor_posts_cap`);
   the frontend still renders all posts. A short editor preview is not a bug.
+- **Avoid OR'd `meta_query` clauses on large post types.** `meta_query` passes
+  straight to `WP_Query`. On gauravtiwari.org's `tool` type, a 3-branch OR
+  (`!= ''` and equality clauses) plus three `tax_query` clauses ran for more than
+  140 seconds per request, and opening the page in the editor ran it again. The
+  same query without the meta filter took 14 ms. Time a new `meta_query` with
+  WP-CLI before saving it; hide empty rows with `&:empty{display:none}` or
+  conditions instead.
 
 ## 3. Pro magic values — relationship queries
 

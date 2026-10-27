@@ -3,6 +3,34 @@
 Notable changes to GenerateBlocks Skills. Entries describe this repository, not
 releases of the GenerateBlocks plugins themselves.
 
+## [Unreleased]
+
+Findings from rebuilding gauravtiwari.org's Black Friday deals page in native
+GenerateBlocks with Pro conditions (GB 2.5.0 / Pro 2.8.0, WordPress 7.1.3).
+
+### Fixed
+
+- `conditions.md`: stored condition types use underscores (`post_meta`,
+  `date_time`); hyphenated types always evaluated false. `gbBlockCondition` is a
+  string; integer IDs were silently dropped by the editor. Added the stored rule
+  shape, `meta_key|value` custom rules, and the loop-context pattern for
+  conditioning a card on another record.
+- `gb_serialize.ordered()` dropped Pro's injected `gbBlockCondition` and
+  `gbBlockConditionInvert`; it now keeps them in native order (before
+  `className`) and stringifies the ID. Preflight accepts that order and fails
+  integer condition IDs.
+
+### Documentation
+
+- Multi-layer backgrounds: native recompiling drops per-layer size and position,
+  so use the `background` shorthand.
+- Element `span` and text `dt`/`dd` fail validation (symptoms documented).
+- OR'd `meta_query` clauses can make a Query Loop take minutes; time them first.
+- gauravtiwari.org template traps: the PBB canvas prints no GB CSS, and the
+  `.format` typography margins need a root reset.
+- Site Agent: what happens when Application Passwords are disabled, and the
+  SSH + WP-CLI fallback for writes.
+
 ## [2026.10.27] - 2026-10-27
 
 GenerateBlocks 2.5.0 and Pro 2.8.0 stable, verified live through Site Agent.

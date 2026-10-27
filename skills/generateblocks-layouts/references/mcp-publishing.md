@@ -91,7 +91,12 @@ Site Agent bundles this skill's references and examples verbatim as its
    `claude mcp add --transport http <name> https://SITE/wp-json/site-agent/v1/mcp`,
    then sign in when prompted; an administrator approves the client and picks
    its tool groups. Remote sites need HTTPS. Use an Application Password only
-   for a client that cannot do OAuth; Site Agent flags those connections.
+   for a client that cannot do OAuth; Site Agent flags those connections. When a
+   site disables Application Passwords (`wp_is_application_passwords_available()`
+   false), that route returns 401 with `X-Site-Agent-Auth: unauthenticated` and core
+   REST rejects the same credentials; reconnect over OAuth, or use SSH + WP-CLI for
+   a scripted write (`wp_set_current_user()` with a trusted account, then
+   `wp_update_post( wp_slash( ... ) )`).
 2. **Version-gate.** Call `site-context`. Its `builders` entry reports
    `generateblocks` with `version` and `pro_version`; pick the matching notes
    here (2.5 inline CSS, compiler order and presets; 2.4 file mode).

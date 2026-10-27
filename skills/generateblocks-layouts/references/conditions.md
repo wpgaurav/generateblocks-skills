@@ -23,17 +23,26 @@ Four different systems show/hide things conditionally. Pick by scope:
 a UI. A block then references the condition post by ID:
 
 ```json
-"gbBlockCondition":123,
-"gbBlockConditionInvert":false
+"gbBlockCondition":"123",
+"gbBlockConditionInvert":true
 ```
 
-- `gbBlockCondition` — integer post ID of a **published** condition post.
+- `gbBlockCondition` — the post ID of a **published** condition post, **as a
+  string**. Pro registers the attribute as `type: string`; an integer fails type
+  validation and the editor silently drops the condition on its next save, so
+  the block then renders for everyone (verified on Pro 2.8.0). The native
+  serializer writes both attributes after the block's own and before
+  `className`; `gb_serialize.ordered()` does the same and stringifies the ID.
   Unpublished/missing condition → block renders normally (fail-open).
 - `gbBlockConditionInvert` — `true` flips the result (render when the
   condition is NOT met).
 - Evaluated on a `render_block` filter
-  (`generateblocks-pro/includes/extend/block-conditions.php:26`) —
-  server-side, before output. Loop-aware (current post context is passed).
+  (`generateblocks-pro/includes/extend/block-conditions.php`) —
+  server-side, before output, with `post_id => get_the_ID()`. GB's looper calls
+  `the_post()`, so inside a Query Loop a `post_meta` rule reads **the loop
+  item's** meta. To condition a card on another record, wrap it in a one-post
+  Query Loop (`post__in:[ID]`); its dynamic tags and conditions then both resolve
+  against that record.
 - The attributes are injected into **every block type** via
   `register_block_type_args`, so they work on core blocks too, not just GB.
 
@@ -42,19 +51,39 @@ a UI. A block then references the condition post by ID:
 
 ### Available condition rule types (built in the Conditions UI)
 
-`location` (page/post/archive targeting), `query-arg` (URL params), `user-role`,
-`date-time` (scheduling), `device` (desktop/tablet/mobile), `referrer`,
-`post-meta`, `user-meta`, `cookie`, `language`, `options`, `author`
-(`generateblocks-pro/includes/conditions/conditions/`).
+Stored `type` keys use underscores: `location`, `query_arg`, `user_role`,
+`date_time`, `device`, `referrer`, `post_meta`, `user_meta`, `cookie`,
+`language`, `options`, `author` (`class-conditions-registry.php`). A hyphenated
+type such as `post-meta` matches no registered type and always evaluates false.
 
 Post/user meta operators: Exists, Does Not Exist, Equals, Contains, Does Not
 Contain, Greater/Less Than, plus Has Value / Has No Value (Pro 2.5+) — this
 is the clean "show only if ACF field is filled" answer.
 
+### Stored rule shape (`_gb_conditions` meta)
+
+```json
+{"logic":"AND","groups":[
+  {"logic":"AND","conditions":[
+    {"type":"post_meta","rule":"custom","operator":"equals","value":"bf_active|1"},
+    {"type":"post_meta","rule":"custom","operator":"has_value","value":"black_friday_deal"}]},
+  {"logic":"OR","conditions":[
+    {"type":"post_meta","rule":"custom","operator":"no_value","value":"bf_expires"},
+    {"type":"post_meta","rule":"custom","operator":"contains","value":"bf_expires|2026"}]}]}
+```
+
+Top-level `logic` combines groups; each group's `logic` combines its conditions.
+A custom meta rule's `value` is `meta_key|comparison`. Date rules use
+`{"type":"date_time","rule":"current_date","operator":"before|after|between","value":"2026-11-27 00:00:00"}`
+(`between` takes `start, end`), in the site timezone. Before referencing a new
+record from blocks, test it with
+`GenerateBlocks_Pro_Conditions::show( $rules, array( 'post_id' => ID ) )`
+against one record that should pass and one that should fail.
+
 ### Workflow for "show this block only to logged-in admins"
 
 1. Create a condition post: rule `User Role is administrator`. Publish. Note ID.
-2. Add to the target block's JSON: `"gbBlockCondition":456`.
+2. Add to the target block's JSON: `"gbBlockCondition":"456"`.
 3. Conditions can't be fully hand-authored — the rule set is post meta
    (`_gb_conditions`) managed by the UI. Author the *reference*, build the
    *rules* in the dashboard (or via REST:

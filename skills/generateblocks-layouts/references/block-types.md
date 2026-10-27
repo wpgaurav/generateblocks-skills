@@ -35,7 +35,9 @@ Container for layout structure. Holds inner blocks — never raw text.
 `footer`, `nav`, `main`, `figure`, `a`, `ul`, `ol`, `li`, `dl`, `dt`, `dd`
 
 No `blockquote`, no `form`, no `button` — those need core blocks or a text
-block (`button`).
+block (`button`). A tag outside this list fails validation: on 2.5.0 an element
+`span` saved as nothing ("Expected end of content"). Use `div` for a styled
+wrapper that sits inside inline content.
 
 ### Basic container
 
@@ -118,6 +120,9 @@ whole page in Custom HTML.
 
 **tagName enum (verified):** `p`, `span`, `div`, `h1`–`h6`, `a`, `button`,
 `figcaption`, `li`
+
+A text `dt`/`dd` saves its content without the tag and fails validation. Use an
+Element `dt`/`dd` holding a text `span`.
 
 ### Heading
 

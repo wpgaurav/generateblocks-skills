@@ -41,6 +41,13 @@ ORDER = {
                            'htmlAttributes','midSize','className'],
 }
 
+# GenerateBlocks Pro injects these into every block; native output puts them before className.
+PRO_INJECTED = ('gbBlockCondition', 'gbBlockConditionInvert')
+
+
+def key_order(kind):
+    return [k for k in ORDER[kind] if k != 'className'] + list(PRO_INJECTED) + ['className']
+
 SUPPORTED_AT_RULES = ('@media', '@supports', '@container')
 
 
@@ -462,11 +469,15 @@ def main():
         kind = name.split('/')[1]
         if kind not in ORDER: continue
         got = top_keys(raw)
-        want = [k for k in ORDER[kind] if k in got]
+        want = [k for k in key_order(kind) if k in got]
         if got != want:
             bad += 1
             if bad <= 3: F(f"key order {kind}: got {got} want {want}")
     chk(bad, f"attribute key order: {len(blocks)-bad}/{len(blocks)}")
+
+    # --- Pro block conditions --------------------------------------------------
+    int_conditions = len(re.findall(r'"gbBlockCondition":\d', src))
+    chk(int_conditions, f"gbBlockCondition stored as a string ({int_conditions} integer IDs would be dropped by the editor)")
 
     # --- uniqueId collisions -------------------------------------------------
     ids = [attrs.get('uniqueId') for _, _, attrs in parsed_blocks]

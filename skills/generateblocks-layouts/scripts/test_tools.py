@@ -124,6 +124,12 @@ class SerializerTests(unittest.TestCase):
             '@media (max-width:767px){.gb-element-x{gap:1rem}}',
         )
 
+    def test_pro_condition_attributes_keep_native_order_and_string_type(self):
+        attrs = ordered('element', {'className': 'gb-element', 'gbBlockConditionInvert': True, 'gbBlockCondition': 1186935,
+                                    'css': '', 'uniqueId': 'x-1234-1', 'tagName': 'div'})
+        self.assertEqual(list(attrs), ['uniqueId', 'tagName', 'css', 'gbBlockCondition', 'gbBlockConditionInvert', 'className'])
+        self.assertEqual(attrs['gbBlockCondition'], '1186935')
+
     def test_bare_selector_keys_are_descendants(self):
         css = build_css('.gb-text-x', {':hover': {'color': 'red'}, '.gb-shape svg': {'width': '1em'}})
         self.assertEqual(css, '.gb-text-x .gb-shape svg{width:1em}.gb-text-x :hover{color:red}')
@@ -168,6 +174,14 @@ class PreflightTests(unittest.TestCase):
                 capture_output=True,
                 check=False,
             )
+
+    def test_pro_condition_reference_must_be_string(self):
+        good = self.block_markup().replace('"className":"gb-element"', '"gbBlockCondition":"77","className":"gb-element"', 1)
+        self.assertEqual(self.run_preflight(good).returncode, 0, self.run_preflight(good).stdout)
+        bad = good.replace('"gbBlockCondition":"77"', '"gbBlockCondition":77')
+        result = self.run_preflight(bad)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('gbBlockCondition stored as a string', result.stdout)
 
     def test_valid_css_mode_markup_passes(self):
         result = self.run_preflight(self.block_markup())

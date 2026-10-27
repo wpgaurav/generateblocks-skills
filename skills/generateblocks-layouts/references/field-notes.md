@@ -346,6 +346,16 @@ CSS requires whitespace around `+` inside `calc()`-style expressions. Combined
 with rule 5 this is the one place where "minify everything" is wrong. Symptom of
 getting it wrong: headings render at body size with **no console error**.
 
+### 6.2 Multi-layer backgrounds: write the `background` shorthand
+
+GB's `combine-background-properties` step folds a multi-layer
+`backgroundImage` plus `backgroundSize`/`backgroundPosition` longhands into one
+`background` shorthand, and on 2.5.0 it **drops the per-layer size and
+position**. `build_css()` keeps the longhands, so stored `css` looks right until
+someone edits the block and the editor recompiles it. Author such layers as one
+`background` value with per-layer size, e.g.
+`linear-gradient(...) center top/64px 64px,linear-gradient(...) center top/64px 64px`.
+
 ---
 
 ## 7. Verify against the TARGET SITE, not just the docs
@@ -374,6 +384,21 @@ On 2026-10-27, gauravtiwari.org ran free 2.5.0 + Pro 2.8.0 on WordPress 7.1.3
 with native Mobile at `max-width:767px`. Its recent content still contained many
 custom `max-width:768px` branches. Preserve those existing boundaries; use the
 native query for new work unless the project deliberately defines another one.
+
+Two gauravtiwari.org template traps (MD theme, verified 2026-10-27):
+
+- **`pbb-template.php` (PBB canvas) prints no `generateblocks-inline-css`.**
+  A GenerateBlocks page on it renders unstyled. Use `builder.php` (full width,
+  site header/footer) or another theme template, and check the rendered page
+  for the `generateblocks-inline-css` style tag.
+- **Every content template wraps the post in `.format`.** Its typography adds
+  `margin-block-end` to `p`, `dl`, `dd`, `ul`, `ol`, `li`, `table` and headings,
+  and `position:relative` to headings, at the same specificity as a block's own
+  rule but later in the cascade, so it wins. Put one reset on the layout's root
+  element, `'& :is(h1,h2,h3,h4,h5,h6,p,dl,dd,ul,ol,li,table)':
+  {'marginBlockEnd':'var(--mbe, 0)','position':'var(--pos, relative)'}`, and give
+  each block that needs a bottom margin or sticky position `--mbe`/`--pos` in its
+  own `styles`.
 
 A mixed result is normal and fine: a page can carry both legacy (no `className`,
 base-first) and Option A (with `className`, id-first) blocks. Pick the dominant

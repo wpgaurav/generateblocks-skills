@@ -499,7 +499,22 @@ ORDER = {
                            'htmlAttributes', 'midSize', 'className'],
 }
 
+# Attributes GenerateBlocks Pro injects into every block type. The native serializer
+# writes them after the block's own attributes and before className. Pro registers
+# gbBlockCondition as a string: an integer ID fails type validation and the editor
+# silently drops the condition on its next save.
+PRO_INJECTED = ('gbBlockCondition', 'gbBlockConditionInvert')
+
+
+def key_order(block_type):
+    keys = [k for k in ORDER[block_type] if k != 'className']
+    return keys + list(PRO_INJECTED) + ['className']
+
+
 def ordered(block_type, attrs):
     if block_type not in ORDER:
         raise ValueError(f"unsupported block type {block_type!r}")
-    return {k: attrs[k] for k in ORDER[block_type] if k in attrs}
+    out = {k: attrs[k] for k in key_order(block_type) if k in attrs}
+    if 'gbBlockCondition' in out:
+        out['gbBlockCondition'] = str(out['gbBlockCondition'])
+    return out
