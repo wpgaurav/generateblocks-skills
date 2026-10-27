@@ -438,7 +438,7 @@ class GenerateBlocks_Dynamic_Tags extends GenerateBlocks_Singleton {
 			[
 				'methods'  => 'POST',
 				'callback' => [ $this, 'get_dynamic_tag_replacements' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
 			]
@@ -450,31 +450,31 @@ class GenerateBlocks_Dynamic_Tags extends GenerateBlocks_Singleton {
 			array(
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_custom_post_record' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data();
 				},
 				'args'     => array(
 					'postId'   => array(
 						'required' => true,
-						'validate_callback' => function( $param, $request, $key ) {
+						'validate_callback' => function ( $param, $request, $key ) {
 							return is_numeric( $param );
 						},
 					),
 					'load'     => array(
 						'required' => false,
-						'validate_callback' => function( $param, $request, $key ) {
+						'validate_callback' => function ( $param, $request, $key ) {
 							return is_string( $param ) || is_array( $param );
 						},
-						'sanitize_callback' => function( $param, $request, $key ) {
+						'sanitize_callback' => function ( $param, $request, $key ) {
 							return is_string( $param ) ? explode( ',', $param ) : $param;
 						},
 					),
 					'options'  => array(
 						'required' => false,
-						'validate_callback' => function( $param, $request, $key ) {
+						'validate_callback' => function ( $param, $request, $key ) {
 							return is_string( $param ) || is_array( $param );
 						},
-						'sanitize_callback' => function( $param, $request, $key ) {
+						'sanitize_callback' => function ( $param, $request, $key ) {
 							return is_string( $param ) ? json_decode( $param, true ) : $param;
 						},
 					),
@@ -488,13 +488,13 @@ class GenerateBlocks_Dynamic_Tags extends GenerateBlocks_Singleton {
 			array(
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_user_record' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data();
 				},
 				'args' => array(
 					'id' => array(
 						'required'          => true,
-						'validate_callback' => function( $param ) {
+						'validate_callback' => function ( $param ) {
 							return is_numeric( $param );
 						},
 					),

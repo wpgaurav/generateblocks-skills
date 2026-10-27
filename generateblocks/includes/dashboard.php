@@ -121,8 +121,15 @@ function generateblocks_set_admin_body_classes( $classes ) {
 	$dashboard_pages = generateblocks_get_dashboard_pages();
 	$current_screen = get_current_screen();
 
-	if ( in_array( $current_screen->id, $dashboard_pages ) ) {
+	if ( $current_screen && in_array( $current_screen->id, $dashboard_pages ) ) {
 		$classes .= ' generateblocks-dashboard-page';
+	}
+
+	// The Settings screen is always rendered with the GeneratePress design-system
+	// page frame, by GenerateBlocks or by the companion plugin that owns it. The
+	// class is added server-side so the frame's spacing applies before React mounts.
+	if ( $current_screen && 'generateblocks_page_generateblocks-settings' === $current_screen->id ) {
+		$classes .= ' gb-admin-page-active';
 	}
 
 	return $classes;
@@ -138,9 +145,18 @@ function generateblocks_do_dashboard_headers() {
 	$dashboard_pages = generateblocks_get_dashboard_pages();
 	$current_screen = get_current_screen();
 
-	if ( in_array( $current_screen->id, $dashboard_pages ) ) {
-		generateblocks_do_dashboard_header();
+	if ( ! $current_screen || ! in_array( $current_screen->id, $dashboard_pages ) ) {
+		return;
 	}
+
+	// The Settings screen renders the design-system page header itself, whether
+	// GenerateBlocks or a companion plugin owns it. This header remains for the
+	// screens that have not adopted the design-system frame.
+	if ( 'generateblocks_page_generateblocks-settings' === $current_screen->id ) {
+		return;
+	}
+
+	generateblocks_do_dashboard_header();
 }
 
 add_action( 'admin_enqueue_scripts', 'generateblocks_enqueue_global_dashboard_scripts' );
@@ -160,10 +176,13 @@ function generateblocks_enqueue_global_dashboard_scripts() {
 	$dashboard_pages = generateblocks_get_dashboard_pages();
 	$current_screen = get_current_screen();
 
-	if ( in_array( $current_screen->id, $dashboard_pages ) ) {
+	// Shared dashboard chrome: the fallback page header, wp-admin layout
+	// adjustments, and the legacy panel styles companion plugins still use.
+	// The Settings app's own stylesheet is enqueued by GenerateBlocks_Settings.
+	if ( $current_screen && in_array( $current_screen->id, $dashboard_pages ) ) {
 		wp_enqueue_style(
 			'generateblocks-settings-build',
-			GENERATEBLOCKS_DIR_URL . 'dist/settings.css',
+			GENERATEBLOCKS_DIR_URL . 'dist/dashboard-chrome.css',
 			array( 'wp-components' ),
 			GENERATEBLOCKS_VERSION
 		);
@@ -228,7 +247,7 @@ function generateblocks_dashboard_navigation() {
  */
 function generateblocks_get_dashboard_header_icon_allowed_html() {
 	// Shared stroke attributes so outline icons (matching the React studio icons)
-	// survive sanitization alongside filled glyphs like the GenerateBlocks logo.
+	// survive sanitization alongside filled glyphs like the GeneratePress mark.
 	$stroke = array(
 		'stroke'           => true,
 		'stroke-width'     => true,
@@ -331,10 +350,16 @@ function generateblocks_do_dashboard_header() {
 	$screen    = get_current_screen();
 	$screen_id = $screen ? $screen->id : '';
 
-	// The GenerateBlocks logo is the default icon. Plugins can swap in their own
-	// SVG for a given screen via the filter below (e.g. GenerateCloud uses a
-	// cloud glyph on its page). The header CSS renders it white on an accent tile.
-	$default_icon = '<svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 50 60.12" xml:space="preserve"><path class="st0" d="M6.686 31.622V18.918a.077.077 0 01.05-.072l6.5-2.313 6.5-2.313 9.682-3.445L39.1 7.33a.067.067 0 00.036-.028.074.074 0 00.014-.044V.076a.077.077 0 00-.032-.062.076.076 0 00-.069-.009l-13 4.625-13 4.625-6.5 2.313-6.5 2.313a.067.067 0 00-.036.028.097.097 0 00-.013.046V52.067c0 .026.013.048.032.062s.044.018.069.009l3.267-1.163 3.267-1.163c.015-.005.028-.015.036-.028s.014-.028.014-.044V37.999l.001-6.377c-.001 0 0 0 0 0z"/><path class="st0" d="M23.949 29.976l13-4.625 13-4.625c.015-.005.028-.015.036-.028s.015-.028.015-.044V8.056a.077.077 0 00-.032-.062.076.076 0 00-.069-.009l-13 4.625-13 4.625-6.5 2.313-6.5 2.313a.067.067 0 00-.036.028.074.074 0 00-.014.044V60.045c0 .026.013.048.032.062a.076.076 0 00.069.009l6.475-2.304 6.475-2.304 6.525-2.322 6.525-2.322 6.5-2.313 6.5-2.313c.015-.005.028-.015.036-.028s.014-.025.014-.041V27.193a.077.077 0 00-.032-.062.076.076 0 00-.069-.009l-6.45 2.295L37 31.711a.067.067 0 00-.036.028.074.074 0 00-.014.044v6.272a.077.077 0 01-.05.072l-6.45 2.295L24 42.715a.075.075 0 01-.101-.071V30.046c0-.016.005-.031.014-.044a.08.08 0 01.036-.026z"/></svg>';
+	// This header is the fallback for dashboard screens that have not adopted
+	// the GeneratePress design-system page frame (GenerateCloud, earlier
+	// GenerateBlocks Pro versions). Its markup and styles mirror the
+	// design-system PageHeader so those screens match the ones that have.
+	//
+	// The GeneratePress mark is the default icon — the same glyph as
+	// assets/images/generatepress-mark.svg (the admin menu icon) and the brand
+	// mark in the design-system page header. Plugins can swap in their own SVG
+	// for a given screen via the filter below.
+	$default_icon = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="19" height="19"><path fill="currentColor" d="m161.74 142.582-34.98-16.311a37.5 37.5 0 1 0-42.608 7.716l58.866 27.45a75 75 0 1 1 31.697-54.907 1 1 0 0 0 .574.993l21.851 10.19a1 1 0 0 0 1.409-.737 100 100 0 1 0-14.528 37.25 1 1 0 0 0-.417-1.449ZM88.67 94.717a12.5 12.5 0 0 1 16.612-6.046 12.5 12.5 0 0 1 6.046 16.612 12.5 12.5 0 0 1-16.612 6.046 12.5 12.5 0 0 1-6.046-16.612"/></svg>';
 
 	/**
 	 * Filters the icon shown in the dashboard header tile for the current screen.
@@ -344,7 +369,7 @@ function generateblocks_do_dashboard_header() {
 	 *
 	 * @since 2.4.0
 	 *
-	 * @param string $default_icon Default SVG markup (the GenerateBlocks logo).
+	 * @param string $default_icon Default SVG markup (the GeneratePress mark).
 	 * @param string $screen_id    Current admin screen id.
 	 */
 	$icon = (string) apply_filters( 'generateblocks_dashboard_header_icon', $default_icon, $screen_id );
@@ -359,7 +384,7 @@ function generateblocks_do_dashboard_header() {
 
 		<?php if ( ! defined( 'GENERATEBLOCKS_PRO_VERSION' ) ) : ?>
 			<div class="gblocks-dashboard-header-actions">
-				<a class="button button-primary gblocks-get-pro" href="https://generatepress.com/blocks/">
+				<a class="gblocks-get-pro" href="https://generatepress.com/blocks/">
 					<?php esc_html_e( 'Get Pro', 'generateblocks' ); ?>
 				</a>
 			</div>

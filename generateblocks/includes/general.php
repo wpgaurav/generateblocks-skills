@@ -115,7 +115,7 @@ function generateblocks_do_block_editor_assets() {
 				'square' => GENERATEBLOCKS_DIR_URL . 'assets/images/square-image-placeholder.png',
 			),
 			'globalContainerWidth' => generateblocks_get_global_container_width(),
-			'queryLoopEditorPostsCap' => apply_filters( 'generateblocks_query_loop_editor_posts_cap', 50 ),
+			'queryLoopEditorPostsCap' => generateblocks_get_query_loop_editor_posts_cap(),
 			'disableGoogleFonts' => generateblocks_get_option( 'disable_google_fonts' ),
 			'typographyFontFamilyList' => generateblocks_get_font_family_list(),
 			'useV1Blocks' => generateblocks_use_v1_blocks(),
@@ -194,26 +194,28 @@ function generateblocks_do_block_editor_assets() {
 		)
 	);
 
-	$editor_sidebar_assets = generateblocks_get_enqueue_assets( 'editor-sidebar' );
+	if ( generateblocks_use_legacy_editor_sidebar() ) {
+		$editor_sidebar_assets = generateblocks_get_enqueue_assets( 'editor-sidebar' );
 
-	wp_enqueue_script(
-		'generateblocks-editor-sidebar',
-		GENERATEBLOCKS_DIR_URL . 'dist/editor-sidebar.js',
-		$editor_sidebar_assets['dependencies'],
-		$editor_sidebar_assets['version'],
-		true
-	);
+		wp_enqueue_script(
+			'generateblocks-editor-sidebar',
+			GENERATEBLOCKS_DIR_URL . 'dist/editor-sidebar.js',
+			$editor_sidebar_assets['dependencies'],
+			$editor_sidebar_assets['version'],
+			true
+		);
 
-	if ( function_exists( 'wp_set_script_translations' ) ) {
-		wp_set_script_translations( 'generateblocks-editor-sidebar', 'generateblocks' );
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations( 'generateblocks-editor-sidebar', 'generateblocks' );
+		}
+
+		wp_enqueue_style(
+			'generateblocks-editor-sidebar',
+			GENERATEBLOCKS_DIR_URL . 'dist/editor-sidebar.css',
+			array( 'wp-components' ),
+			filemtime( GENERATEBLOCKS_DIR . 'dist/editor-sidebar.css' )
+		);
 	}
-
-	wp_enqueue_style(
-		'generateblocks-editor-sidebar',
-		GENERATEBLOCKS_DIR_URL . 'dist/editor-sidebar.css',
-		array( 'wp-components' ),
-		filemtime( GENERATEBLOCKS_DIR . 'dist/editor-sidebar.css' )
-	);
 
 	$packages_asset_info = generateblocks_get_enqueue_assets( 'packages' );
 	wp_register_style(
@@ -233,13 +235,27 @@ function generateblocks_do_block_editor_assets() {
 		$package_asset_info = generateblocks_get_enqueue_assets( "{$name}-imported" );
 		$script_asset_info = generateblocks_get_enqueue_assets( $name );
 
-		wp_register_script(
+		$registered = wp_register_script(
 			"generateblocks-$name",
 			GENERATEBLOCKS_DIR_URL . 'dist/' . $name . '.js',
 			$package_asset_info['dependencies'],
 			$script_asset_info['version'],
 			true
 		);
+
+		// The package builds its at-rule list once as it loads, so the presets
+		// have to be printed right before it.
+		if ( $registered && 'styles-builder' === $name ) {
+			$at_rules = wp_json_encode( generateblocks_get_default_at_rules(), JSON_HEX_TAG | JSON_HEX_AMP );
+
+			if ( $at_rules ) {
+				wp_add_inline_script(
+					"generateblocks-$name",
+					'window.generateBlocksDefaultAtRules = ' . $at_rules . ';',
+					'before'
+				);
+			}
+		}
 
 		wp_register_style(
 			"generateblocks-$name",
@@ -347,22 +363,6 @@ function generateblocks_do_google_fonts() {
 	if ( $fonts_url ) {
 		wp_enqueue_style( 'generateblocks-google-fonts', $fonts_url, array(), null, 'all' ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 	}
-}
-
-add_filter( 'generateblocks_css_print_method', 'generateblocks_set_css_print_method' );
-/**
- * Set our CSS print method.
- *
- * @param string $method Existing method.
- */
-function generateblocks_set_css_print_method( $method ) {
-	$method = generateblocks_get_option( 'css_print_method' );
-
-	if ( is_single() ) {
-		$method = 'inline';
-	}
-
-	return $method;
 }
 
 add_filter( 'excerpt_allowed_blocks', 'generateblocks_set_excerpt_allowed_blocks' );
@@ -624,18 +624,41 @@ add_filter( 'generateblocks_css_output', 'generateblocks_add_general_css' );
  * @param string $css Existing CSS.
  */
 function generateblocks_add_general_css( $css ) {
-	$container_width = generateblocks_get_global_container_width();
-
-	if ( $container_width ) {
-		$css .= ':root{--gb-container-width:' . $container_width . ';}';
-	}
-
 	$css .= '.gb-container .wp-block-image img{vertical-align:middle;}';
 	$css .= '.gb-grid-wrapper .wp-block-image{margin-bottom:0;}';
 	$css .= '.gb-highlight{background:none;}';
 	$css .= '.gb-shape{line-height:0;}';
 
 	return $css;
+}
+
+/**
+ * The frontend fallback declaration for the global container width.
+ *
+ * Emitted with the request's inline local block CSS, so ownership changes and
+ * Settings edits apply on the next request with no cache invalidation. Plain
+ * `:root` is intentional: an integration that owns
+ * the property suppresses this declaration entirely via
+ * `generateblocks_should_set_container_width`, so the two declarations never
+ * compete. The block editor canvas keeps its own unconditional
+ * `:where(:root)` copy instead — see generateblocks_do_block_editor_styles().
+ *
+ * @since 2.5.0
+ *
+ * @return string The declaration, or an empty string when not owned/empty.
+ */
+function generateblocks_get_container_width_css() {
+	if ( ! generateblocks_should_set_container_width() ) {
+		return '';
+	}
+
+	$container_width = generateblocks_get_global_container_width();
+
+	if ( ! $container_width ) {
+		return '';
+	}
+
+	return ':root{--gb-container-width:' . $container_width . ';}';
 }
 
 add_filter( 'block_editor_settings_all', 'generateblocks_do_block_editor_styles', 15 );
@@ -647,8 +670,11 @@ add_filter( 'block_editor_settings_all', 'generateblocks_do_block_editor_styles'
 function generateblocks_do_block_editor_styles( $editor_settings ) {
 	$container_width = generateblocks_get_global_container_width();
 
+	// The canvas is a live surface: integrations can add or remove their own
+	// `:root` override mid-session, so this fallback is always present at
+	// zero specificity and the cascade picks the winner.
 	$editor_settings['styles'][] = array(
-		'css' => ':root{--gb-container-width:' . $container_width . ';}',
+		'css' => ':where(:root){--gb-container-width:' . $container_width . ';}',
 	);
 
 	$editor_settings['styles'][] = array(

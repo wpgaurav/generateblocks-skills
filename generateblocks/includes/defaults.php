@@ -63,7 +63,6 @@ function generateblocks_get_option_defaults() {
 		'generateblocks_option_defaults',
 		array(
 			'container_width' => 1100,
-			'css_print_method' => 'file',
 			'sync_responsive_previews' => true,
 			'disable_google_fonts' => true,
 		)

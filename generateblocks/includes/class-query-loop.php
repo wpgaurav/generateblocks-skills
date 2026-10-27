@@ -177,7 +177,7 @@ class GenerateBlocks_Query_Loop {
 	 */
 	public static function normalize_tax_query_attributes( $raw_tax_query, $operator = 'IN' ) {
 		return array_map(
-			function( $tax ) use ( $operator ) {
+			function ( $tax ) use ( $operator ) {
 				return array(
 					'taxonomy' => $tax['taxonomy'],
 					'field'    => 'term_id',

@@ -21,10 +21,6 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 	 * @return void
 	 */
 	public function init() {
-		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
-		add_action( 'init', [ $this, 'rewrite_endpoints' ] );
-		add_action( 'template_include', [ $this, 'template_viewer' ] );
-		add_filter( 'show_admin_bar', [ $this, 'hide_admin_bar' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
 	}
 
@@ -34,7 +30,20 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 	 * @return void
 	 */
 	public function enqueue_block_editor_assets() {
+		/**
+		 * Whether to load the editor Pattern Library.
+		 *
+		 * @since 2.5.0
+		 * @param bool $enabled Whether the editor library is enabled.
+		 */
+		if ( ! apply_filters( 'generateblocks_enable_pattern_library', true ) ) {
+			// Older Pro versions cannot hide their link to the disabled library themselves.
+			wp_add_inline_style( 'generateblocks', '.gblocks-legacy-pattern-library-notice { display: none; }' );
+			return;
+		}
+
 		$assets = generateblocks_get_enqueue_assets( 'pattern-library' );
+		$preview_assets = generateblocks_get_enqueue_assets( 'pattern-preview' );
 
 		wp_enqueue_script(
 			'generateblocks-pattern-library',
@@ -53,8 +62,14 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 			'generateblocks-pattern-library',
 			'generateBlocksPatternLibrary',
 			array(
-				'patternPreviewUrl'         => site_url() . '?gb-template-viewer=1',
-				'isolatedPatternPreviewUrl' => site_url() . '?gb-template-viewer=isolated',
+				'useLegacySidebar' => generateblocks_use_legacy_editor_sidebar(),
+				'previewExcludedStyleHandles' => $this->get_preview_excluded_style_handles(),
+				'patternPreviewScriptUrl' => add_query_arg(
+					'ver',
+					$preview_assets['version'],
+					GENERATEBLOCKS_DIR_URL . 'dist/pattern-preview.js'
+				),
+				'siteUrl' => trailingslashit( site_url() ),
 				'defaultOpenLibrary' => apply_filters(
 					'generateblocks_default_open_pattern_library',
 					'gb_default_pro_library'
@@ -72,6 +87,26 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 			array( 'wp-components' ),
 			GENERATEBLOCKS_VERSION
 		);
+	}
+
+	/**
+	 * Editor controls and block edit-state CSS must not style rendered previews.
+	 *
+	 * Keep handles also registered for frontend use. The legacy GB/Pro bundles
+	 * predate block.json and contain selection-dependent rules too.
+	 *
+	 * @return array Editor-only stylesheet handles.
+	 */
+	private function get_preview_excluded_style_handles(): array {
+		$editor_handles = [ 'wp-edit-blocks', 'generateblocks', 'generateblocks-editor', 'generateblocks-pro', 'generateblocks-pro-editor' ];
+		$shared_handles = [];
+
+		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
+			$editor_handles = array_merge( $editor_handles, (array) $block_type->editor_style_handles );
+			$shared_handles = array_merge( $shared_handles, (array) $block_type->style_handles, (array) ( $block_type->view_style_handles ?? [] ) );
+		}
+
+		return array_values( array_unique( array_diff( $editor_handles, $shared_handles ) ) );
 	}
 
 	/**
@@ -101,7 +136,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 			[ $this, 'create' ],
 			array_filter(
 				$saved_libraries,
-				function( $saved_library ) {
+				function ( $saved_library ) {
 					return is_array( $saved_library ) &&
 						isset( $saved_library['isLocal'] ) &&
 						! rest_sanitize_boolean( $saved_library['isLocal'] ) &&
@@ -125,7 +160,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 
 		$libraries = array_filter(
 			$libraries,
-			function( $library ) {
+			function ( $library ) {
 				return $this->is_valid_library( $library );
 			}
 		);
@@ -140,7 +175,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 		foreach ( $libraries as $key => $library ) {
 			$saved_data = array_filter(
 				$saved_libraries,
-				function( $saved_library ) use ( $library ) {
+				function ( $saved_library ) use ( $library ) {
 					if ( ! is_array( $saved_library ) || ! isset( $saved_library['id'] ) ) {
 						return false;
 					}
@@ -158,7 +193,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 
 		return array_filter(
 			$libraries,
-			function( GenerateBlocks_Library_DTO $library ) use ( $enabled_only ) {
+			function ( GenerateBlocks_Library_DTO $library ) use ( $enabled_only ) {
 				if ( $enabled_only ) {
 					return $library->is_enabled;
 				}
@@ -180,7 +215,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 
 		return array_reduce(
 			$libraries,
-			function( $result, GenerateBlocks_Library_DTO $library ) use ( $id ) {
+			function ( $result, GenerateBlocks_Library_DTO $library ) use ( $id ) {
 				if ( $id === $library->id ) {
 					return $library;
 				}
@@ -320,7 +355,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 	public function exists( array $libraries, string $id ): bool {
 		return array_reduce(
 			$libraries,
-			function( $result, GenerateBlocks_Library_DTO $library ) use ( $id ) {
+			function ( $result, GenerateBlocks_Library_DTO $library ) use ( $id ) {
 				if ( $id === $library->id ) {
 					return true;
 				}
@@ -347,37 +382,40 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 			return get_transient( $cache_key );
 		}
 
-		$cached_data = [];
-		$has_cache = false;
-		$index = 0;
+		$manifest = self::get_cache_manifest( $cache_key );
 
-		while ( true ) {
-			$option_key = $cache_key . '_' . $index;
-			$chunk = get_transient( $option_key );
-
-			if ( false === $chunk ) {
-				// No more chunks found, exit the loop.
-				break;
-			}
-
-			// Merge the chunk into the cached data.
-			$cached_data += $chunk;
-			$has_cache = true;
-
-			// Increment the index for the next iteration.
-			$index++;
+		// No manifest means no cache. A manifest with a count of 0 means
+		// an empty result set was cached deliberately.
+		if ( false === $manifest ) {
+			return false;
 		}
 
-		// If we have no cache, return false.
-		// This allows empty arrays to be cached.
-		if ( ! $has_cache ) {
-			return false;
+		$cached_data = [];
+
+		for ( $index = 0; $index < $manifest['count']; $index++ ) {
+			$chunk = get_transient( self::get_chunk_key( $cache_key, $index ) );
+
+			// External object caches can evict individual chunks, and chunk
+			// keys are reused across rebuilds. A missing chunk, or one from
+			// a different generation than the manifest, makes the whole set
+			// a miss so the data is re-fetched instead of serving partial
+			// or mixed results.
+			if (
+				! is_array( $chunk ) ||
+				! isset( $chunk['gen'], $chunk['items'] ) ||
+				$manifest['gen'] !== $chunk['gen'] ||
+				! is_array( $chunk['items'] )
+			) {
+				return false;
+			}
+
+			$cached_data += $chunk['items'];
 		}
 
 		if ( ! empty( $query_args['categoryId'] ) ) {
 			$cached_data = array_filter(
 				$cached_data,
-				function( $data ) use ( $query_args ) {
+				function ( $data ) use ( $query_args ) {
 					if ( ! isset( $data['categories'] ) || ! is_array( $data['categories'] ) ) {
 						return false;
 					}
@@ -390,7 +428,7 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 		if ( ! empty( $query_args['search'] ) ) {
 			$cached_data = array_filter(
 				$cached_data,
-				function( $data ) use ( $query_args ) {
+				function ( $data ) use ( $query_args ) {
 					if ( ! is_array( $data ) ) {
 						return false;
 					}
@@ -422,6 +460,14 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 	/**
 	 * Set our cached data. This function will split our patterns into chunks.
 	 *
+	 * Chunk keys are stable and reused across rebuilds, so the stored key
+	 * count never grows. Each chunk value carries its write's generation and
+	 * the manifest — written last — names that generation: a read only
+	 * succeeds when every chunk matches the manifest's generation, so a torn
+	 * or concurrent rewrite reads as a full miss, never as mixed data. A
+	 * write that fails partway unpublishes the manifest (unless the previous
+	 * set is still untouched) so the next read re-fetches cleanly.
+	 *
 	 * @param array  $data The data to cache.
 	 * @param string $cache_key The key to set.
 	 * @param string $collection The collection to check.
@@ -437,21 +483,53 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 
 		$expiration = self::get_cache_expiry();
 
-		if ( 'patterns' === $collection ) {
-			self::delete_cached_data( $cache_key, $collection );
-
-			if ( ! empty( $data ) ) {
-				$chunks = array_chunk( $data, 20, true );
-
-				foreach ( $chunks as $index => $chunk ) {
-					$option_key = $cache_key . '_' . $index;
-					set_transient( $option_key, $chunk, $expiration );
-				}
-			} else {
-				set_transient( $cache_key . '_0', $data, $expiration );
-			}
-		} else {
+		if ( 'patterns' !== $collection ) {
 			set_transient( $cache_key, $data, $expiration );
+			return;
+		}
+
+		$gen    = uniqid( '', true );
+		$chunks = empty( $data ) ? [] : array_chunk( $data, 20, true );
+
+		foreach ( $chunks as $index => $chunk ) {
+			$stored = set_transient(
+				self::get_chunk_key( $cache_key, $index ),
+				[
+					'gen'   => $gen,
+					'items' => $chunk,
+				],
+				$expiration
+			);
+
+			if ( ! $stored ) {
+				// A failed write after earlier chunks were overwritten leaves
+				// the previous set torn, so unpublish the manifest and let
+				// the next read miss cleanly. If nothing was overwritten
+				// yet, the previous cache is still complete — keep it.
+				if ( $index > 0 ) {
+					delete_transient( $cache_key );
+				}
+
+				return;
+			}
+		}
+
+		$published = set_transient(
+			$cache_key,
+			[
+				'gen'     => $gen,
+				'count'   => count( $chunks ),
+				'expires' => time() + $expiration,
+			],
+			$expiration
+		);
+
+		if ( ! $published && ! empty( $chunks ) ) {
+			// A surviving stale manifest can only reference the previous
+			// generation, which the chunk writes above just overwrote.
+			// Remove it so reads miss cleanly. With no chunks written, the
+			// previous set is still complete and stays published.
+			delete_transient( $cache_key );
 		}
 	}
 
@@ -471,72 +549,149 @@ class GenerateBlocks_Libraries extends GenerateBlocks_Singleton {
 			return;
 		}
 
+		// Delete the manifest first so concurrent readers miss immediately.
+		delete_transient( $cache_key );
+
+		// Best-effort chunk cleanup. Chunk indexes are contiguous at write
+		// time, but eviction can leave holes that end the walk early.
+		// Anything left behind is unreachable without a manifest and
+		// expires on its own.
+		$index = 0;
+
+		while ( false !== get_transient( self::get_chunk_key( $cache_key, $index ) ) ) {
+			delete_transient( self::get_chunk_key( $cache_key, $index ) );
+			++$index;
+		}
+
+		// Same best-effort sweep for chunks in the pre-manifest format
+		// (`{key}_0`, `{key}_1`, …) left behind by older plugin versions.
 		$index = 0;
 
 		while ( false !== get_transient( $cache_key . '_' . $index ) ) {
 			delete_transient( $cache_key . '_' . $index );
-			$index++;
+			++$index;
 		}
 	}
 
 	/**
-	 * Adds GB custom query variables.
+	 * Get the expiration timestamp of a patterns cache from its manifest.
+	 *
+	 * Unlike reading the `_transient_timeout_` option directly, this works
+	 * on hosts where transients live in an external object cache.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param string $cache_key The base cache key.
+	 * @return int The Unix timestamp the cache expires at, or 0 if no cache.
+	 */
+	public static function get_cache_expiration( $cache_key = '' ) {
+		if ( ! $cache_key ) {
+			return 0;
+		}
+
+		$manifest = self::get_cache_manifest( $cache_key );
+
+		if ( false === $manifest || empty( $manifest['expires'] ) || ! is_numeric( $manifest['expires'] ) ) {
+			return 0;
+		}
+
+		return (int) $manifest['expires'];
+	}
+
+	/**
+	 * Read and validate the chunk manifest for a patterns cache.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param string $cache_key The base cache key.
+	 * @return array|false The manifest with `gen` and `count`, or false if missing or invalid.
+	 */
+	private static function get_cache_manifest( $cache_key ) {
+		$manifest = get_transient( $cache_key );
+
+		if (
+			! is_array( $manifest ) ||
+			empty( $manifest['gen'] ) ||
+			! is_scalar( $manifest['gen'] ) ||
+			! isset( $manifest['count'] ) ||
+			! is_numeric( $manifest['count'] )
+		) {
+			return false;
+		}
+
+		$manifest['gen']   = (string) $manifest['gen'];
+		$manifest['count'] = (int) $manifest['count'];
+
+		if ( $manifest['count'] < 0 ) {
+			return false;
+		}
+
+		return $manifest;
+	}
+
+	/**
+	 * Build the transient key for a single patterns chunk.
+	 *
+	 * Keys are stable across rebuilds — the write's generation lives inside
+	 * the chunk value, not the key — and the cache key is hashed so chunk
+	 * keys stay a fixed length regardless of the library ID, inside
+	 * WordPress's 172-character transient name budget for database-stored
+	 * transients.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param string $cache_key The base cache key.
+	 * @param int    $index The chunk index.
+	 * @return string
+	 */
+	private static function get_chunk_key( $cache_key, $index ) {
+		return 'gb_library_chunk_' . md5( $cache_key ) . '_' . $index;
+	}
+
+	/**
+	 * Previously added the pattern preview query variable.
+	 *
+	 * @deprecated 2.5.0 Pattern previews are built in the editor and no longer use a frontend route.
 	 *
 	 * @param array $vars The variables.
 	 *
 	 * @return array
 	 */
 	public function add_query_vars( array $vars ): array {
-		$vars[] = 'gb-template-viewer';
 		return $vars;
 	}
 
 	/**
-	 * Adds GB custom rewrite endpoints.
+	 * Previously added the pattern preview rewrite endpoint.
+	 *
+	 * @deprecated 2.5.0 Pattern previews are built in the editor and no longer use a frontend route.
 	 *
 	 * @return void
 	 */
-	public function rewrite_endpoints(): void {
-		add_rewrite_endpoint( 'gb-template-viewer', EP_ROOT );
-	}
+	public function rewrite_endpoints(): void {}
 
 	/**
-	 * Register the template viewer template.
+	 * Previously loaded the pattern preview template.
+	 *
+	 * @deprecated 2.5.0 Pattern previews are built in the editor and no longer use a frontend route.
 	 *
 	 * @param string $template The current template.
 	 *
 	 * @return string
 	 */
 	public function template_viewer( string $template ): string {
-		$template_viewer = get_query_var( 'gb-template-viewer', false );
-
-		if ( false !== $template_viewer ) {
-			// Match the WordPress 7.1 editor's isolation policy so the parent can access this document.
-			if ( 'isolated' === $template_viewer && function_exists( 'wp_start_cross_origin_isolation_output_buffer' ) ) {
-				wp_start_cross_origin_isolation_output_buffer();
-			}
-
-			return GENERATEBLOCKS_DIR . 'includes/pattern-library/templates/gb-template-viewer.php';
-		}
-
 		return $template;
 	}
 
 	/**
-	 * Hide the admin bar if we are on the template viewer.
+	 * Previously hid the admin bar in the pattern preview template.
+	 *
+	 * @deprecated 2.5.0 Pattern previews are built in the editor and no longer use a frontend route.
 	 *
 	 * @param bool $show_admin_bar Whether to show the admin bar.
 	 * @return bool
 	 */
 	public function hide_admin_bar( $show_admin_bar ) {
-		if ( ! isset( $GLOBALS['wp_query'] ) ) {
-			return $show_admin_bar;
-		}
-
-		if ( false !== get_query_var( 'gb-template-viewer', false ) ) {
-			$show_admin_bar = false;
-		}
-
 		return $show_admin_bar;
 	}
 }

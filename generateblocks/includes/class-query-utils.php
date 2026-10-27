@@ -37,7 +37,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'get_wp_query' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
 			]
@@ -49,7 +49,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'get_user_query' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
 			]
@@ -109,7 +109,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 
 		// Filter sensitive data from user objects while maintaining structure.
 		$users = array_map(
-			function( $user ) use ( $can_manage_options, $can_list_users ) {
+			function ( $user ) use ( $can_manage_options, $can_list_users ) {
 				// Always remove critical security fields.
 				unset( $user->data->user_pass );
 				unset( $user->data->user_activation_key );
@@ -155,6 +155,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 		$args           = is_array( $args ) ? $args : [];
 		$page           = $args['paged'] ?? $request->get_param( 'page' ) ?? 1;
 		$page           = is_scalar( $page ) ? (int) $page : 1;
+		$page           = max( 1, $page );
 		$attributes     = $request->get_param( 'attributes' ) ?? [];
 		$current_post   = $request->get_param( 'postId' ) ?? null;
 		$current_author = $request->get_param( 'authorId' ) ?? null;
@@ -185,6 +186,20 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 			]
 		);
 
+		$posts_cap      = generateblocks_get_query_loop_editor_posts_cap();
+		$posts_per_page = $args['posts_per_page'] ?? get_option( 'posts_per_page', 10 );
+
+		if (
+			! is_scalar( $posts_per_page ) ||
+			! is_numeric( $posts_per_page ) ||
+			(int) $posts_per_page < 1 ||
+			(int) $posts_per_page > $posts_cap
+		) {
+			$posts_per_page = $posts_cap;
+		}
+
+		$args['posts_per_page'] = (int) $posts_per_page;
+
 		$query = new WP_Query(
 			self::get_wp_query_args(
 				$args,
@@ -197,7 +212,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 
 		// Filter sensitive data in-place so consumers still receive the full WP_Query object.
 		$query->posts = array_map(
-			function( $post ) {
+			function ( $post ) {
 				$requires_password = ! empty( $post->post_password ) && post_password_required( $post );
 				$can_read_post     = current_user_can( 'read_post', $post->ID );
 				$can_bypass_pw     = current_user_can( 'edit_post', $post->ID ) || get_current_user_id() === (int) $post->post_author;
@@ -301,10 +316,10 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 
 		if ( is_array( $date_query ) ) {
 			$args['date_query'] = array_map(
-				function( $query ) {
+				function ( $query ) {
 					$query = array_filter(
 						$query,
-						function( $value ) {
+						function ( $value ) {
 							return ! empty( $value );
 						}
 					);
@@ -364,7 +379,7 @@ class GenerateBlocks_Query_Utils extends GenerateBlocks_Singleton {
 	 */
 	public static function normalize_tax_query_attributes( $raw_tax_query, $operator = 'IN' ) {
 		return array_map(
-			function( $tax ) use ( $operator ) {
+			function ( $tax ) use ( $operator ) {
 				return array(
 					'taxonomy' => $tax['taxonomy'],
 					'field'    => 'term_id',

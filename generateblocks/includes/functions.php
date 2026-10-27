@@ -28,7 +28,7 @@ function generateblocks_get_block_data( $content, $data = array(), $depth = 0 ) 
 		if ( ! is_object( $block ) && is_array( $block ) && isset( $block['blockName'] ) ) {
 			if ( 'generateblocks/grid' === $block['blockName'] ) {
 				$data['grid'][] = $block['attrs'];
-				$depth++;
+				++$depth;
 				$data[ 'tempGridId-' . $depth ] = $block['attrs']['uniqueId'];
 			}
 
@@ -245,6 +245,84 @@ function generateblocks_get_media_query( $type ) {
 }
 
 /**
+ * Get the at-rule presets offered by the Styles Builder.
+ *
+ * Presets only affect authoring: at-rules are saved with each style, so
+ * changing them never alters existing content. Built-in labels and icons live
+ * in the styles-builder package, which also validates and normalizes values.
+ *
+ * @since 2.5.0
+ *
+ * @return array[] Ordered list of `id`, `value` and optional `label`/`show` entries.
+ */
+function generateblocks_get_default_at_rules() {
+	$defaults = array(
+		'largeWidth'       => array( 'value' => '@media (min-width:1025px)' ),
+		'mediumLargeWidth' => array( 'value' => '@media (min-width:768px)' ),
+		'mediumWidth'      => array( 'value' => '@media (max-width:1024px) and (min-width:768px)' ),
+		'mediumSmallWidth' => array( 'value' => '@media (max-width:1024px)' ),
+		'smallWidth'       => array( 'value' => '@media (max-width:767px)' ),
+	);
+
+	/**
+	 * Filters the at-rule presets offered by the Styles Builder.
+	 *
+	 * The returned list is the preset list: its order is kept, and a built-in
+	 * that is unset is no longer offered. "All screens" is always present.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param array[] $at_rules Presets keyed by id. Each entry takes a `value`
+	 *                          ("@media (max-width:767px)"), plus an optional
+	 *                          `label` and `show` (give it a device button).
+	 */
+	$at_rules = apply_filters( 'generateblocks_default_at_rules', $defaults );
+
+	if ( ! is_array( $at_rules ) ) {
+		$at_rules = $defaults;
+	}
+
+	$presets = array();
+
+	foreach ( $at_rules as $id => $at_rule ) {
+		$id = is_int( $id ) ? 'preset-' . $id : (string) $id;
+
+		if ( 'all' === $id ) {
+			continue;
+		}
+
+		$at_rule = is_array( $at_rule ) ? $at_rule : array();
+		$value   = isset( $at_rule['value'] ) && is_string( $at_rule['value'] ) ? trim( $at_rule['value'] ) : '';
+
+		// A mistake in a built-in breakpoint shouldn't remove the device.
+		if ( '' === $value && isset( $defaults[ $id ] ) ) {
+			$value = $defaults[ $id ]['value'];
+		}
+
+		if ( '' === $value ) {
+			continue;
+		}
+
+		$preset = array(
+			'id'    => $id,
+			'value' => $value,
+		);
+
+		if ( isset( $at_rule['label'] ) && is_string( $at_rule['label'] ) ) {
+			$preset['label'] = sanitize_text_field( $at_rule['label'] );
+		}
+
+		if ( isset( $at_rule['show'] ) ) {
+			$preset['show'] = (bool) $at_rule['show'];
+		}
+
+		$presets[] = $preset;
+	}
+
+	return $presets;
+}
+
+/**
  * Build our list of Google fonts on this page.
  *
  * @since 0.1
@@ -442,7 +520,7 @@ function generateblocks_hex2rgba( $hex, $alpha ) {
 
 	$hex = str_replace( '#', '', $hex );
 
-	if ( strlen( $hex ) == 3 ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+	if ( strlen( $hex ) == 3 ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 		$r = hexdec( substr( $hex, 0, 1 ) . substr( $hex, 0, 1 ) );
 		$g = hexdec( substr( $hex, 1, 1 ) . substr( $hex, 1, 1 ) );
 		$b = hexdec( substr( $hex, 2, 1 ) . substr( $hex, 2, 1 ) );
@@ -946,7 +1024,7 @@ function generateblocks_block_has_value( $setting, $data ) {
 function generateblocks_map_array_keys( $arr = array(), $keyMap = array() ) {
 	return array_combine(
 		array_map(
-			function( $key ) use ( $keyMap ) {
+			function ( $key ) use ( $keyMap ) {
 				return isset( $keyMap[ $key ] ) ? $keyMap[ $key ] : $key;
 			},
 			array_keys( $arr )
@@ -997,9 +1075,11 @@ function generateblocks_filter_images( $content, $attributes ) {
 
 	// Add 'loading' attribute if applicable.
 	if ( wp_lazy_loading_enabled( 'img', '' ) && false === strpos( $content, ' loading=' ) ) {
+		// phpcs:disable WordPress.WP.DeprecatedFunctions -- Required for WordPress versions older than 6.3.
 		$content = function_exists( 'wp_img_tag_add_loading_optimization_attrs' )
 			? wp_img_tag_add_loading_optimization_attrs( $content, '' )
 			: wp_img_tag_add_loading_attr( $content, '' );
+		// phpcs:enable WordPress.WP.DeprecatedFunctions
 	}
 
 	return $content;
@@ -1111,7 +1191,7 @@ function generateblocks_get_parsed_css( $data ) {
 				continue;
 			}
 
-			$elements_added++;
+			++$elements_added;
 			$temporary_output .= $value;
 		}
 
@@ -1212,7 +1292,7 @@ function generateblocks_get_dynamic_css( $content = '', $store_block_id_only = f
 
 						add_filter(
 							'generateblocks_css_output',
-							function( $output ) use ( $css ) {
+							function ( $output ) use ( $css ) {
 								return $output .= wp_strip_all_tags( $css );
 							}
 						);
@@ -1250,7 +1330,7 @@ function generateblocks_get_frontend_block_css() {
 function generateblocks_add_to_css_data( $data ) {
 	add_filter(
 		'generateblocks_css_data',
-		function( $css_data ) use ( $data ) {
+		function ( $css_data ) use ( $data ) {
 			return generateblocks_group_css_data( $css_data, $data );
 		}
 	);
@@ -1296,7 +1376,7 @@ function generateblocks_maybe_add_block_css( $content = '', $data = [] ) {
 		return $content;
 	}
 
-	if ( ! GenerateBlocks_Enqueue_CSS::can_enqueue() && ! $inline_style_override ) {
+	if ( ! GenerateBlocks_Inline_CSS::can_process_block_css() && ! $inline_style_override ) {
 		return $content;
 	}
 
@@ -1316,7 +1396,7 @@ function generateblocks_maybe_add_block_css( $content = '', $data = [] ) {
 		// Add our CSS to the pool of existing CSS in wp_head.
 		add_filter(
 			'generateblocks_css_output',
-			function( $output ) use ( $css ) {
+			function ( $output ) use ( $css ) {
 				return $output .= wp_strip_all_tags( $css );
 			}
 		);
@@ -1354,7 +1434,7 @@ function generateblocks_maybe_add_legacy_block_css( $content = '', $data = [] ) 
 			return $content;
 		}
 
-		if ( ! GenerateBlocks_Enqueue_CSS::can_enqueue() && ! $inline_style_override ) {
+		if ( ! GenerateBlocks_Inline_CSS::can_process_block_css() && ! $inline_style_override ) {
 			return $content;
 		}
 
@@ -1394,10 +1474,71 @@ function generateblocks_maybe_add_legacy_block_css( $content = '', $data = [] ) 
 function generateblocks_get_global_container_width() {
 	return apply_filters(
 		'generateblocks_global_container_width',
-		function_exists( 'generate_get_option' )
+		generateblocks_use_customizer_container_width()
 			? generate_get_option( 'container_width' ) . 'px'
 			: generateblocks_get_option( 'container_width' ) . 'px'
 	);
+}
+
+/**
+ * Whether the GeneratePress Customizer supplies the built-in container width.
+ *
+ * Integrations can return false from the filter to use GenerateBlocks' saved
+ * width instead. The Settings control and rendered width share this decision.
+ * The theme option API must exist, even if a filter returns true.
+ *
+ * @since 2.5.0
+ *
+ * @return bool
+ */
+function generateblocks_use_customizer_container_width() {
+	return function_exists( 'generate_get_option' )
+		&& (bool) apply_filters( 'generateblocks_use_customizer_container_width', true );
+}
+
+/**
+ * Whether GenerateBlocks owns the global container width.
+ *
+ * Gates the Settings input and the frontend `:root` fallback declaration as
+ * one fact. An integration that manages `--gb-container-width` itself (like
+ * GenerateBlocks Pro Design Tokens) can return false to take ownership. The
+ * saved setting is never modified; returning true again restores both
+ * surfaces on the next request.
+ *
+ * @since 2.5.0
+ *
+ * @return bool
+ */
+function generateblocks_should_set_container_width() {
+	return (bool) apply_filters( 'generateblocks_should_set_container_width', true );
+}
+
+/**
+ * Whether GenerateBlocks should register and render its own Settings screen.
+ *
+ * A companion plugin that renders its own Settings screen (GenerateBlocks Pro)
+ * returns false here and registers the `generateblocks-settings` submenu page
+ * itself. GenerateBlocks then registers no menu item, enqueues no assets, and
+ * prints no header for that screen. The GenerateBlocks parent menu, the
+ * settings REST routes, and the option defaults stay in GenerateBlocks.
+ *
+ * The decision must be made before `admin_menu` runs (for example on
+ * `plugins_loaded`) and must not change during a request. Companion plugins
+ * should detect this switch with generateblocks_supports( 'settings-page-owner' ).
+ *
+ * @since 2.5.0
+ *
+ * @return bool
+ */
+function generateblocks_should_register_settings_page() {
+	/**
+	 * Filters whether GenerateBlocks registers its own Settings screen.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param bool $register True to register the screen. Default true.
+	 */
+	return (bool) apply_filters( 'generateblocks_should_register_settings_page', true );
 }
 
 /**
@@ -1465,7 +1606,7 @@ function generateblocks_add_sizing_css( $css, $settings, $device = '' ) {
 		$value = generateblocks_get_array_attribute_value( $option_name, $settings['sizing'] );
 
 		if ( 'max-width' === $property && ! empty( $settings['useGlobalMaxWidth'] ) && ! $device ) {
-			$value = generateblocks_get_global_container_width();
+			$value = 'var(--gb-container-width)';
 		}
 
 		$css->add_property( $property, $value );
@@ -1537,7 +1678,7 @@ function generateblocks_add_typography_css( $css, $settings, $device = '' ) {
  */
 function generateblocks_add_spacing_css( $css, $settings, $device = '' ) {
 	$padding_values = array_map(
-		function( $attribute ) use ( $device, $settings ) {
+		function ( $attribute ) use ( $device, $settings ) {
 			if ( isset( $settings['useInnerContainer'] ) && $settings['useInnerContainer'] ) {
 				return false;
 			}
@@ -1558,7 +1699,7 @@ function generateblocks_add_spacing_css( $css, $settings, $device = '' ) {
 	);
 
 	$margin_values = array_map(
-		function( $attribute ) use ( $device, $settings ) {
+		function ( $attribute ) use ( $device, $settings ) {
 			return generateblocks_get_array_attribute_value( $attribute . $device, $settings['spacing'] );
 		},
 		[
@@ -1584,7 +1725,7 @@ function generateblocks_add_spacing_css( $css, $settings, $device = '' ) {
  */
 function generateblocks_add_border_css( $css, $settings, $device = '' ) {
 	$border_radius_values = array_map(
-		function( $attribute ) use ( $device, $settings ) {
+		function ( $attribute ) use ( $device, $settings ) {
 			return generateblocks_get_array_attribute_value( $attribute . $device, $settings['borders'] );
 		},
 		[
@@ -1641,7 +1782,7 @@ function generateblocks_add_border_css( $css, $settings, $device = '' ) {
 
 		if ( 4 === $number_of_borders ) {
 			$all_values = array_map(
-				function( $value ) {
+				function ( $value ) {
 					return trim( implode( ' ', array_values( $value ) ) );
 				},
 				$border_values
@@ -2065,6 +2206,24 @@ function generateblocks_use_v1_blocks() {
 }
 
 /**
+ * Whether the active Pro version still needs the GenerateBlocks editor sidebar.
+ *
+ * @since 2.5.0
+ * @return bool
+ */
+function generateblocks_use_legacy_editor_sidebar() {
+	if ( ! defined( 'GENERATEBLOCKS_PRO_VERSION' ) ) {
+		return false;
+	}
+
+	if ( ! is_string( GENERATEBLOCKS_PRO_VERSION ) || '' === GENERATEBLOCKS_PRO_VERSION ) {
+		return true;
+	}
+
+	return version_compare( GENERATEBLOCKS_PRO_VERSION, '2.8.0-alpha.1', '<' );
+}
+
+/**
  * Declare which extension points this version of GenerateBlocks supports.
  *
  * Companion plugins (GenerateBlocks Pro, GenerateCloud) should call this with
@@ -2076,6 +2235,9 @@ function generateblocks_use_v1_blocks() {
  *    `<BlockInspectorControls>` wrapper, which exposes the
  *    `generateblocks.editor.inspectorControls` and
  *    `generateblocks.editor.areInspectorControlsDisabled` filters.
+ *  - 'settings-page-owner': the `generateblocks_should_register_settings_page`
+ *    filter lets a companion plugin register and render the Settings screen
+ *    itself. See generateblocks_should_register_settings_page().
  *
  * @param string $feature Feature key.
  * @return bool
@@ -2083,6 +2245,7 @@ function generateblocks_use_v1_blocks() {
 function generateblocks_supports( $feature ) {
 	$features = [
 		'block-inspector-slot' => true,
+		'settings-page-owner'  => true,
 	];
 
 	/**
@@ -2268,7 +2431,7 @@ function generateblocks_with_escaped_attributes( $content, $args = [] ) {
 			$updated = true;
 		}
 
-		$tags_processed++;
+		++$tags_processed;
 	}
 
 	if ( $updated ) {
@@ -2315,7 +2478,7 @@ function generateblocks_get_acf_option_field_keys() {
 
 	$options = array_filter(
 		$acf_options,
-		function( $key ) {
+		function ( $key ) {
 			// Only allow string keys that don't start with underscore.
 			return is_string( $key ) && strpos( $key, '_' ) !== 0;
 		},
@@ -2323,4 +2486,22 @@ function generateblocks_get_acf_option_field_keys() {
 	);
 
 	return array_keys( $options );
+}
+
+/**
+ * Get the maximum number of Query Loop posts rendered in the editor.
+ *
+ * @since 2.5.0
+ *
+ * @return int The editor query post cap.
+ */
+function generateblocks_get_query_loop_editor_posts_cap() {
+	$default = 50;
+	$cap     = apply_filters( 'generateblocks_query_loop_editor_posts_cap', $default );
+
+	if ( ! is_scalar( $cap ) || ! is_numeric( $cap ) || (int) $cap < 1 ) {
+		return $default;
+	}
+
+	return (int) $cap;
 }

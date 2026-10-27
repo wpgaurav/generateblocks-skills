@@ -62,11 +62,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * class_exists( 'GenerateBlocks_Save_Gate' ) check — there is no registration
  * action to miss. Re-registering an id replaces that rule.
  *
- * CONTRACT: the gate is a convenience/authoring layer, not a security boundary
- * on its own. Saves can predate a rule or arrive with the gate disabled by
- * filter, so every rule needs its own authoritative guard at output time (the
- * dynamic-data rule's is the render-time taint in
- * GenerateBlocks_Dynamic_Tag_Security; a kses-stripped field's is kses itself).
+ * CONTRACT: the gate is normally a convenience/authoring layer, not a security
+ * boundary on its own. Saves can predate a rule or arrive with the gate disabled
+ * by filter, so rules need an authoritative guard at output time (the dynamic-data
+ * rule's is normally the render-time taint in GenerateBlocks_Dynamic_Tag_Security;
+ * a kses-stripped field's is kses itself). The documented exceptions are render
+ * paths that do not expose source ownership: legacy v1 dynamic-background CSS and
+ * Core's direct wp_template/wp_template_part `do_blocks()` pipelines. This gate is
+ * the authoritative authoring control for those paths. Disabling a rule's
+ * enforcement also opts out of any protection it owns.
  *
  * @since 2.4.0
  */
@@ -244,7 +248,7 @@ class GenerateBlocks_Save_Gate extends GenerateBlocks_Singleton {
 		$blocking_rule = $this->get_blocking_rule(
 			$content,
 			self::build_context( $post_id, $post_type ),
-			static function() use ( $content, $post_id, $new_status, $new_password, $new_parent, $new_type ) {
+			static function () use ( $content, $post_id, $new_status, $new_password, $new_parent, $new_type ) {
 				return self::is_no_new_exposure_save( $content, $post_id, $new_status, $new_password, $new_parent, $new_type );
 			}
 		);
@@ -301,7 +305,7 @@ class GenerateBlocks_Save_Gate extends GenerateBlocks_Singleton {
 		$blocking_rule = $this->get_blocking_rule(
 			$content,
 			self::build_context( $post_id, $post_type ),
-			static function() use ( $content, $post_id ) {
+			static function () use ( $content, $post_id ) {
 				// A byte-identical autosave persists nothing new, and an autosave can never
 				// change the parent row's status or password, so no exposure check is needed.
 				// Template autosaves resolve no numeric parent (post_id 0) and stay blocked.
@@ -367,7 +371,7 @@ class GenerateBlocks_Save_Gate extends GenerateBlocks_Singleton {
 			// A byte-identical autosave persists nothing new, and an autosave never changes
 			// the parent row's status or password, so no exposure check applies. Compare
 			// against the PARENT's stored content ($post_id is the parent here).
-			$is_generically_exempt = static function() use ( $content, $post_id ) {
+			$is_generically_exempt = static function () use ( $content, $post_id ) {
 				return self::content_matches_stored( $content, $post_id );
 			};
 		} else {
@@ -381,7 +385,7 @@ class GenerateBlocks_Save_Gate extends GenerateBlocks_Singleton {
 			// trash request that also rewrites the content fails the byte match and stays
 			// gated, as does any transition toward publish/future, a password removal, a
 			// parent change, or a post-type change.
-			$is_generically_exempt = static function() use ( $content, $post_id, $new_status, $new_password, $new_parent, $new_type ) {
+			$is_generically_exempt = static function () use ( $content, $post_id, $new_status, $new_password, $new_parent, $new_type ) {
 				return self::is_no_new_exposure_save( $content, $post_id, $new_status, $new_password, $new_parent, $new_type );
 			};
 		}
@@ -393,8 +397,20 @@ class GenerateBlocks_Save_Gate extends GenerateBlocks_Singleton {
 		);
 
 		if ( $blocking_rule ) {
+			$message = self::get_rule_message( $blocking_rule );
+			$is_ajax_request = function_exists( 'wp_doing_ajax' ) && wp_doing_ajax();
+			$uses_json_handler = ! $is_ajax_request &&
+				function_exists( 'wp_is_json_request' ) &&
+				wp_is_json_request();
+
+			// AJAX takes precedence over JSON in wp_die(). Only the JSON handler
+			// encodes this message verbatim; every other path receives escaped HTML.
+			if ( ! $uses_json_handler ) {
+				$message = esc_html( $message );
+			}
+
 			wp_die(
-				esc_html( self::get_rule_message( $blocking_rule ) ),
+				$message, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above for the HTML die path; the JSON die handler encodes verbatim.
 				'',
 				[
 					'response'  => 403,

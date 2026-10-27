@@ -85,7 +85,7 @@ class GenerateBlocks_Dynamic_CSS {
 			is_array( $value ) &&
 			! array_filter(
 				$value,
-				function( $v ) {
+				function ( $v ) {
 					return is_numeric( $v ) || $v;
 				}
 			)

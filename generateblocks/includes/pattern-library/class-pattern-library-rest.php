@@ -39,7 +39,7 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'list_libraries' ),
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return apply_filters(
 						'generateblocks_can_view_pattern_library',
 						$this->edit_posts_permission()
@@ -64,7 +64,7 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'list_categories' ),
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return apply_filters(
 						'generateblocks_can_view_pattern_library',
 						$this->edit_posts_permission()
@@ -79,7 +79,7 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'list_patterns' ),
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return apply_filters(
 						'generateblocks_can_view_pattern_library',
 						$this->edit_posts_permission()
@@ -94,7 +94,7 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 			array(
 				'methods'             => WP_REST_Server::READABLE,
 				'callback'            => array( $this, 'get_cache_data' ),
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return apply_filters(
 						'generateblocks_can_view_pattern_library',
 						$this->edit_posts_permission()
@@ -268,15 +268,26 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 		$cache = GenerateBlocks_Libraries::get_cached_data( $cache_key, $query_args, $collection );
 
 		if ( false !== $cache ) {
-			return $this->success( $cache );
+			return $this->success( $this->prepare_preview_assets( $cache, $library, $collection ) );
+		}
+
+		$headers = array(
+			'X-GB-Public-Key' => $library->public_key,
+		);
+
+		// Tell the provider which plugin versions will use the response.
+		if ( defined( 'GENERATEBLOCKS_VERSION' ) ) {
+			$headers['X-GB-Version'] = GENERATEBLOCKS_VERSION;
+		}
+
+		if ( defined( 'GENERATEBLOCKS_PRO_VERSION' ) ) {
+			$headers['X-GB-Pro-Version'] = GENERATEBLOCKS_PRO_VERSION;
 		}
 
 		$request = wp_remote_get(
 			$url,
 			array(
-				'headers' => array(
-					'X-GB-Public-Key' => $library->public_key,
-				),
+				'headers' => $headers,
 				'timeout' => 15,
 			)
 		);
@@ -307,7 +318,64 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 		// Cache our data.
 		GenerateBlocks_Libraries::set_cached_data( $data, $cache_key, $collection );
 
-		return $this->success( $data );
+		return $this->success( $this->prepare_preview_assets( $data, $library, $collection ) );
+	}
+
+	/**
+	 * Let this site replace the preview scripts and styles a library supplies.
+	 *
+	 * Runs on every response, so cached library data is never modified.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param array                      $patterns   The patterns.
+	 * @param GenerateBlocks_Library_DTO $library    The library the patterns belong to.
+	 * @param string                     $collection The collection type.
+	 *
+	 * @return array
+	 */
+	private function prepare_preview_assets( array $patterns, GenerateBlocks_Library_DTO $library, string $collection ): array {
+		if ( 'patterns' !== $collection ) {
+			return $patterns;
+		}
+
+		foreach ( $patterns as $key => $pattern ) {
+			if ( ! is_array( $pattern ) ) {
+				continue;
+			}
+
+			$assets = [
+				'scripts' => is_array( $pattern['scripts'] ?? null ) ? $pattern['scripts'] : [],
+				'styles'  => is_array( $pattern['styles'] ?? null ) ? $pattern['styles'] : [],
+			];
+
+			/**
+			 * Filter the scripts and styles a pattern preview loads.
+			 *
+			 * Libraries supply these URLs from their own site. Plugins that
+			 * provide the pattern's blocks on this site can return their own
+			 * asset URLs so previews don't load them from the library.
+			 *
+			 * @since 2.5.0
+			 *
+			 * @param array                      $assets  The `scripts` and `styles` URL arrays.
+			 * @param array                      $pattern The pattern data from the library.
+			 * @param GenerateBlocks_Library_DTO $library The library the pattern belongs to.
+			 */
+			$filtered_assets = apply_filters( 'generateblocks_pattern_library_preview_assets', $assets, $pattern, $library );
+
+			if ( ! is_array( $filtered_assets ) ) {
+				continue;
+			}
+
+			foreach ( [ 'scripts', 'styles' ] as $type ) {
+				if ( isset( $filtered_assets[ $type ] ) && is_array( $filtered_assets[ $type ] ) ) {
+					$patterns[ $key ][ $type ] = array_values( array_filter( $filtered_assets[ $type ], 'is_string' ) );
+				}
+			}
+		}
+
+		return $patterns;
 	}
 
 	/**
@@ -328,7 +396,13 @@ class GenerateBlocks_Pattern_Library_Rest extends GenerateBlocks_Singleton {
 			return $this->error( 404, __( 'Library not found.', 'generateblocks' ) );
 		}
 
-		$expiration_time = get_option( '_transient_timeout_' . $id . '-patterns_0' );
+		$expiration_time = GenerateBlocks_Libraries::get_cache_expiration( $id . '-patterns' );
+
+		if ( ! $expiration_time ) {
+			// Pre-manifest caches stored the expiry in per-chunk timeout
+			// options, which only exist for database-stored transients.
+			$expiration_time = (int) get_option( '_transient_timeout_' . $id . '-patterns_0' );
+		}
 
 		if ( ! $expiration_time ) {
 			return $this->failed( 'no_cache' );

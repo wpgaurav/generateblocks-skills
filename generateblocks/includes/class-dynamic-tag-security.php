@@ -25,7 +25,8 @@ if ( ! class_exists( 'GenerateBlocks_Save_Gate' ) ) {
  *    clears a taint meta recording whether the content was last changed by a user
  *    who may not author dynamic data. At render time, any tainted frame suppresses
  *    dynamic tags for the whole descendant render tree. This layer is the security
- *    boundary and must hold entirely on its own — it never assumes the save gate ran.
+ *    boundary and must hold entirely on its own, except for the unframed render
+ *    paths documented below.
  *
  * 2. Save gate (convenience/fallback). Blocks restricted users from persisting
  *    dynamic-data markers in the first place, so a live page's tags are never
@@ -38,13 +39,32 @@ if ( ! class_exists( 'GenerateBlocks_Save_Gate' ) ) {
  *    public save-gate methods. The gate's contract: a restricted user never
  *    persists NEW marker content, and never INCREASES the exposure of existing
  *    marker content (see the no-new-exposure exemption documented on the gate).
+ *
+ * KNOWN UNFRAMED RENDER PATHS:
+ *
+ * Legacy v1 dynamic-background CSS:
+ * The pre-render CSS collector runs before `the_content` and flattens the host
+ * post, reusable blocks, widgets, and integration-owned content into one attribute
+ * pool. The original content source is therefore unavailable when a legacy dynamic
+ * background URL resolves. For this one path, the save gate is the authoritative
+ * authoring control. Inferring ownership from the global post would incorrectly
+ * suppress trusted widget, Element, template, and Global Style CSS on a tainted
+ * host. Sites that disable `generateblocks_enforce_dynamic_data_save_gate` also
+ * opt out of this legacy-path protection. Output-time taint for this path requires
+ * a future source-aware CSS collector; do not add a host-wide source fallback.
+ *
+ * Core block templates and template parts:
+ * Core renders these sources through `do_blocks()` without a balanced hook that
+ * carries the owning wp_template/wp_template_part post ID. Their saves still pass
+ * through the gate. Do not infer ownership from the queried post: that would make
+ * trusted site headers and footers inherit an Author post's taint. Renderers we
+ * control should use render_with_content_source() around their existing render call.
  */
 class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 	const UNTRUSTED_DYNAMIC_CONTENT_META_KEY = '_generateblocks_untrusted_dynamic_content';
 
-	// Written by GenerateBlocks_Enqueue_CSS::post_update_option(); also used by
-	// the event-handler dynamic-tag gate to know which GB version last saved a post.
-	const SAVED_VERSION_META_KEY = '_generateblocks_dynamic_css_version';
+	// Compatibility alias for the content-provenance marker's historical public name.
+	const SAVED_VERSION_META_KEY = GenerateBlocks_Content_Version::META_KEY;
 
 	// The first GB release that ships the event-handler gate. A post stamped BELOW this
 	// version was last saved by a pre-gate GB and keeps legacy on* resolution; a missing
@@ -146,7 +166,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 		GenerateBlocks_Save_Gate::get_instance()->register_rule(
 			[
 				'id'         => self::SAVE_GATE_RULE_ID,
-				'enforced'   => static function( $context ) {
+				'enforced'   => static function ( $context ) {
 					/**
 					 * Whether to enforce the dynamic-data save gate.
 					 *
@@ -158,10 +178,10 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 					return (bool) apply_filters( 'generateblocks_enforce_dynamic_data_save_gate', true, $context );
 				},
 				'user_can'   => [ __CLASS__, 'user_can_author_dynamic_data' ],
-				'applies'    => static function( $content ) {
-					return self::should_validate_content( $content );
+				'applies'    => static function ( $content ) {
+					return self::should_validate_content( $content, false );
 				},
-				'message'    => static function() {
+				'message'    => static function () {
 					return self::get_restricted_dynamic_content_message();
 				},
 				'error_code' => 'generateblocks_restricted_dynamic_content',
@@ -174,11 +194,12 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $content The post content to evaluate.
+	 * @param string $content    The post content to evaluate.
+	 * @param bool   $is_slashed Whether the content uses WordPress slashing. Default true.
 	 * @return bool True when validation should proceed.
 	 */
-	public static function should_validate_content( $content ) {
-		$content = self::normalize_serialized_content( $content );
+	public static function should_validate_content( $content, $is_slashed = true ) {
+		$content = self::normalize_serialized_content( $content, $is_slashed );
 
 		if ( '' === $content ) {
 			return false;
@@ -188,7 +209,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 		$has_dynamic_attributes = false;
 
 		if ( class_exists( 'GenerateBlocks_Dynamic_Content' ) && method_exists( 'GenerateBlocks_Dynamic_Content', 'content_has_dynamic_attribute_markers' ) ) {
-			$has_dynamic_attributes = (bool) GenerateBlocks_Dynamic_Content::content_has_dynamic_attribute_markers( $content );
+			$has_dynamic_attributes = (bool) GenerateBlocks_Dynamic_Content::content_has_dynamic_attribute_markers( $content, false );
 		}
 
 		// Legacy v1 dynamic attributes (headline/button/image/container) render dynamic content
@@ -272,7 +293,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 		return array_values(
 			array_filter(
 				$blocks,
-				function( $block_name ) {
+				function ( $block_name ) {
 					return is_string( $block_name ) && '' !== $block_name;
 				}
 			)
@@ -319,21 +340,30 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 	}
 
 	/**
-	 * Normalize serialized block content so validation sees unslashed values.
+	 * Normalize serialized block content for validation.
+	 *
+	 * Internal validation callers pass unslashed content. WordPress's slashed
+	 * wp_insert_post_data boundary is normalized once by GenerateBlocks_Save_Gate
+	 * before it reaches them. Unslashing again would corrupt valid JSON escape
+	 * sequences (for example, `\u0075seDynamicData`) before parse_blocks() can
+	 * decode them. The default preserves the existing one-argument public API.
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param mixed $content Possibly slashed content string.
+	 * @param mixed $content    Content string.
+	 * @param bool  $is_slashed Whether the content uses WordPress slashing. Default true.
 	 * @return string Normalized content string.
 	 */
-	public static function normalize_serialized_content( $content ) {
+	public static function normalize_serialized_content( $content, $is_slashed = true ) {
 		if ( ! is_string( $content ) ) {
 			return '';
 		}
 
-		$normalized = function_exists( 'wp_unslash' ) ? wp_unslash( $content ) : stripslashes( $content );
+		if ( $is_slashed ) {
+			$content = function_exists( 'wp_unslash' ) ? wp_unslash( $content ) : stripslashes( $content );
+		}
 
-		return trim( (string) $normalized );
+		return trim( $content );
 	}
 
 	/**
@@ -764,7 +794,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 			return false;
 		}
 
-		return self::should_validate_content( $post->post_content ) || self::content_embeds_reusable_blocks( $post->post_content );
+		return self::should_validate_content( $post->post_content, false ) || self::content_embeds_reusable_blocks( $post->post_content );
 	}
 
 	/**
@@ -807,7 +837,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 			return false;
 		}
 
-		return self::should_validate_content( $post->post_content );
+		return self::should_validate_content( $post->post_content, false );
 	}
 
 	/**
@@ -849,7 +879,7 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 			return;
 		}
 
-		if ( self::should_validate_content( $post->post_content ) ) {
+		if ( self::should_validate_content( $post->post_content, false ) ) {
 			$message = __( 'Dynamic data on this page is disabled because it was last saved by a user who cannot author dynamic data. Ask an administrator or another trusted user to re-save this page to restore it.', 'generateblocks' );
 		} elseif ( self::content_embeds_reusable_blocks( $post->post_content ) ) {
 			// The page's own content is static; anything disabled lives inside the
@@ -1129,6 +1159,10 @@ class GenerateBlocks_Dynamic_Tag_Security extends GenerateBlocks_Singleton {
 			if ( '' === $full_tag ) {
 				continue;
 			}
+
+			// Always strip the bare tag. A matching protocol-prefixed occurrence may
+			// add a second, longer key below, but must not hide this form elsewhere.
+			$replacements[ $full_tag ] = '';
 
 			if ( method_exists( 'GenerateBlocks_Register_Dynamic_Tag', 'maybe_prepend_protocol' ) ) {
 				$full_tag = GenerateBlocks_Register_Dynamic_Tag::maybe_prepend_protocol( $block_html, $full_tag );

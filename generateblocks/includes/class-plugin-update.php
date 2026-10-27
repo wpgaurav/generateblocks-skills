@@ -47,7 +47,7 @@ class GenerateBlocks_Plugin_Update extends GenerateBlocks_Singleton {
 			self::v_2_0_0();
 		}
 
-		// Force regenerate our static CSS files.
+		// Reset the legacy generated CSS index when changing versions.
 		update_option( 'generateblocks_dynamic_css_posts', array() );
 
 		// Last thing to do is update our version.

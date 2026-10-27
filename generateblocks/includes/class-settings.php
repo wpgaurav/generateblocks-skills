@@ -39,14 +39,20 @@ class GenerateBlocks_Settings {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
-		add_action( 'generateblocks_settings_area', array( $this, 'add_settings_container' ) );
-		add_action( 'generateblocks_settings_area', array( $this, 'add_blocks_version_settings_container' ), 100 );
+		add_action( 'admin_menu', array( $this, 'remove_parent_duplicate' ), 999 );
 	}
 
 	/**
 	 * Add our Dashboard menu item.
+	 *
+	 * A companion plugin can register and render the Settings screen instead;
+	 * see generateblocks_should_register_settings_page().
 	 */
 	public function add_menu() {
+		if ( ! generateblocks_should_register_settings_page() ) {
+			return;
+		}
+
 		$settings = add_submenu_page(
 			'generateblocks',
 			__( 'Settings', 'generateblocks' ),
@@ -57,9 +63,41 @@ class GenerateBlocks_Settings {
 			1
 		);
 
-		remove_submenu_page( 'generateblocks', 'generateblocks' );
+		// Keep released companion plugins' submenu positions unchanged.
+		$this->remove_parent_duplicate();
 
+		add_action( "admin_print_styles-$settings", array( $this, 'enqueue_styles' ) );
 		add_action( "admin_print_scripts-$settings", array( $this, 'enqueue_scripts' ) );
+	}
+
+	/**
+	 * Remove the parent menu's duplicate entry.
+	 *
+	 * WordPress inserts the parent as the first submenu entry when the first
+	 * child is added, which duplicates the Settings link. Free removes it
+	 * immediately; the late callback also covers companion-owned screens.
+	 *
+	 * @since 2.5.0
+	 */
+	public function remove_parent_duplicate() {
+		remove_submenu_page( 'generateblocks', 'generateblocks' );
+	}
+
+	/**
+	 * Enqueue the Settings screen stylesheet.
+	 *
+	 * It carries the GeneratePress design-system styles, so it is only enqueued
+	 * when GenerateBlocks renders the screen itself.
+	 *
+	 * @since 2.5.0
+	 */
+	public function enqueue_styles() {
+		wp_enqueue_style(
+			'generateblocks-settings',
+			GENERATEBLOCKS_DIR_URL . 'dist/settings.css',
+			array( 'wp-components' ),
+			GENERATEBLOCKS_VERSION
+		);
 	}
 
 	/**
@@ -67,6 +105,9 @@ class GenerateBlocks_Settings {
 	 */
 	public function enqueue_scripts() {
 		$generateblocks_deps = array( 'wp-api', 'wp-i18n', 'wp-components', 'wp-element', 'wp-api-fetch' );
+
+		$show_container_width = generateblocks_should_set_container_width();
+		$use_customizer_container_width = generateblocks_use_customizer_container_width();
 
 		$assets_file = GENERATEBLOCKS_DIR . 'dist/settings.asset.php';
 		$compiled_assets = file_exists( $assets_file )
@@ -102,21 +143,26 @@ class GenerateBlocks_Settings {
 					get_option( 'generateblocks', array() ),
 					generateblocks_get_option_defaults()
 				),
-				'gpContainerWidth' => function_exists( 'generate_get_option' ) ? generate_get_option( 'container_width' ) : false,
-				'gpContainerWidthLink' => function_exists( 'generate_get_option' ) ?
-					add_query_arg(
-						rawurlencode( 'autofocus[control]' ),
-						rawurlencode( 'generate_settings[container_width]' ),
-						wp_customize_url()
-					) :
+				'gpContainerWidth' => $use_customizer_container_width ? generate_get_option( 'container_width' ) : false,
+				'gpContainerWidthLink' => $use_customizer_container_width ?
+				add_query_arg(
+					rawurlencode( 'autofocus[control]' ),
+					rawurlencode( 'generate_settings[container_width]' ),
+					wp_customize_url()
+				) :
 					false,
+				'showContainerWidthSetting' => $show_container_width,
 				'useV1Blocks' => generateblocks_use_v1_blocks(),
+				'hasPro' => defined( 'GENERATEBLOCKS_PRO_VERSION' ),
 			)
 		);
 	}
 
 	/**
 	 * Add settings container.
+	 *
+	 * Retained for backwards compatibility. The Settings app mounts into the
+	 * container printed by settings_page() and no longer uses this hook.
 	 *
 	 * @since 1.2.0
 	 */
@@ -127,6 +173,9 @@ class GenerateBlocks_Settings {
 	/**
 	 * Add blocks version settings container.
 	 *
+	 * Retained for backwards compatibility. The block version controls are
+	 * part of the Settings app and no longer use this hook.
+	 *
 	 * @since 2.0.0
 	 */
 	public function add_blocks_version_settings_container() {
@@ -136,14 +185,21 @@ class GenerateBlocks_Settings {
 	/**
 	 * Output our Dashboard HTML.
 	 *
+	 * The Settings app renders first. Companion plugins that still print their
+	 * own controls through `generateblocks_settings_area` render below it.
+	 *
 	 * @since 0.1
 	 */
 	public function settings_page() {
 		?>
-			<div class="wrap gblocks-dashboard-wrap">
-				<div class="generateblocks-settings-area">
-					<?php do_action( 'generateblocks_settings_area' ); ?>
-				</div>
+			<div class="wrap gblocks-dashboard-wrap gblocks-settings-wrap">
+				<div id="gblocks-settings-dashboard"></div>
+
+				<?php if ( false !== has_action( 'generateblocks_settings_area' ) ) : ?>
+					<div class="generateblocks-settings-area gblocks-settings-extensions">
+						<?php do_action( 'generateblocks_settings_area' ); ?>
+					</div>
+				<?php endif; ?>
 			</div>
 		<?php
 	}

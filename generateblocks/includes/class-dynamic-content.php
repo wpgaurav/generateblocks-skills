@@ -168,7 +168,7 @@ class GenerateBlocks_Dynamic_Content {
 
 		self::$source_ids[ $unique_id ] = $source_id;
 
-		$filter_excerpt_length = function( $length ) use ( $attributes ) {
+		$filter_excerpt_length = function ( $length ) use ( $attributes ) {
 			return isset( $attributes['excerptLength'] ) ? $attributes['excerptLength'] : $length;
 		};
 
@@ -179,7 +179,7 @@ class GenerateBlocks_Dynamic_Content {
 		);
 
 		if ( isset( $attributes['useDefaultMoreLink'] ) && ! $attributes['useDefaultMoreLink'] ) {
-			$filter_more_text = function() use ( $attributes ) {
+			$filter_more_text = function () use ( $attributes ) {
 				if ( empty( $attributes['customMoreLinkText'] ) ) {
 					return ' ...';
 				}
@@ -1155,6 +1155,11 @@ class GenerateBlocks_Dynamic_Content {
 	/**
 	 * Set our dynamic background image.
 	 *
+	 * The legacy CSS prepass can call this outside a content-source frame after
+	 * combining multiple independently owned sources. Do not infer a source from
+	 * the global post here: restricted authoring is enforced by the save gate for
+	 * this path, while a host-wide taint would suppress unrelated trusted CSS.
+	 *
 	 * @param string $url Existing background image URL.
 	 * @param array  $settings Block settings.
 	 */
@@ -1198,7 +1203,7 @@ class GenerateBlocks_Dynamic_Content {
 
 			// Remove button from count if it has no dynamic content.
 			if ( ! empty( $block_attributes['dynamicContentType'] ) && ! self::get_content( $block_attributes, $block ) ) {
-				$button_count--;
+				--$button_count;
 			}
 		}
 
@@ -1234,11 +1239,12 @@ class GenerateBlocks_Dynamic_Content {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param string $content Serialized post content.
+	 * @param string $content    Serialized post content.
+	 * @param bool   $is_slashed Whether the content uses WordPress slashing. Default true.
 	 * @return bool
 	 */
-	public static function content_has_dynamic_attribute_markers( $content ) {
-		$content = GenerateBlocks_Dynamic_Tag_Security::normalize_serialized_content( $content );
+	public static function content_has_dynamic_attribute_markers( $content, $is_slashed = true ) {
+		$content = GenerateBlocks_Dynamic_Tag_Security::normalize_serialized_content( $content, $is_slashed );
 
 		if ( '' === $content ) {
 			return false;
@@ -1256,6 +1262,26 @@ class GenerateBlocks_Dynamic_Content {
 			if ( false !== strpos( $content, $marker ) ) {
 				return true;
 			}
+		}
+
+		/**
+		 * Candidate gate for the expensive parsed fallback below. Every positive from
+		 * blocks_have_dynamic_attribute_markers() requires at least one of these attribute
+		 * keys in some block's decoded attrs — the referenced-post-ids branch returns empty
+		 * without useDynamicData or dynamicLinkType, and the remaining branches read these
+		 * keys directly. A decoded JSON key name either appears literally in the serialized
+		 * block comment or was written with \u escapes (no other JSON escape produces
+		 * letters), so content with none of the key names and no \u sequence cannot decode
+		 * into a marker and can skip parse_blocks() entirely. Ordinary posts take this exit;
+		 * unusual escaped content merely falls through to the existing slow path.
+		 */
+		if (
+			false === strpos( $content, 'useDynamicData' ) &&
+			false === strpos( $content, 'dynamicLinkType' ) &&
+			false === strpos( $content, 'dynamicContentType' ) &&
+			false === strpos( $content, '\u' )
+		) {
+			return false;
 		}
 
 		/**

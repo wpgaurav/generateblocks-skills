@@ -43,7 +43,7 @@ class GenerateBlocks_Meta_Handler extends GenerateBlocks_Singleton {
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_post_meta_rest' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data();
 				},
 			]
@@ -55,7 +55,7 @@ class GenerateBlocks_Meta_Handler extends GenerateBlocks_Singleton {
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_user_meta_rest' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data();
 				},
 			]
@@ -67,7 +67,7 @@ class GenerateBlocks_Meta_Handler extends GenerateBlocks_Singleton {
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_term_meta_rest' ],
-				'permission_callback' => function() {
+				'permission_callback' => function () {
 					return GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data();
 				},
 			]
@@ -79,7 +79,7 @@ class GenerateBlocks_Meta_Handler extends GenerateBlocks_Singleton {
 			[
 				'methods'  => 'GET',
 				'callback' => [ $this, 'get_option_rest' ],
-				'permission_callback' => function( $request ) {
+				'permission_callback' => function ( $request ) {
 					if ( ! GenerateBlocks_Dynamic_Tag_Security::user_can_author_dynamic_data() ) {
 						return false;
 					}
@@ -134,7 +134,6 @@ class GenerateBlocks_Meta_Handler extends GenerateBlocks_Singleton {
 				},
 			]
 		);
-
 	}
 
 	/**

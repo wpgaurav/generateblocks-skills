@@ -36,6 +36,10 @@ class GenerateBlocks_Register_Dynamic_Tag {
 			$args['type'] = 'post';
 		}
 
+		if ( ! isset( $args['supports'] ) || ! is_array( $args['supports'] ) ) {
+			$args['supports'] = [];
+		}
+
 		self::$tags[ $args['tag'] ] = $args;
 	}
 
@@ -90,7 +94,7 @@ class GenerateBlocks_Register_Dynamic_Tag {
 	 */
 	public static function find_matches( $content, $availableTags ) {
 		$tag_names = array_map(
-			function( $tag_name ) {
+			function ( $tag_name ) {
 				return preg_quote( $tag_name, '/' );
 			},
 			array_keys( $availableTags )

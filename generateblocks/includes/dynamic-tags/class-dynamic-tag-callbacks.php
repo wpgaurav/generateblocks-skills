@@ -642,7 +642,7 @@ class GenerateBlocks_Dynamic_Tag_Callbacks extends GenerateBlocks_Singleton {
 		$read_more             = $options['readMore'] ?? '';
 		$pre_read_more         = $options['pre'] ?? '';
 		$use_theme_read_more   = isset( $options['useTheme'] ) ? true : false;
-		$filter_excerpt_length = function( $length ) use ( $options ) {
+		$filter_excerpt_length = function ( $length ) use ( $options ) {
 			return $options['length'] ?? $length;
 		};
 
@@ -653,7 +653,7 @@ class GenerateBlocks_Dynamic_Tag_Callbacks extends GenerateBlocks_Singleton {
 		);
 
 		if ( ! $use_theme_read_more ) {
-			$filter_more_text = function() use ( $read_more, $pre_read_more ) {
+			$filter_more_text = function () use ( $read_more, $pre_read_more ) {
 				if ( ! $read_more ) {
 					return $pre_read_more;
 				}

@@ -5,7 +5,7 @@
  * Description: A small collection of lightweight WordPress blocks that can accomplish nearly anything.
  * Author: Tom Usborne
  * Author URI: https://tomusborne.com
- * Version: 2.4.1
+ * Version: 2.5.0
  * Requires at least: 6.7
  * Requires PHP: 7.2
  * License: GPL2+
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define( 'GENERATEBLOCKS_VERSION', '2.4.1' );
+define( 'GENERATEBLOCKS_VERSION', '2.5.0' );
 define( 'GENERATEBLOCKS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GENERATEBLOCKS_DIR_URL', plugin_dir_url( __FILE__ ) );
 
@@ -35,6 +35,8 @@ require_once GENERATEBLOCKS_DIR . 'includes/utils/class-dto.php';
 
 // General.
 require_once GENERATEBLOCKS_DIR . 'includes/class-do-css.php';
+require_once GENERATEBLOCKS_DIR . 'includes/class-content-version.php';
+require_once GENERATEBLOCKS_DIR . 'includes/class-inline-css.php';
 require_once GENERATEBLOCKS_DIR . 'includes/class-enqueue-css.php';
 require_once GENERATEBLOCKS_DIR . 'includes/dashboard.php';
 require_once GENERATEBLOCKS_DIR . 'includes/class-settings.php';

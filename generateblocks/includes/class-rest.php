@@ -90,17 +90,6 @@ class GenerateBlocks_Rest extends WP_REST_Controller {
 			)
 		);
 
-		// Regenerate CSS Files.
-		register_rest_route(
-			$namespace,
-			'/regenerate_css_files/',
-			array(
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => array( $this, 'regenerate_css_files' ),
-				'permission_callback' => array( $this, 'update_settings_permission' ),
-			)
-		);
-
 		register_rest_route(
 			$namespace,
 			'/onboarding/',
@@ -143,14 +132,13 @@ class GenerateBlocks_Rest extends WP_REST_Controller {
 			'generateblocks_option_sanitize_callbacks',
 			array(
 				'container_width'          => 'absint',
-				'css_print_method'         => 'sanitize_text_field',
 				'sync_responsive_previews' => 'rest_sanitize_boolean',
 				'disable_google_fonts'     => 'rest_sanitize_boolean',
 				'gb_use_v1_blocks'         => 'rest_sanitize_boolean',
 			)
 		);
 
-		$callback = $callbacks[ $name ];
+		$callback = $callbacks[ $name ] ?? null;
 
 		if ( ! is_callable( $callback ) ) {
 			return sanitize_text_field( $value );
@@ -220,19 +208,6 @@ class GenerateBlocks_Rest extends WP_REST_Controller {
 		}
 
 		return $this->success( __( 'Settings saved.', 'generateblocks' ) );
-	}
-
-	/**
-	 * Regenerate CSS Files.
-	 *
-	 * @param WP_REST_Request $request  request object.
-	 *
-	 * @return mixed
-	 */
-	public function regenerate_css_files( WP_REST_Request $request ) {
-		update_option( 'generateblocks_dynamic_css_posts', array() );
-
-		return $this->success( __( 'CSS files regenerated.', 'generateblocks' ) );
 	}
 
 	/**

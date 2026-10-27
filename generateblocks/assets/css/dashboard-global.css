@@ -1,22 +1,38 @@
 @font-face {
-  font-family: 'generateblocks';
-  src:  url('../fonts/generateblocks.eot');
-  src:  url('../fonts/generateblocks.eot#iefix') format('embedded-opentype'),
-    url('../fonts/generateblocks.ttf') format('truetype'),
-    url('../fonts/generateblocks.woff') format('woff'),
-    url('../fonts/generateblocks.svg') format('svg');
-  font-weight: normal;
-  font-style: normal;
-  font-display: block;
-}
-
-#adminmenu #toplevel_page_generateblocks div.wp-menu-image:before {
-	content: "\e900";
 	font-family: generateblocks;
-	font-size: 18px;
-	margin-top: 1px;
+	src: url(../fonts/generateblocks.eot);
+	src:
+		url(../fonts/generateblocks.eot#iefix) format("embedded-opentype"),
+		url(../fonts/generateblocks.ttf) format("truetype"),
+		url(../fonts/generateblocks.woff) format("woff"),
+		url(../fonts/generateblocks.svg) format("svg");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
 }
 
+@font-face {
+	font-family: generatepress-admin;
+	src: url(../fonts/generatepress-admin.woff2) format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
+
+/* Share Dashicons' generic icon code point for a failed-font fallback. */
+/* stylelint-disable-next-line selector-id-pattern -- Core-owned IDs. */
+body #adminmenu #toplevel_page_generateblocks.menu-top div.wp-menu-image::before {
+	content: "\f111";
+	background-color: transparent;
+	-webkit-mask-image: none;
+	mask-image: none;
+	font-family: generatepress-admin, dashicons, sans-serif;
+	font-size: 18px;
+	line-height: 20px;
+	margin-top: 0;
+}
+
+/* stylelint-disable-next-line selector-id-pattern -- Core-owned IDs. */
 #adminmenu #toplevel_page_generateblocks a[href="admin.php?page=generateblocks-upgrade"] {
 	font-weight: 600;
 	background-color: #0171d5;
@@ -25,6 +41,6 @@
 	display: block;
 	text-align: center;
 	border-radius: 3px;
-	transition: all .3s;
+	transition: all 0.3s;
 	box-shadow: 0 0 0;
 }

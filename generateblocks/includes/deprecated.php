@@ -10,6 +10,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Return the only supported local CSS output mode.
+ *
+ * This callback is no longer registered because the corresponding filter is
+ * not part of inline-only output. It remains callable for compatibility.
+ *
+ * @since 1.0
+ * @deprecated 2.5.0 Local block CSS is always inline.
+ *
+ * @param string $method Former CSS output method.
+ * @return string Always `inline`.
+ */
+function generateblocks_set_css_print_method( $method ) {
+	unset( $method );
+
+	return 'inline';
+}
+
+/**
  * Redirect to the Dashboard page on single plugin activation.
  *
  * @since 0.1
@@ -59,7 +77,7 @@ function generateblocks_admin_head_scripts() {
 
 	$permission_object = wp_json_encode( $permissions );
 
-	echo sprintf(
+	printf(
 		'<script>
 				const gbPermissions = %s;
 				Object.freeze( gbPermissions );
