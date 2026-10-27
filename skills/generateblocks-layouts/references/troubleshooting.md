@@ -187,6 +187,35 @@ After generating all chunks, combine in order with proper nesting.
 .gb-shape-icon1{...}
 ```
 
+### Editor layout differs from the frontend
+
+GB compiles block CSS for the editor as `.editor-styles-wrapper .gb-element-x`
+(specificity 0,2,0). A theme or plugin editor stylesheet that targets every
+`.wp-block` with more specificity beats it there and nowhere else, because
+frontend markup has no `.wp-block` class. Typical symptom: sections stretch full
+width and headings sit hard left in the editor while the frontend is centered.
+
+1. In the editor canvas iframe (`iframe[name=editor-canvas]`), compare the
+   block's computed `max-width`/`margin` with the frontend, and list every rule
+   that matches it (`el.matches(rule.selectorText)` across
+   `document.styleSheets`).
+2. Prefer fixing the source rule: scope a full-width-template rule to top-level
+   blocks, e.g. `.is-root-container > .wp-block`, rather than every nested block.
+3. When the theme can't change, add a guard on the layout's root element that
+   ties the theme's specificity and loads later, and pass each block's own value
+   through a custom property, for example
+   `'& .wp-block[data-type]': {'maxWidth': 'var(--mw, none)'}` plus
+   `'--mw': '<same value as maxWidth>'` on every block or branch that sets
+   `maxWidth`. Custom properties inherit, so give a wider breakout child
+   (such as a table inside a reading-width column) its own `--mw`, and never
+   set `--mw` from a branch whose value already reads `var(--mw…)`; a
+   self-reference makes every block's max-width `none`.
+
+Expected editor differences, not bugs: Pro Conditions are evaluated only at
+render time, so the editor shows every conditional variant at once; and
+`htmlAttributes.id` is not printed on the editor wrapper (find blocks by class
+or text there).
+
 ### Hover Not Working
 
 1. Put the transition in base `styles` and the state under `&:hover` or

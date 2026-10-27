@@ -3,7 +3,7 @@
 Notable changes to GenerateBlocks Skills. Entries describe this repository, not
 releases of the GenerateBlocks plugins themselves.
 
-## [Unreleased]
+## [2026.10.27.2] - 2026-10-27
 
 Findings from rebuilding gauravtiwari.org's Black Friday deals page in native
 GenerateBlocks with Pro conditions (GB 2.5.0 / Pro 2.8.0, WordPress 7.1.3).
@@ -30,6 +30,12 @@ GenerateBlocks with Pro conditions (GB 2.5.0 / Pro 2.8.0, WordPress 7.1.3).
   `.format` typography margins need a root reset.
 - Site Agent: what happens when Application Passwords are disabled, and the
   SSH + WP-CLI fallback for writes.
+- Editor vs frontend layout: how to diagnose theme editor CSS that overrides
+  block widths in the editor only (gauravtiwari.org's builder-template
+  `.wp-block[data-type]{max-width:1920px}`), the `--mw` guard pattern and its two
+  traps (inheritance into breakout children, self-reference), and the expected
+  differences (conditions show every variant, no `id` on editor wrappers). The
+  authoring contract now asks for an editor-vs-frontend layout comparison.
 
 ## [2026.10.27] - 2026-10-27
 

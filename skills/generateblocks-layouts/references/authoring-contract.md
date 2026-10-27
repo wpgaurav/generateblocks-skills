@@ -143,6 +143,10 @@ different delivery paths; consult `performance.md` only for delivery/cache work.
   the affected checks. Use `recovery-rules.md` for the reported symptom.
   Count blocks recursively with the native parser; preflight's displayed count
   covers only its matched attributed free blocks.
+- Compare the editor canvas with the rendered page for layout, not just validity:
+  theme editor CSS can override block widths only in the editor, and theme
+  content typography can override margins only on the frontend. Diagnosis and
+  guards: `troubleshooting.md` ("Editor layout differs from the frontend").
 - A live write additionally requires `mcp-publishing.md`: verify the exact target,
   snapshot `content.raw`, splice intended changes, write, fetch `content.raw`, and
   run `verify_roundtrip.py --local SENT --remote READBACK`. Check rendering and

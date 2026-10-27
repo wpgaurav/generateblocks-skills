@@ -399,6 +399,14 @@ Two gauravtiwari.org template traps (MD theme, verified 2026-10-27):
   {'marginBlockEnd':'var(--mbe, 0)','position':'var(--pos, relative)'}`, and give
   each block that needs a bottom margin or sticky position `--mbe`/`--pos` in its
   own `styles`.
+- **The editor caps every nested block at 1920px on full-width templates.**
+  `md-dropins/blocks/css/block-editor.php` sets
+  `.editor-styles-wrapper:is(.page-template-builder-php, …) .wp-block[data-type]
+  {max-width:1920px}` (0,4,0), so editor blocks ignore their own `max-width`
+  and appear full width and left-aligned while the frontend is correct. Root
+  fix: scope it to `.is-root-container > .wp-block`. Layout-level guard: the
+  `--mw` pattern in `troubleshooting.md` ("Editor layout differs from the
+  frontend").
 
 A mixed result is normal and fine: a page can carry both legacy (no `className`,
 base-first) and Option A (with `className`, id-first) blocks. Pick the dominant
