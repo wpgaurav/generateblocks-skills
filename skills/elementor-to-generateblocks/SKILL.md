@@ -18,7 +18,7 @@ metadata:
   - elementor
   - conversion
   - migration
-  compatibility: Stable V2 guidance plus free 2.5.0-beta.1 / Pro 2.8.0-beta.1 design-system
+  compatibility: V2 guidance verified on free 2.5.0 / Pro 2.8.0 (WordPress 7.1.3); design-system
     routing
 ---
 

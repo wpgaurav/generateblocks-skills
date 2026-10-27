@@ -20,8 +20,8 @@ the layout and conversion skills. Use `_index.md` for task-specific details;
   token approval. Edge cases: `styling-scope.md`.
 - Inspect the target's actual plugin versions, block conventions, breakpoints,
   and design language. Examples are not proof of a site's current configuration.
-  The tested beta pair is free 2.5.0-beta.1 / Pro 2.8.0-beta.1 on WordPress 7.1.1;
-  the older local Pro folder is 2.7.0-rc.1 despite older documentation labels.
+  Current verification: free 2.5.0 / Pro 2.8.0 on WordPress 7.1.3. Sites on
+  free 2.4.x / Pro 2.7.x keep the older CSS-delivery and design-system limits.
 - Use the real post ID when it exists. Otherwise choose one random four-digit
   number (1000–9999) for the layout, avoiding known existing scopes. Do not create
   a WordPress record just to obtain an ID. New IDs use
@@ -104,7 +104,9 @@ transitions, hover/focus states, pseudo-elements, and responsive branches in
 Never keep a rule only in `css`. CSS Mode has no `cssMode` attribute.
 
 Use camelCase declarations, `&:hover`/`&:focus-visible` for states, and
-`& .child` for descendants. Supported structure is one selector level plus one
+`& .child` for descendants. A key without a leading `&` is always a descendant:
+bare `:hover` compiles to `.sel :hover` (any hovered child), not `.sel:hover`.
+Supported structure is one selector level plus one
 `@media`, `@supports`, or `@container` level. Distribute source declarations to
 their owning blocks; stylesheet length is not a reason to move styling outside
 GenerateBlocks. Flatten supported selectors. Omit or simplify effects requiring
@@ -116,7 +118,7 @@ Native Tablet & Mobile is `@media (max-width:1024px)`; Mobile is
 `@media (max-width:767px)`. Preserve deliberate custom boundaries. Use
 `minmax(0,1fr)` for shrinking grid tracks. Compile compact CSS but retain required
 spaces around `+`/`-` in `calc()` and `clamp()`. Advanced responsive cases route
-to `responsive.md`. In the beta native editor, `getCss()` is asynchronous.
+to `responsive.md`. In the 2.5 native editor, `getCss()` is asynchronous.
 
 Free 2.5 local CSS is inline-only. Older local modes and Pro Global Styles have
 different delivery paths; consult `performance.md` only for delivery/cache work.

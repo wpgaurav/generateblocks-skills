@@ -14,7 +14,9 @@ Read this whenever the task is "put it on the site" rather than "give me the
 markup". Everything in `recovery-rules.md` still applies — this file only adds
 what changes once a transport sits between you and `post_content`.
 
-Verified 2026-08-31 against GenerateBlocks 2.4.1 + Pro 2.7.1.
+Verified 2026-08-31 against GenerateBlocks 2.4.1 + Pro 2.7.1, and 2026-10-27
+through Site Agent 0.5.0 on a live 2.5.0 + Pro 2.8.0 / WordPress 7.1.3 site
+(§1.1).
 
 ## The one requirement for any server
 
@@ -39,11 +41,12 @@ that settles the question in one write.
 
 ## 1. Server options
 
-All four routes end at the same place: an authenticated write to
+All of these routes end at the same place: an authenticated write to
 `post_content`. They differ in blast radius, not capability.
 
 | Route | What it is | Licence / cost | Where the write happens |
 |---|---|---|---|
+| **Site Agent** | Self-hosted plugin by the author of these skills. Streamable HTTP MCP at `/wp-json/site-agent/v1/mcp`, OAuth sign-in (recommended) or an Application Password. Raw `get-content`/`save-content` with a content-hash guard, bundled builder skills (including this one), and opt-in developer tools. WP 6.9+, PHP 8.0+. | GPL-2.0-or-later | Your server |
 | **WordPress MCP Adapter** | Official WordPress package bridging the Abilities API to MCP. Exposes `mcp-adapter/discover-abilities`, `mcp-adapter/get-ability-info`, `mcp-adapter/execute-ability` at `/wp-json/mcp/mcp-adapter-default-server`. | GPL-2.0-or-later, free | Your server |
 | **Novamira** | Self-hosted plugin + MCP server. PHP execution, WP-CLI, filesystem, block editor workflows. Application Passwords or OAuth, direct client→site connection. WP 6.9+, PHP 8.0+. | AGPL-3.0-or-later, free; paid Pro adds builder expertise and project memory | Your server |
 | **WPVibe** (SeedProd LLC) | Free plugin plus a hosted MCP service. One-click authorization from wp-admin, builder "skills" including Gutenberg and SeedProd, emulated WP-CLI, approval gates for destructive operations. | Plugin free; hosted service has a free daily action allowance, paid tiers above it | Cloud service brokers the call to your site |
@@ -77,6 +80,43 @@ Practical notes:
 - Hosted brokering (WPVibe) means block markup transits a third party. That
   is a fine trade for many sites and a policy question for others. Decide it
   before the first write, not after.
+
+### 1.1 Site Agent workflow (tested)
+
+Site Agent bundles this skill's references and examples verbatim as its
+`generateblocks` skill (`get-skill`). Tool names below omit the client's
+`site-agent-` prefix.
+
+1. **Connect.** In Claude Code:
+   `claude mcp add --transport http <name> https://SITE/wp-json/site-agent/v1/mcp`,
+   then sign in when prompted; an administrator approves the client and picks
+   its tool groups. Remote sites need HTTPS. Use an Application Password only
+   for a client that cannot do OAuth; Site Agent flags those connections.
+2. **Version-gate.** Call `site-context`. Its `builders` entry reports
+   `generateblocks` with `version` and `pro_version`; pick the matching notes
+   here (2.5 inline CSS, compiler order and presets; 2.4 file mode).
+3. **Read raw.** `get-content` returns raw block markup plus `content_sha256`.
+   Snapshot both before editing.
+4. **Splice, preflight, write.** `save-content` replaces the whole content and
+   requires `expected_content_sha256` for updates, so a concurrent edit fails
+   instead of being overwritten. Creating without `post_id` makes a draft. Edits
+   to a published post are staged as your autosave unless you pass `status`.
+5. **Read back.** The `save-content` result includes the stored `content`; still
+   re-read with `get-content` (or `autosave_content: true` for a staged edit) and
+   run `verify_roundtrip.py`.
+6. **Native check.** Open the post in the block editor and confirm every block is
+   valid and the post is not dirty (the last step of §3).
+
+Verified result on gauravtiwari.org: a 59-block draft (all skill examples plus
+2.5 at-rule cases) saved byte-identical through `save-content`, reopened with 0
+invalid blocks and no dirty state, and `site-context` reported GB 2.5.0 / Pro
+2.8.0. Optional developer tools (`run-wp-cli`, `execute-php`) give read-only
+diagnostics such as `generateblocks_get_default_at_rules()`; they are full-power
+tools, so keep them off on sites where they are not needed.
+
+The connected account is the saving user for GenerateBlocks' dynamic-tag save
+gate: without `unfiltered_html` or `manage_options` it cannot add tags, and a
+post it saves stops rendering existing tags (`dynamic-tags.md` §10).
 
 ## 2. Distinguish block IDs from the write target
 

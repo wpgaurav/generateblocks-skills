@@ -36,6 +36,6 @@ does not require removing an existing shared system. Keep new styling local
 unless the user chooses otherwise.
 
 An ordinary request to build a website, convert a design, optimize CSS, or use
-the beta is not by itself an opt-in to shared styling. Read-only explanations
-and audits do not need this prompt. The beta kit is an explicit shared-system
+Pro 2.8 is not by itself an opt-in to shared styling. Read-only explanations
+and audits do not need this prompt. The design-system kit is an explicit shared-system
 example, not the default starting point for every layout.

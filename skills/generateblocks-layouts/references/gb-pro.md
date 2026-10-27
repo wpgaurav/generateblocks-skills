@@ -3,26 +3,29 @@ title: GenerateBlocks Pro overview (2.7)
 description: What Pro adds on top of free GenerateBlocks — block catalog, global classes, query extensions, conditions, forms, overlays — with pointers to the deep-dive references.
 ---
 
-# GenerateBlocks Pro (stable guidance plus 2.8 beta)
+# GenerateBlocks Pro (2.8 and earlier)
 
 Use Pro features only when the user has GB Pro installed. If unsure, default
 to free-plugin patterns and say in chat which parts would need Pro.
 
-Status note (August 2026): free 2.4.1 and Pro 2.7.1 are stable and active on
-gauravtiwari.org. Both require WordPress 6.7 or later; free requires PHP 7.2+
-and Pro requires PHP 7.4+. Recheck the target instead of assuming these
+Status note (October 2026): free 2.5.0 and Pro 2.8.0 are stable and active on
+gauravtiwari.org (WordPress 7.1.3). Both require WordPress 6.7 or later; free
+requires PHP 7.2+ and Pro requires PHP 7.4+. Recheck the target instead of assuming these
 versions. GenerateBlocks 2.3 disabled the legacy core Additional CSS field on
 GB blocks by default; Pro 2.6 added the structured CSS Editor/CSS Mode.
 
-For Pro 2.8.0-beta.1, read `design-systems-beta.md`: Design Tokens, Style Book,
+For Pro 2.8, read `design-systems-beta.md`: Design Tokens, Style Book,
 expanded selectors, categories, portable files, and verified local workflows.
-Forms, CSS Mode, overlays, carousels, and Editor Access predate this beta.
+Forms, CSS Mode, overlays, carousels, and Editor Access predate 2.8. Pro 2.8 also
+opens the Pattern Library from the editor toolbar or Options menu, adds OKLCH
+shade/opacity controls for tokens, and moves license/update checks to
+updates.generatepress.com.
 
 ## What Pro adds — map
 
 | Capability | Detail file |
 |---|---|
-| Design Tokens, Style Book, broader selectors, design-system imports — **2.8 beta** | `design-systems-beta.md` |
+| Design Tokens, Style Book, broader selectors, design-system imports — **2.8** | `design-systems-beta.md` |
 | Accordion, Tabs, Carousel, Navigation, Site Header, Overlays, Mega Menus | `pro-interactive.md` |
 | Forms (fields, validation, email/webhook/ESP integrations, Turnstile) — **2.6** | `pro-forms.md` |
 | Block/menu conditions (`gbBlockCondition` → Conditions CPT) | `conditions.md` |
@@ -124,8 +127,8 @@ editors can change content but not design.
 | 2.4 | Conditions system (blocks + menu items) |
 | 2.5 | Carousel, site logo/URL tags, grid-template controls |
 | 2.6 | Forms system + integrations, CSS Mode |
-| 2.8 beta | Design Tokens, Design workspace/Style Book, selectors/targets, categories, token-aware imports |
 | 2.7 | Editor Access + Control Sets, content-only/read-only editing (needs free 2.4); forms editing now needs `edit_others_posts` |
+| 2.8 | Design Tokens, Design workspace/Style Book, selectors/targets, categories, import/export, token-aware patterns, `generateblocks_default_at_rules` (needs free 2.5) |
 
 ## When to recommend Pro
 

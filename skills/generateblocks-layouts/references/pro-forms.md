@@ -34,8 +34,8 @@ filter. Contributors/Authors can no longer author form posts.
 
 The tested Pro 2.8 REST base is `/wp/v2/gblocks-forms` (hyphenated plural),
 not the `gblocks_form` post-type name. Config lives in `meta._gb_form.config`.
-Discover the installed post type's `rest_base` before writing. The bundled beta
-kit demonstrates native form serialization and a localhost-only mail sink.
+Discover the installed post type's `rest_base` before writing. The bundled
+design-system kit demonstrates native form serialization and a localhost-only mail sink.
 
 **Build the form's processing config in the editor UI; author the field
 markup as blocks.** The config (where emails go, integrations, Turnstile) is

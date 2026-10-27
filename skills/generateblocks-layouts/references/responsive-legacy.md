@@ -3,7 +3,7 @@
 > **LEGACY FILE — patterns here predate the hardened serialization rules.**
 > Markup examples may use old class order, unsorted CSS, and descendant
 > selectors. They also use `max-width:768px` as Mobile and often place queries
-> only in `css`; neither is the current native 2.4.1 contract. Use
+> only in `css`; neither is the current native 2.5 contract. Use
 > `responsive.md` for current patterns; treat this file as historical reference
 > only and never copy its markup directly.
 

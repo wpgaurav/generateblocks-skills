@@ -122,7 +122,9 @@ Notes verified in source:
   visitors who can't `read_private_posts`.
 - **`stickyPosts`** (GB-specific key): `"ignore"` → `ignore_sticky_posts:true`,
   `"exclude"` → merges sticky IDs into `post__not_in`, `"only"` → only sticky.
-- `posts_per_page: -1` = all posts (no pagination).
+- `posts_per_page: -1` = all posts (no pagination). On 2.5 the editor preview
+  is capped server-side at 50 posts (`generateblocks_query_loop_editor_posts_cap`);
+  the frontend still renders all posts. A short editor preview is not a bug.
 
 ## 3. Pro magic values — relationship queries
 

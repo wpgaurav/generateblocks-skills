@@ -1,9 +1,9 @@
 ---
-title: Design systems in free 2.5 and Pro 2.8 beta
+title: Design systems in free 2.5 and Pro 2.8
 description: Verified tokens, managed root saves, expanded selectors, native imports, CSS delivery, and a reusable two-brand kit.
 ---
 
-# Design systems: free 2.5 / Pro 2.8 beta
+# Design systems: free 2.5 / Pro 2.8
 
 Use this guide for Design Tokens, the Design workspace, Style Book, multi-selector
 Global Styles, or portable design-system kits. These features require Pro 2.8.
@@ -15,14 +15,21 @@ below do not make shared styling the default; ordinary builds use local styles.
 
 ## Verification boundary
 
+Status 2026-10-27: free **2.5.0** and Pro **2.8.0** are final releases. The stored
+identifiers this guide relies on (`gb_style_css`, `gb_style_tokens`,
+`gb_style_targets`, `gb_style_targets_css`, `gb_base_checksum`,
+`generateblocks_global_css_print_method`, `cssToStyles`) all exist in the 2.8.0
+source, and the native compiler and serializer were re-verified on a live 2.5.0 /
+2.8.0 editor. The token and Style Book workflows below were exercised on the
+beta pair; re-run them on a staging site before a production design-system import.
+
 Tested locally on 2026-09-18 with WordPress **7.1.1**, PHP **8.4**, GenerateBlocks
 **2.5.0-beta.1**, and Pro **2.8.0-beta.1**. Both test sites used the minimal canvas
 theme in `../examples/beta-design-system/`. This is not a production upgrade or
 a compatibility claim for every theme, plugin, role, or beta.
 
-The local reference folder `generateblocks-pro/` reports **2.7.0-rc.1**, although
-older repo prose called it 2.7.1. The earlier live 2.7.1 observation is a separate
-historical record. Never infer a package version from its folder or stable tag.
+The local reference folder `generateblocks-pro/` now holds **2.8.0** final.
+Never infer a package version from its folder or stable tag.
 
 Bundled schema comparison: 9 free schemas unchanged; 27 Pro schemas unchanged
 except `form-render.editorStyle`. Editor and PHP changes still require runtime

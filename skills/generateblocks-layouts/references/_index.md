@@ -36,6 +36,7 @@ layout. Examples never authorize shared styles, tokens, or publication.
 | Recovery or preflight failure | Matching topic in `recovery-rules.md`; `troubleshooting.md` if unresolved |
 | Target convention inspection or bulk conversion diagnostics | Relevant section of `field-notes.md` |
 
-The stable references record earlier free 2.4.1/Pro 2.7.1 observations. The beta
-workflow was tested with free 2.5.0-beta.1/Pro 2.8.0-beta.1 on WordPress 7.1.1.
+Current references are verified on free 2.5.0/Pro 2.8.0 (WordPress 7.1.3, live
+native editor, 2026-10-27). Notes labeled 2.4.1/Pro 2.7.x describe older sites;
+the design-system workflow was first tested on the 2.5.0-beta.1/2.8.0-beta.1 pair.
 Verify the target instead of treating those observations as its installed state.

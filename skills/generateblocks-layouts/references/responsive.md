@@ -13,8 +13,9 @@ Read `css-mode.md` with this file when editing CSS directly.
 
 ## Installed Query Contract
 
-GenerateBlocks 2.4.1 registers 5 native media queries through
-`generateblocks_get_media_queries()`:
+GenerateBlocks 2.5.0 (unchanged from 2.4.1) offers 5 native media queries.
+In 2.5 the Styles Builder presets come from `generateblocks_get_default_at_rules()`;
+2.4.1 used `generateblocks_get_media_queries()`:
 
 | Editor label | Styles key | Intended range |
 |---|---|---|
@@ -25,6 +26,38 @@ GenerateBlocks 2.4.1 registers 5 native media queries through
 | Mobile | `@media (max-width:767px)` | 767px and narrower |
 
 The default Mobile query is `767px`, not `768px`.
+
+### 2.5: site-defined presets
+
+Free 2.5 / Pro 2.8 add the `generateblocks_default_at_rules` PHP filter. It
+returns the preset list itself: order is kept, an unset built-in is no longer
+offered, and "All screens" is always present. Each entry takes `value`, an
+optional `label`, and `show` (gives it a device button):
+
+```php
+add_filter( 'generateblocks_default_at_rules', function ( $presets ) {
+    $presets['wideWidth'] = array(
+        'value' => '@media (min-width:1440px)',
+        'label' => 'Wide',
+        'show'  => true,
+    );
+    return $presets;
+} );
+```
+
+Before authoring for a 2.5 site, read the active list instead of assuming the
+five defaults, for example over WP-CLI or a site agent:
+`wp eval 'echo wp_json_encode( generateblocks_get_default_at_rules() );'`.
+Custom presets are ordinary `@media` keys in `styles`; nothing new is stored in
+block markup. The filter is site code, so add one only on explicit request.
+
+### 2.5: compiled order is fixed
+
+The compiler emits `@supports`/`@container` blocks first (authored order), then
+every `@media` block merged by query and sorted mobile-first: other queries,
+`min-width` ascending, `max-width` descending, `print` last. Authoring order of
+`@media` keys does not change the output. `field-notes.md` §6 has the full
+algorithm; `build_css()` reproduces it.
 
 GenerateBlocks Pro can register custom `@media` and `@container` queries. A
 site can therefore have a valid custom `@media (max-width:768px)` rule alongside

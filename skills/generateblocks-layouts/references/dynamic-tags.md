@@ -1,12 +1,13 @@
 ---
 title: Dynamic Tags (canonical catalog)
-description: Every dynamic tag in GenerateBlocks free 2.4 + Pro 2.7 with exact source-verified syntax, options, and usage in block markup. Replaces all older tag documentation.
+description: Every dynamic tag in GenerateBlocks free 2.4/2.5 + Pro 2.7/2.8 with exact source-verified syntax, options, and usage in block markup. Replaces all older tag documentation.
 ---
 
 # Dynamic Tags — Canonical Reference
 
 Source-verified against GenerateBlocks 2.4.0 (`includes/dynamic-tags/`) and
-GB Pro 2.7.0 (`includes/extend/dynamic-tags/`); matches the official docs at
+GB Pro 2.7.0 (`includes/extend/dynamic-tags/`), re-checked on free 2.5.0 / Pro
+2.8.0: tag grammar, names and options are unchanged; matches the official docs at
 learn.generatepress.com (canonical for v2 — docs.generateblocks.com is v1
 only). **If another file in this repo shows a different tag syntax, this file
 wins.**
@@ -278,7 +279,7 @@ attachment, which a loop image doesn't.
 | Tag renders raw inside a core block | Tags only run in GB blocks | Move into `generateblocks/text` |
 | Wrong post's data inside a loop | Tag has stray `id:` option | Remove `id:` to use loop context |
 
-## 10. Permissions & security model (2.4)
+## 10. Permissions & security model (2.4, tightened in 2.5)
 
 GenerateBlocks 2.4 replaced the old save-time validation middleware with a
 capability model, a save gate, and render-time taint tracking. The old
@@ -313,6 +314,22 @@ validation methods are no-op stubs now. What matters when authoring markup:
   empty.
 - **Editor previews** for untrusted users come back blank or
   kses-sanitized; the server render is authoritative.
+
+**2.5.0 additions** (verified on a live 2.5.0 site, 2026-10-27):
+
+- The save gate also catches dynamic-data markers written with escaped JSON
+  (`\u0022useDynamicData\u0022:true`), so escaping a legacy V1 marker no
+  longer slips past validation. Markup from this skill is unaffected.
+- When a post has both a bare tag and a link-prefixed copy of it, a suppressed
+  tag is now stripped in both forms.
+- A third-party tag registered without a `supports` key no longer fatals on
+  render; it is treated as `supports: []`.
+- The "last saved by" provenance meta is still `_generateblocks_dynamic_css_version`
+  (now written by `GenerateBlocks_Content_Version`); it records the GB version
+  of the last save, for example `2.5.0`.
+- Over MCP or REST, the authenticated account is the saving user. A site-agent
+  or Application Password account without `unfiltered_html`/`manage_options` is
+  untrusted: adding tags is rejected and existing tags stop rendering.
 
 None of this changes tag syntax or markup rules — it changes **who can save
 tags and when they render**. Markup this skill emits is unaffected as long

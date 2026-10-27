@@ -3,9 +3,49 @@
 Notable changes to GenerateBlocks Skills. Entries describe this repository, not
 releases of the GenerateBlocks plugins themselves.
 
-## [Unreleased]
+## [2026.10.27] - 2026-10-27
+
+GenerateBlocks 2.5.0 and Pro 2.8.0 stable, verified live through Site Agent.
 
 ### Fixed
+
+- `build_css()` now reproduces the native 2.5 Styles Builder byte for byte
+  (1,453 generated style objects checked in the live editor, 800 of them from an
+  untuned seed). Before, it diverged in four ways:
+  - custom properties were lowercased (`--myAccent` became `--my-accent`, broken CSS);
+  - `@media` blocks kept authored order instead of merging and sorting mobile-first
+    after `@supports`/`@container`;
+  - selector branches kept authored order instead of key order;
+  - bare `:hover`, `.child` and `[attr]` keys were attached instead of compiled as
+    descendants.
+  It also now matches native declaration order (shorthand-aware, vendor-prefix
+  aware, custom properties kept in place), border/border-radius longhand merging,
+  `url('…')` quoting, selector minification and comma-list expansion.
+- Recompiled five example blocks whose stored `css` used the pre-2.5 rule order.
+
+### Changed
+
+- Reference source updated to GenerateBlocks 2.5.0 (wordpress.org checksums
+  verified); local Pro reference is 2.8.0. Version notes across the skills now
+  say 2.5.0 / Pro 2.8.0 instead of the beta pair.
+- Documented 2.5 behavior: inline-only local CSS with the removed filters, the
+  `generateblocks_default_at_rules` preset filter, the 50-post editor Query
+  Loop preview cap, the toolbar Pattern Library entry, escaped-JSON save-gate
+  detection, and the fixed compiled at-rule order.
+- `mcp-publishing.md` adds Site Agent as a server option with a tested
+  read-splice-write-verify workflow, version gating from `site-context`, and the
+  saving-account trust rule for dynamic tags.
+
+### Validation
+
+- Native regression fixture `scripts/fixtures/native_css_2_5_0.json` (93 cases)
+  plus three new compiler tests; 25 tooling tests pass.
+- A 59-block draft of every example saved byte-identical through Site Agent,
+  reopened with 0 invalid blocks and no dirty state, and rendered through the
+  `generateblocks-inline-css` tag with no per-page CSS file. The draft and
+  temporary sessions were removed afterwards.
+
+### Fixed (since 2026.09.20)
 
 - Wrapped the migration guide's `wp_update_post()` and `update_post_meta()`
   calls in `wp_slash()`. Both functions unslash their input, so the documented

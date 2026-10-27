@@ -2,7 +2,7 @@
 name: generateblocks-layouts
 description: Build and audit WordPress layouts with GenerateBlocks V2, including CSS Mode, responsive at-rules, dynamic data, Pro components, and recovery-safe block serialization. Use for new GB layouts, conversions, repairs, and hand-authored block markup.
 metadata:
-  compatibility: "Stable guidance: free 2.4.1 + Pro 2.7.1. Beta design-system workflow tested with free 2.5.0-beta.1 + Pro 2.8.0-beta.1 on WordPress 7.1.1/PHP 8.4, 2026-09-18."
+  compatibility: "Verified: free 2.5.0 + Pro 2.8.0 on WordPress 7.1.3/PHP 8.5 (live native editor, 2026-10-27). Design-system workflow first tested on 2.5.0-beta.1 + 2.8.0-beta.1. Older sites: free 2.4.x + Pro 2.7.x notes retained."
 ---
 
 # GenerateBlocks layout builder

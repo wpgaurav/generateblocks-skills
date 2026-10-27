@@ -32,14 +32,16 @@ visual direction, apply `references/design-quality.md` and target brand guidance
 
 ## Reference versions
 
-- `generateblocks/`: free 2.4.1.
-- `generateblocks-pro/`: actual local header 2.7.0-rc.1; do not call it 2.7.1.
-- `generateblocks 2/` / `generateblocks-pro 2/`: 2.5.0-beta.1 / 2.8.0-beta.1,
-  tested locally on WordPress 7.1.1 / PHP 8.4 on 2026-09-18.
-- The earlier live free 2.4.1 / Pro 2.7.1 observation is separate history.
+- `generateblocks/`: free 2.5.0 (wordpress.org, checksums verified).
+- `generateblocks-pro/`: Pro 2.8.0 (git-ignored).
+- Live verification: free 2.5.0 / Pro 2.8.0 on gauravtiwari.org, WordPress
+  7.1.3 / PHP 8.5, through Site Agent on 2026-10-27. The native-compiler
+  regression set is `scripts/fixtures/native_css_2_5_0.json`.
+- History: design-system workflow first tested on 2.5.0-beta.1 / 2.8.0-beta.1
+  (WordPress 7.1.1, 2026-09-18); earlier live observation free 2.4.1 / Pro 2.7.1.
 
 Inspect target versions before relying on these snapshots. Current official
-reference: learn.generatepress.com. Vendor beta/Pro sources remain local.
+reference: learn.generatepress.com. Vendor Pro sources remain local.
 
 ## Packaging
 

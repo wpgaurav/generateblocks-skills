@@ -139,9 +139,16 @@ Styles. Before importing:
 A same-named Global Style can still mean something different. Treat selector
 collisions as semantic conflicts.
 
+## Opening the Pattern Library (2.5)
+
+Free 2.5 opens the Pattern Library from the editor toolbar or the Options menu,
+not the GenerateBlocks sidebar (with Pro active this needs Pro 2.8). Previews
+render in a sandboxed frame with its own security policy, and the library
+re-fetches automatically when an object cache evicts part of the cached set.
+
 ## Pro 2.8 token-aware imports
 
-Read `design-systems-beta.md` before moving a token-dependent pattern. The beta
+Read `design-systems-beta.md` before moving a token-dependent pattern. Pro 2.8
 can carry recursively referenced registered tokens, including responsive values.
 A variable that exists only in an external stylesheet is not automatically
 portable. Full design-system file import was tested across two local sites;
@@ -191,7 +198,7 @@ Prefer structural patterns such as:
 ## Responsive Verification
 
 - Use `max-width:767px` when the pattern means native GenerateBlocks Mobile
-  on 2.4.1.
+  (2.4.1 and 2.5.0).
 - Preserve destination custom queries rather than silently changing them.
 - Verify 1025, 1024, 768, 767, 375, and one awkward tablet width.
 - Confirm logical DOM/focus order, long strings, missing media, and no

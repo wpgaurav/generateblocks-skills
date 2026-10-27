@@ -17,7 +17,7 @@ for one-off values.
 Read `css-mode.md` for selector and at-rule grammar and `design-quality.md`
 before creating a visual system.
 
-## Pro 2.8 beta extension
+## Pro 2.8 extension
 
 Read `design-systems-beta.md` for managed root tokens, selector grammar,
 `gb_style_targets`/`gb_style_targets_css`, categories, checksum-aware saves,
@@ -138,7 +138,7 @@ Use the site's registered at-rule key exactly:
 }
 ```
 
-GenerateBlocks 2.4.1 native Mobile ends at 767px. Pro permits custom queries;
+GenerateBlocks 2.5.0 (as 2.4.1) native Mobile ends at 767px. Pro permits custom queries;
 preserve existing custom 768px boundaries during unrelated edits.
 
 If a component responds to its container rather than the viewport, set

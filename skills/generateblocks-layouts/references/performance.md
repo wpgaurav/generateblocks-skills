@@ -10,7 +10,8 @@ the blocks present on the request, and delivers the result according to the
 installed version. Free 2.5 is inline-only for local CSS; free 2.4 supports the
 older file/inline modes. Pro Global Styles have a separate delivery path.
 
-Verified against GenerateBlocks 2.4.1 and GenerateBlocks Pro 2.7.1.
+Verified against GenerateBlocks 2.5.0 and Pro 2.8.0 (live, 2026-10-27); the
+file-mode sections describe 2.4.1 / Pro 2.7.1.
 
 ## Local Styles Data
 
@@ -24,13 +25,20 @@ declarations from `styles` on every frontend request. This makes
 `styles`/`css` parity a correctness and maintenance concern, not merely an
 editor concern.
 
-## Free 2.5 beta: inline-only local CSS
+## Free 2.5: inline-only local CSS
 
-Tested with 2.5.0-beta.1 on WordPress 7.1.1. `GenerateBlocks_Inline_CSS`
+First tested with 2.5.0-beta.1; re-verified on 2.5.0 / WordPress 7.1.3, where the
+rendered page carried `<style id="generateblocks-inline-css">`, no
+`uploads/generateblocks/style-*.css` request, and each block's stored `css`
+attribute printed verbatim. `GenerateBlocks_Inline_CSS`
 owns local output. The former enqueue class is a compatibility shim; its file
 methods are inert. The local print-method setting/filter, inline-length
 threshold, and regeneration endpoint are retired. A frontend probe confirmed
-inline local CSS with no per-page stylesheet request.
+inline local CSS with no per-page stylesheet request. Upgraded sites can still
+hold a `css_print_method` key in the `generateblocks` option; 2.5 ignores it.
+`generateblocks_css_print_method` and `generateblocks_css_inline_length` no
+longer exist; `generateblocks_dynamic_css_priority`, `generateblocks_css_output`,
+`generateblocks_process_block_css` and `generateblocks_block_css` remain.
 
 Pro 2.8 Global Styles still support file delivery through
 `generateblocks_global_css_print_method`, with inline fallback. Offer shared
@@ -75,13 +83,13 @@ fallback condition applies.
 
 ### Live gauravtiwari.org state
 
-Observed 2026-08-26:
+Observed 2026-10-27 (free 2.5.0, Pro 2.8.0, WordPress 7.1.3):
 
-- `css_print_method`: `inline`;
+- local CSS: inline (the stored `css_print_method` value is ignored);
 - container width: `1366`;
-- responsive preview syncing: enabled;
-- GenerateBlocks Google Fonts: disabled;
-- 45 published Pro Global Styles.
+- no `gblocks_styles` records, so no Pro Global Styles in use (45 published on
+  2026-08-26 have since been removed);
+- 4 published Pro conditions.
 
 Recheck before future work. These are site state, not universal defaults.
 
@@ -209,7 +217,7 @@ wp option get generateblocks_dynamic_css_posts --format=json
 wp post meta get POST_ID _generateblocks_dynamic_css_version
 ```
 
-Source-level filters verified in 2.4.1:
+Source-level filters verified in 2.4.1 (the first two were removed in 2.5):
 
 ```text
 generateblocks_css_print_method
@@ -228,7 +236,8 @@ frontend script strategy without confirming them in the installed source.
 
 - Confirm the actual delivery mode on the rendered target.
 - Check that block CSS exists once and selectors match the stored IDs.
-- In file mode, confirm the generated file is current and cacheable.
+- On 2.4 file mode, confirm the generated file is current and cacheable. On 2.5
+  there is no file; check the `generateblocks-inline-css` style tag.
 - In inline mode, measure HTML/CSS size rather than assuming inline is faster.
 - Compare before/after request count, transfer size, LCP, CLS, and interaction
   readiness when the change is performance-driven.

@@ -11,7 +11,7 @@ class patterns and frontend JS that the plugin enqueues automatically when the
 block is present.
 
 Do not derive every Pro selector as `gb-{slug}-{uniqueId}`. Native save output
-in Pro 2.8.0-beta.1 uses `gb-accordion__item-{id}`,
+in Pro 2.8.0 (first seen in 2.8.0-beta.1) uses `gb-accordion__item-{id}`,
 `gb-accordion__toggle-{id}`, and `gb-accordion__content-{id}` for those children.
 For programmatic styling, obtain the class from that block's native save output
 before compiling local CSS. A guessed class can yield valid saved blocks whose
@@ -96,7 +96,7 @@ generateblocks-pro/tabs
 
 - The Nth `tab-menu-item` controls the Nth `tab-item` — order is the link.
 - Set `tabItemOpen:true` on exactly one menu item AND its matching item.
-- In Pro 2.8 beta, supply stable IDs and `tablist`/`tab`/`tabpanel` roles through
+- In Pro 2.8, supply stable IDs and `tablist`/`tab`/`tabpanel` roles through
   native `htmlAttributes` when save output does not include them. The plugin
   runtime manages `aria-selected`, `tabindex`, and ID-based control/label links.
   Verify click and arrow/Home/End behavior against the installed version.

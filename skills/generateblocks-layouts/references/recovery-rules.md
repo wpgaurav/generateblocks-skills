@@ -8,7 +8,8 @@ description: Every known cause of "Attempt Recovery" errors in the WordPress blo
 Read `authoring-contract.md` before generating markup. Use this detailed catalog
 for the specific recovery/preflight symptom or unresolved serialization question;
 a routine task does not require the entire catalog.
-The rules cover production failures and explicitly labeled local beta tests.
+The rules cover production failures, live 2.5.0 editor checks, and explicitly
+labeled local beta tests.
 
 ## The meta-rule (read this first)
 
@@ -270,7 +271,10 @@ The editor/compiler can normalize declaration order and collapse complete box
 longhands into shorthand. Use `build_css()` for deterministic new output rather
 than hand-sorting rules. Do not claim that a non-alphabetical existing string
 alone causes recovery; live editor-authored and imported blocks can preserve
-other valid orders.
+other valid orders. Verified on 2.5.0 / WordPress 7.1.3: blocks whose stored
+`css` used an older rule order (for example `:hover` before `:focus-visible`)
+opened valid and left the post clean. The editor rewrites `css` only when that
+block's styles are edited. `field-notes.md` §6 has the exact 2.5 order.
 
 ### 2.7 Comments and global CSS
 
@@ -565,7 +569,7 @@ between its tags.
 
 ### 6.1 Use the installed at-rule keys
 
-GenerateBlocks 2.4.1 registers:
+GenerateBlocks 2.5.0 (unchanged from 2.4.1) registers by default:
 
 ```text
 @media (min-width:1025px)

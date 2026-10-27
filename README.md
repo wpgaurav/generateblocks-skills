@@ -6,7 +6,7 @@ LLM-optimized skill documentation and development resources for the [GenerateBlo
 
 **Documentation:** [Wiki](https://github.com/wpgaurav/generateblocks-skills/wiki) · [Getting started](https://github.com/wpgaurav/generateblocks-skills/wiki/Getting-Started) · [Installation](https://github.com/wpgaurav/generateblocks-skills/wiki/Installation) · [Latest release](https://github.com/wpgaurav/generateblocks-skills/releases/latest)
 
-**Beta workflow tested with GenerateBlocks 2.5.0-beta.1 and Pro 2.8.0-beta.1** on two local WordPress 7.1.1 / PHP 8.4 sites (September 18, 2026). Includes Design Tokens, Style Book guidance, shared selectors, portable design systems, and a working two-brand product-page kit. Older 2.4.1 / 2.7.1 guidance remains versioned; the old local Pro reference folder actually reports 2.7.0-rc.1. See the [beta guide](skills/generateblocks-layouts/references/design-systems-beta.md) for the test boundary.
+**Verified on GenerateBlocks 2.5.0 and Pro 2.8.0** in a live WordPress 7.1.3 editor (October 27, 2026), connected through [Site Agent](skills/generateblocks-layouts/references/mcp-publishing.md#11-site-agent-workflow-tested). The bundled `build_css()` compiler now matches the native 2.5 Styles Builder byte for byte: 1,453 generated style objects checked, including 800 from a seed it was never tuned on. The design-system workflow (Design Tokens, Style Book, shared selectors, portable kits) was first tested on 2.5.0-beta.1 / 2.8.0-beta.1.
 
 **Styling defaults:** local block styles. The skills prompt before introducing
 shared Global Styles or Design Tokens and add them only when the user explicitly
@@ -32,7 +32,7 @@ Start with the selected skill, the shared [authoring contract](skills/generatebl
 - **GB Pro blocks** — accordion, tabs, carousel, navigation, site header, overlays/mega menus, the 2.6 Forms system
 - **Full-site templates** — GeneratePress Elements (loop templates, page heroes, hooks, display rules), FSE block themes
 
-## Reusable beta kit
+## Reusable design-system kit
 
 [Paper and Ink product-page kit](skills/generateblocks-layouts/examples/beta-design-system/README.md): 19 tokens, 23 shared styles, six reusable sections, native query/accordion/form blocks, and two brand presets. Both 65-block pages survived real editor reload/save with byte-identical content. Imports, collision preservation, CSS parser/compiler parity, responsive layout, and local form behavior were checked.
 
@@ -153,8 +153,8 @@ generateblocks-skills/
 │   └── figma-to-generateblocks/
 ├── importable/                # .skill and .zip files for upload
 ├── examples/                  # Historical exploration/exports; not current copy-paste fixtures
-├── generateblocks/            # Plugin source (2.4.1) for reference
-└── generateblocks-pro/        # Pro plugin source (local 2.7.0-rc.1 header; git-ignored) for reference
+├── generateblocks/            # Plugin source (2.5.0) for reference
+└── generateblocks-pro/        # Pro plugin source (2.8.0; git-ignored) for reference
 ```
 
 ### Skills
@@ -220,7 +220,7 @@ generateblocks/query      → Dynamic lists (+ looper, loop-item, query-no-resul
 - **Links**: element `<a>` wrapping a text `span` child. Text `<a>` strips its href on save; element `<a>` with raw text triggers recovery
 - JSON attribute order follows each block's `block.json` declaration order, `className` last
 - `styles` is the editable source; compile the same states/selectors/at-rules into local `css`
-- Native Mobile is `@media (max-width:767px)` in 2.4.1; preserve deliberate custom queries
+- Native Mobile is `@media (max-width:767px)` in 2.4.1 and 2.5.0; preserve deliberate custom queries
 - Pro CSS Mode has no `cssMode` markup attribute
 
 Block format (Option A — the plugin auto-injects the id-class):

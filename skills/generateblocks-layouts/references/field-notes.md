@@ -291,27 +291,46 @@ page and hand back the edit URL so the user can confirm it loads clean.
 
 When you want `css` to match what the plugin would generate (not required for
 recovery, see §2.7, but it keeps the block clean through future edits), this is
-the algorithm. It was reverse-engineered and validated against **467 production
-blocks** that carry both `styles` and `css`, reproducing 89% byte-for-byte —
-every residual difference being a place where the *live* markup was
-hand-authored and internally inconsistent.
+the algorithm. It was ported from the GenerateBlocks 2.5.0 Styles Builder
+(`getCss()`, frontend mode) and checked against the live native compiler on
+WordPress 7.1.3: 1,453 generated style objects, 100% byte-for-byte, including
+800 from a seed the port was never tuned on. The regression set lives in
+`scripts/fixtures/native_css_2_5_0.json`.
 
-1. camelCase property → kebab-case (`gridTemplateColumns` → `grid-template-columns`).
-2. If a complete longhand box set is present (`paddingTop/Right/Bottom/Left`),
-   collapse it to the shortest shorthand (`6rem 1.5rem`) and **remove the longhands**.
-3. Emit the remaining properties **alphabetically sorted**.
-4. Append the collapsed shorthands **after** the sorted longhands — this is why
-   real output reads `background-color;overflow;position;padding`, which looks
-   non-alphabetical but is deterministic.
-5. Strip whitespace **after commas** inside values (`clamp(2rem, 4vw, 3rem)` →
-   `clamp(2rem,4vw,3rem)`). Do **not** strip spaces around `+` — `1.9rem + 3.4vw`
-   is required for the calc expression to be valid.
-6. Compile one-level selector branches (`&:hover`, `&::before`, child and
-   sibling selectors) relative to the block selector.
-7. Compile `@media`, `@supports`, and `@container` branches, including one
-   selector level inside an at-rule or one at-rule level inside a selector.
-8. Reject unsupported structured at-rules instead of hiding them only in
-   `css`.
+1. **Properties.** camelCase → kebab-case (`gridTemplateColumns` →
+   `grid-template-columns`, `WebkitLineClamp` → `-webkit-line-clamp`).
+   Custom properties keep their exact case (`--brandAccent`); 2.5 stopped
+   lowercasing them.
+2. **Declaration order.** The base rule and an at-rule's own properties are
+   key-sorted first, so custom properties lead. Branch maps (`&:hover`, …) keep
+   insertion order. Then regular declarations are sorted alphabetically by
+   unprefixed name (shorthand before its longhands, vendor-prefixed before
+   standard) into the slot of the first regular declaration; custom properties
+   keep their positions around it.
+3. **Longhand merging, appended last.** Complete sets become shorthands after the
+   sorted declarations, in this order: `border` (all four sides with equal
+   width/style/color) or per-side `border-top`…; `border-radius` (all four
+   corners); `margin` and `padding` (all four sides). This is why real output reads
+   `background-color;overflow;position;padding`.
+4. **Values.** No whitespace around commas, after `(` or before `)`;
+   `url(x)` becomes `url('x')`. Do **not** strip spaces around `+`/`-` —
+   `1.9rem + 3.4vw` is required for the calc expression to be valid.
+5. **Selectors.** Branches are emitted sorted by key. A part starting with `&`
+   attaches (`&:hover` → `.sel:hover`); **any other key is a descendant**,
+   including `:hover` → `.sel :hover` and `.child` → `.sel .child`. Comma lists
+   are expanded per part, and spaces around `>`, `+`, `~` and `,` are removed.
+6. **At-rules.** Identical at-rules merge, including one nested inside a branch
+   (`'&:hover': {'@media …': {}}` lands in the root `@media …` block). Inside an
+   at-rule: own properties, then branches sorted by key. `@supports` and
+   `@container` blocks keep authored first-encounter order; all `@media` blocks
+   move after them, sorted mobile-first (other queries, `min-width` ascending,
+   `max-width` descending, `print` last).
+7. One selector level and one at-rule level. Reject unsupported structured
+   at-rules instead of hiding them only in `css`.
+
+Stored `css` produced by an older compiler or by hand still loads valid: the
+editor does not recompile on open. It is rewritten the next time someone edits
+that block's styles, so parity matters for clean diffs, not for validity.
 
 `scripts/gb_serialize.py` implements this, plus `serialize_block_attributes()`
 and the canonical key order. Import it rather than re-deriving.
@@ -350,7 +369,8 @@ print(collections.Counter(c.split()[0] for c in re.findall(r'class="(gb-[^"]+)"'
 
 Check the installed versions too — authenticated plugin inventory or read-only
 WP-CLI returns exact versions, which decides whether Pro features are available.
-On 2026-08-26, gauravtiwari.org ran free 2.4.1 + Pro 2.7.1 on WordPress 7.1,
+On 2026-10-27, gauravtiwari.org ran free 2.5.0 + Pro 2.8.0 on WordPress 7.1.3
+(2.4.1 + Pro 2.7.1 on 2026-08-26),
 with native Mobile at `max-width:767px`. Its recent content still contained many
 custom `max-width:768px` branches. Preserve those existing boundaries; use the
 native query for new work unless the project deliberately defines another one.

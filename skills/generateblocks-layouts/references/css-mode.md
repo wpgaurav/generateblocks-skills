@@ -9,14 +9,14 @@ GenerateBlocks Pro CSS Mode is a code editor for the same structured styles
 used by the visual Styles panel. It is not an Additional CSS field and it does
 not introduce a `cssMode` block attribute.
 
-Verified against GenerateBlocks 2.4.1 and GenerateBlocks Pro 2.7.1. CSS Mode
-was introduced in Pro 2.6.
+Verified against GenerateBlocks 2.5.0 and GenerateBlocks Pro 2.8.0 (earlier
+notes: 2.4.1 / Pro 2.7.1). CSS Mode was introduced in Pro 2.6.
 
-## Pro 2.8 beta extension
+## Pro 2.8 extension
 
 The managed `:root` style can be edited as token CSS; Global Styles can have
 supported base/additional selectors. See `design-systems-beta.md` for the
-storage and save contract. On the tested beta, `gbp.stylesBuilder.getCss()` is
+storage and save contract. In Pro 2.8, `gbp.stylesBuilder.getCss()` is
 asynchronous. Its `cssToStyles()` parser plus awaited compiler preserved the
 kit's root tokens and mobile branch exactly. This does not expand the local
 block CSS grammar or add a `cssMode` attribute.
@@ -148,7 +148,7 @@ These are valid single selectors. This is not:
 Flatten it to `&:hover > .child`. Never add a wrapper solely to make a
 decorative selector easier.
 
-The Pro 2.8 beta compiler substitutes a leading `&`; an ancestor form such as
+The 2.5 / Pro 2.8 compiler substitutes only a leading `&`; an ancestor form such as
 `html[data-theme="dark"] &` compiled incorrectly in the About test. Use the
 verified relative form `&:is(html[data-theme="dark"] *)` and check the generated
 selector. Keep these theme/state rules in the block's `styles`.
@@ -182,8 +182,9 @@ Stored shape:
 }
 ```
 
-The editor normalizes at-rule formatting. GenerateBlocks 2.4.1 exposes these
-native queries:
+The editor normalizes at-rule formatting. GenerateBlocks 2.5.0 (and 2.4.1)
+exposes these native queries; 2.5 sites can change the list with the
+`generateblocks_default_at_rules` filter (see `responsive.md`):
 
 ```text
 @media (min-width:1025px)
